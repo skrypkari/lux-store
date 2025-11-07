@@ -1,0 +1,176 @@
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, ShoppingBag, Watch, Glasses, Gem } from "lucide-react";
+
+const categories = [
+  {
+    id: 1,
+    name: "Handbags",
+    description: "Iconic leather goods",
+    itemCount: "250+ Items",
+    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2006&auto=format&fit=crop",
+    link: "/categories/handbags",
+    icon: ShoppingBag,
+    featured: true,
+  },
+  {
+    id: 2,
+    name: "Watches",
+    description: "Swiss timepieces",
+    itemCount: "180+ Items",
+    image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop",
+    link: "/categories/watches",
+    icon: Watch,
+    featured: true,
+  },
+  {
+    id: 3,
+    name: "Jewelry",
+    description: "Fine gems & diamonds",
+    itemCount: "320+ Items",
+    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop",
+    link: "/categories/jewelry",
+    icon: Gem,
+    featured: false,
+  },
+  {
+    id: 4,
+    name: "Sunglasses",
+    description: "Designer eyewear",
+    itemCount: "150+ Items",
+    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=2080&auto=format&fit=crop",
+    link: "/categories/sunglasses",
+    icon: Glasses,
+    featured: false,
+  },
+];
+
+export default function CategoriesSection() {
+  return (
+    <section className="relative py-32 bg-background overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.02]">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 50%)`,
+          backgroundSize: '20px 20px',
+        }} />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-20 space-y-6">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-foreground/30" />
+            <Badge variant="outline" className="px-4 py-1.5 text-sm font-light tracking-widest">
+              SHOP BY CATEGORY
+            </Badge>
+            <div className="h-px w-16 bg-gradient-to-l from-transparent to-foreground/30" />
+          </div>
+          
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+            Explore Our
+            <span className="block bg-gradient-to-r from-foreground via-foreground/80 to-foreground bg-clip-text text-transparent">
+              Collections
+            </span>
+          </h2>
+          
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-light">
+            Curated selections from the world's most prestigious brands
+          </p>
+        </div>
+
+        {/* Categories Grid */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {categories.map((category, index) => {
+            const Icon = category.icon;
+            return (
+              <Link
+                key={category.id}
+                href={category.link}
+                className="group relative"
+                style={{ 
+                  animationDelay: `${index * 100}ms`,
+                }}
+              >
+                <div className={`relative overflow-hidden rounded-2xl border-2 hover:border-foreground/30 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${
+                  category.featured ? 'md:row-span-1' : ''
+                }`}>
+                  {/* Image Container */}
+                  <div className={`relative overflow-hidden ${
+                    category.featured ? 'h-[500px]' : 'h-[400px]'
+                  }`}>
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
+                    
+                    {/* Icon Badge */}
+                    <div className="absolute top-6 right-6 w-14 h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <Icon className="w-7 h-7 text-white" />
+                    </div>
+
+                    {/* Content */}
+                    <div className="absolute inset-0 flex flex-col justify-end p-8 text-white">
+                      {/* Item Count Badge */}
+                      <Badge className="w-fit mb-4 bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
+                        {category.itemCount}
+                      </Badge>
+
+                      {/* Category Name */}
+                      <h3 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight transform group-hover:translate-x-2 transition-transform duration-300">
+                        {category.name}
+                      </h3>
+                      
+                      {/* Description */}
+                      <p className="text-white/90 font-light text-lg mb-6 transform group-hover:translate-x-2 transition-transform duration-300 delay-75">
+                        {category.description}
+                      </p>
+
+                      {/* Explore Button */}
+                      <div className="flex items-center gap-2 text-white font-medium group-hover:gap-4 transition-all duration-300">
+                        <span>Explore Collection</span>
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                      </div>
+                    </div>
+
+                    {/* Decorative Elements */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+
+                  {/* Shine Effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="text-center space-y-6 pt-8">
+          <div className="inline-flex items-center gap-4 px-6 py-3 rounded-full bg-muted/50 backdrop-blur-sm">
+            <span className="text-sm text-muted-foreground">Can't find what you're looking for?</span>
+            <Button variant="link" className="p-0 h-auto font-semibold" asChild>
+              <Link href="/categories" className="flex items-center gap-2">
+                View All Categories
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Decorative Bottom Line */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+    </section>
+  );
+}
