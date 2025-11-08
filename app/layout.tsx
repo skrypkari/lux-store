@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { CartProvider } from "@/contexts/cart-context";
 
 const generalSans = localFont({
   src: "../public/fonts/GeneralSans-Variable.ttf",
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body
         className={`${generalSans.variable} ${satoshi.variable} antialiased`}
       >
-        {children}
+        <CartProvider>
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

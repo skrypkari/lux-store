@@ -826,6 +826,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                           variant="outline" 
                           size="sm"
                           className="font-semibold"
+                          onClick={() => window.location.href = `/product/${product.id}`}
                         >
                           Details
                         </Button>
