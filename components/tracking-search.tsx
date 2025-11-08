@@ -333,45 +333,6 @@ export default function TrackingSearch() {
                   </div>
                 </div>
               )}
-
-              {/* Quick Examples - Enhanced */}
-              <div className="rounded-xl border border-black/10 bg-gradient-to-br from-black/5 to-transparent p-4 sm:rounded-2xl sm:p-6">
-                <div className="mb-3 flex items-center gap-2 sm:mb-4">
-                  <div className="h-1.5 w-1.5 rounded-full bg-black/40" />
-                  <p className="font-satoshi text-xs font-bold uppercase tracking-wider text-black/70 sm:text-sm">
-                    Demo Tracking Numbers
-                  </p>
-                </div>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {Object.keys(trackingData).map((num) => {
-                    const data = trackingData[num];
-                    const status = statusConfig[data.status as keyof typeof statusConfig];
-                    return (
-                      <button
-                        key={num}
-                        onClick={() => {
-                          setTrackingNumber(num);
-                          setError("");
-                        }}
-                        className="group relative overflow-hidden rounded-lg border border-black/10 bg-white p-3 text-left shadow-md transition-all hover:border-black hover:shadow-xl sm:rounded-xl sm:p-4"
-                      >
-                        <div className="mb-1.5 flex items-center justify-between sm:mb-2">
-                          <status.icon className="h-4 w-4 text-black/60 transition-transform group-hover:scale-110 sm:h-5 sm:w-5" />
-                          <span className="rounded-full bg-black/5 px-1.5 py-0.5 font-general-sans text-[9px] font-bold uppercase tracking-wide text-black/50 sm:px-2 sm:text-[10px]">
-                            {status.label}
-                          </span>
-                        </div>
-                        <p className="mb-0.5 font-satoshi text-[10px] font-bold uppercase tracking-wider text-black sm:mb-1 sm:text-xs">
-                          {num}
-                        </p>
-                        <p className="font-general-sans text-[9px] text-black/50 sm:text-[10px]">
-                          {data.items.length} item{data.items.length > 1 ? 's' : ''}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
           </div>
         </div>
