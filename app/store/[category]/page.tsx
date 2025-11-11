@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect, useRef } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
@@ -49,10 +49,57 @@ interface PageProps {
   }>;
 }
 
+interface Product {
+  id: string;
+  name: string;
+  subtitle?: string;
+  sku?: string;
+  base_price?: number;
+  currency: string;
+  is_sold_out: boolean;
+  media?: Array<{ url_800?: string }>;
+  // Display properties
+  brand?: string;
+  price?: number;
+  originalPrice?: number;
+  image?: string;
+  rating?: number;
+  reviews?: number;
+  inStock?: boolean;
+  description?: string;
+}
+
+interface ProductsResponse {
+  products: Product[];
+  total: number;
+  skip: number;
+  take: number;
+  hasMore: boolean;
+}
+
+interface AttributeValue {
+  id: string;
+  name: string;
+  type: string;
+  values: string[];
+}
+
 export default function CategoryPage({ params, searchParams }: PageProps) {
   const { category } = use(params);
   const { brand } = use(searchParams);
   const [priceRange, setPriceRange] = useState([0, 100000]);
+  const tempPriceRef = useRef([0, 100000]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [attributes, setAttributes] = useState<AttributeValue[]>([]);
+  const [loadingFilters, setLoadingFilters] = useState(true);
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, string[]>>({});
+  const [priceResetTrigger, setPriceResetTrigger] = useState(0);
+  const pageSize = 12;
 
   const categoryName = category
     .split("-")
@@ -66,476 +113,294 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
         .join(" ")
     : null;
 
-  const brands = [
-    { name: "Hermès", count: 45 },
-    { name: "Rolex", count: 38 },
-    { name: "Cartier", count: 52 },
-    { name: "Chanel", count: 41 },
-    { name: "Louis Vuitton", count: 67 },
-    { name: "Patek Philippe", count: 29 },
-    { name: "Audemars Piguet", count: 24 },
-    { name: "Van Cleef & Arpels", count: 33 },
-  ];
+  // Функция для переключения фильтра
+  const toggleFilter = (attributeName: string, value: string) => {
+    setSelectedFilters(prev => {
+      const currentValues = prev[attributeName] || [];
+      const isSelected = currentValues.includes(value);
+      
+      if (isSelected) {
+        // Убираем значение
+        const newValues = currentValues.filter(v => v !== value);
+        if (newValues.length === 0) {
+          const { [attributeName]: _, ...rest } = prev;
+          return rest;
+        }
+        return { ...prev, [attributeName]: newValues };
+      } else {
+        // Добавляем значение
+        return { ...prev, [attributeName]: [...currentValues, value] };
+      }
+    });
+  };
 
-  const categories = [
-    { name: "Handbags", count: 89 },
-    { name: "Watches", count: 112 },
-    { name: "Jewelry", count: 76 },
-    { name: "Sunglasses", count: 43 },
-  ];
+  // Функция для очистки всех фильтров
+  const clearAllFilters = () => {
+    setSelectedFilters({});
+    setAppliedFilters({});
+    tempPriceRef.current = [0, 100000];
+    setPriceRange([0, 100000]);
+    setPriceResetTrigger(prev => prev + 1); // Триггер для сброса PriceSlider
+    setPage(0);
+  };
 
-  const colors = [
-    "Black",
-    "White",
-    "Red",
-    "Blue",
-    "Gold",
-    "Silver",
-    "Brown",
-    "Pink",
-    "Green",
-    "Purple",
-    "Orange",
-    "Beige",
-  ];
+  // Функция для применения фильтров
+  const applyFilters = () => {
+    setPriceRange(tempPriceRef.current);
+    setAppliedFilters(selectedFilters);
+    setPage(0); // Сбрасываем на первую страницу при изменении фильтров
+    // Плавная прокрутка наверх
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  const metals = [
-    { name: "Yellow Gold", count: 34 },
-    { name: "White Gold", count: 28 },
-    { name: "Rose Gold", count: 31 },
-    { name: "Platinum", count: 19 },
-    { name: "Stainless Steel", count: 45 },
-  ];
+  // Загрузка товаров
+  useEffect(() => {
+    setLoading(true);
+    // Плавная прокрутка наверх при смене страницы
+    if (page > 0) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    const skip = page * pageSize;
+    
+    // Строим query параметры для фильтров
+    const queryParams = new URLSearchParams();
+    queryParams.append('skip', skip.toString());
+    queryParams.append('take', pageSize.toString());
+    
+    // Добавляем ценовой диапазон
+    if (priceRange[0] > 0 || priceRange[1] < 100000) {
+      queryParams.append('minPrice', priceRange[0].toString());
+      queryParams.append('maxPrice', priceRange[1].toString());
+    }
+    
+    // Добавляем атрибуты (используем appliedFilters вместо selectedFilters)
+    Object.entries(appliedFilters).forEach(([attributeName, values]) => {
+      values.forEach(value => {
+        queryParams.append(attributeName, value);
+      });
+    });
+    
+    // If category is "all", fetch all products, otherwise fetch by category
+    const baseUrl = category === 'all' 
+      ? `https://luxstore-backend.vercel.app/products`
+      : `https://luxstore-backend.vercel.app/products/category/${category}`;
+    
+    const url = `${baseUrl}?${queryParams.toString()}`;
+    
+    fetch(url)
+      .then((res) => res.json())
+      .then((data: ProductsResponse) => {
+        console.log("Products data:", data);
+        setProducts(data.products || []);
+        setTotal(data.total || 0);
+        setHasMore(data.hasMore || false);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+        setProducts([]);
+        setTotal(0);
+        setLoading(false);
+      });
+  }, [category, page, priceRange, appliedFilters]);
 
-  const models = [
-    { name: "Birkin", count: 12 },
-    { name: "Kelly", count: 9 },
-    { name: "Submariner", count: 8 },
-    { name: "Datejust", count: 15 },
-    { name: "Nautilus", count: 7 },
-    { name: "Royal Oak", count: 6 },
-  ];
+  // Загрузка атрибутов (фильтров)
+  useEffect(() => {
+    setLoadingFilters(true);
+    
+    fetch(`https://luxstore-backend.vercel.app/attributes/category/${category}`)
+      .then((res) => res.json())
+      .then((data: AttributeValue[]) => {
+        console.log("Attributes data:", data);
+        setAttributes(data || []);
+        setLoadingFilters(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching attributes:", error);
+        setAttributes([]);
+        setLoadingFilters(false);
+      });
+  }, [category]);
 
-  const products = [
-    {
-      id: 1,
-      name: "Hermès Birkin 30",
-      brand: "Hermès",
-      price: 185000,
-      originalPrice: 195000,
-      image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=90",
-      rating: 5.0,
-      reviews: 127,
-      sku: "H076099CK89",
-      inStock: true,
-      description: "Togo leather in classic black with gold hardware"
-    },
-    {
-      id: 2,
-      name: "Rolex Submariner Date",
-      brand: "Rolex",
-      price: 42500,
-      image: "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=800&q=90",
-      rating: 4.9,
-      reviews: 89,
-      sku: "R124060BL33",
-      inStock: true,
-      description: "41mm Oystersteel case with black ceramic bezel"
-    },
-    {
-      id: 3,
-      name: "Cartier Love Bracelet",
-      brand: "Cartier",
-      price: 7800,
-      image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=90",
-      rating: 4.8,
-      reviews: 234,
-      sku: "C089234XL67",
-      inStock: true,
-      description: "18K yellow gold with signature screw motif"
-    },
-    {
-      id: 4,
-      name: "Chanel Classic Flap",
-      brand: "Chanel",
-      price: 38500,
-      image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&q=90",
-      rating: 5.0,
-      reviews: 156,
-      sku: "CH345678QU12",
-      inStock: true,
-      description: "Medium size in quilted caviar leather"
-    },
-    {
-      id: 5,
-      name: "Patek Philippe Nautilus",
-      brand: "Patek Philippe",
-      price: 125000,
-      originalPrice: 135000,
-      image: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?w=800&q=90",
-      rating: 5.0,
-      reviews: 67,
-      sku: "PP567123RF40",
-      inStock: false,
-      description: "40mm stainless steel with blue dial"
-    },
-    {
-      id: 6,
-      name: "Van Cleef Alhambra Necklace",
-      brand: "Van Cleef & Arpels",
-      price: 15500,
-      image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=90",
-      rating: 4.9,
-      reviews: 98,
-      sku: "VC234789GD20",
-      inStock: true,
-      description: "18K yellow gold with 20 motifs"
-    },
-  ];
+  // Преобразование данных из API в формат для отображения
+  const displayProducts = products.map((product) => ({
+    ...product,
+    brand: extractBrand(product.name),
+    price: product.base_price || 0,
+    image: product.media?.[0]?.url_800 || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop',
+    rating: 4.5 + Math.random() * 0.5,
+    reviews: Math.floor(Math.random() * 200) + 50,
+    inStock: !product.is_sold_out,
+    description: product.subtitle || "Luxury item from prestigious collection",
+  }));
 
-  const FiltersContent = () => (
-    <div className="space-y-6 px-4 lg:px-0 pb-20 lg:pb-0">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold tracking-tight">Filters</h2>
-        <Button variant="ghost" size="sm" className="h-8 text-xs">
-          <X className="h-3.5 w-3.5 mr-1.5" />
-          Clear All
+  // Функция для извлечения бренда из названия
+  function extractBrand(name: string) {
+    const brands = ['HERMÈS', 'CARTIER', 'ROLEX', 'CHANEL', 'GUCCI', 'LOUIS VUITTON', 'PATEK PHILIPPE'];
+    for (const brand of brands) {
+      if (name.toUpperCase().includes(brand)) {
+        return brand;
+      }
+    }
+    return name.split(' ')[0].toUpperCase();
+  }
+
+  const PriceSlider = () => {
+    // Локальное состояние для плавного движения слайдера
+    const [localPrice, setLocalPrice] = useState([0, 100000]);
+    
+    // Синхронизируем локальное состояние при сбросе фильтров
+    useEffect(() => {
+      setLocalPrice(tempPriceRef.current);
+    }, [priceResetTrigger]);
+    
+    return (
+      <AccordionItem value="price">
+        <AccordionTrigger className="text-sm font-medium">
+          Price Range
+        </AccordionTrigger>
+        <AccordionContent>
+          <div className="space-y-4 pt-2">
+            <Slider
+              value={localPrice}
+              onValueChange={(value) => {
+                setLocalPrice(value);
+                tempPriceRef.current = value;
+              }}
+              max={100000}
+              step={1000}
+              className="w-full"
+            />
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  $
+                </span>
+                <input
+                  type="number"
+                  value={localPrice[0]}
+                  onChange={(e) => {
+                    const newValue = [Number(e.target.value), localPrice[1]];
+                    setLocalPrice(newValue);
+                    tempPriceRef.current = newValue;
+                  }}
+                  className="w-full pl-7 pr-3 py-2 text-sm border rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  placeholder="Min"
+                />
+              </div>
+              <span className="text-muted-foreground">—</span>
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  $
+                </span>
+                <input
+                  type="number"
+                  value={localPrice[1]}
+                  onChange={(e) => {
+                    const newValue = [localPrice[0], Number(e.target.value)];
+                    setLocalPrice(newValue);
+                    tempPriceRef.current = newValue;
+                  }}
+                  className="w-full pl-7 pr-3 py-2 text-sm border rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  placeholder="Max"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>${localPrice[0].toLocaleString()}</span>
+              <span>${localPrice[1].toLocaleString()}</span>
+            </div>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    );
+  };
+
+  const FiltersContent = () => {
+    if (loadingFilters) {
+      return (
+        <div className="space-y-6 px-4 lg:px-0 pb-20 lg:pb-0">
+          <p className="text-sm text-muted-foreground">Loading filters...</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6 px-4 lg:px-0 pb-20 lg:pb-0">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight">Filters</h2>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 text-xs"
+            onClick={clearAllFilters}
+          >
+            <X className="h-3.5 w-3.5 mr-1.5" />
+            Clear All
+          </Button>
+        </div>
+
+        <Accordion
+          type="multiple"
+          defaultValue={["price", ...attributes.slice(0, 3).map(attr => attr.name.toLowerCase())]}
+          className="w-full"
+        >
+          <PriceSlider />
+
+          {attributes.map((attribute) => (
+            <AccordionItem key={attribute.id} value={attribute.name.toLowerCase()}>
+              <AccordionTrigger className="text-sm font-medium">
+                <div className="flex">
+                {attribute.name}
+                {selectedFilters[attribute.name]?.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {selectedFilters[attribute.name].length}
+                  </Badge>
+                )}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-3 pt-2 max-h-64 overflow-y-auto">
+                  {attribute.values.map((value) => {
+                    const isChecked = selectedFilters[attribute.name]?.includes(value) || false;
+                    return (
+                      <div
+                        key={value}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`${attribute.name}-${value}`}
+                            checked={isChecked}
+                            onCheckedChange={() => toggleFilter(attribute.name, value)}
+                          />
+                          <Label
+                            htmlFor={`${attribute.name}-${value}`}
+                            className="text-sm font-normal cursor-pointer"
+                          >
+                            {value}
+                          </Label>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+
+        {/* Apply Button */}
+        <Button 
+          className="w-full" 
+          size="lg"
+          onClick={applyFilters}
+        >
+          Apply Filters
         </Button>
       </div>
-
-      <Accordion
-        type="multiple"
-        defaultValue={["price", "brand", "category", "color"]}
-        className="w-full"
-      >
-        <AccordionItem value="price">
-          <AccordionTrigger className="text-sm font-medium">
-            Price Range
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-4 pt-2">
-              <Slider
-                value={priceRange}
-                onValueChange={setPriceRange}
-                max={100000}
-                step={1000}
-                className="w-full"
-              />
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                    $
-                  </span>
-                  <input
-                    type="number"
-                    value={priceRange[0]}
-                    onChange={(e) =>
-                      setPriceRange([Number(e.target.value), priceRange[1]])
-                    }
-                    className="w-full pl-7 pr-3 py-2 text-sm border rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    placeholder="Min"
-                  />
-                </div>
-                <span className="text-muted-foreground">—</span>
-                <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                    $
-                  </span>
-                  <input
-                    type="number"
-                    value={priceRange[1]}
-                    onChange={(e) =>
-                      setPriceRange([priceRange[0], Number(e.target.value)])
-                    }
-                    className="w-full pl-7 pr-3 py-2 text-sm border rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    placeholder="Max"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>${priceRange[0].toLocaleString()}</span>
-                <span>${priceRange[1].toLocaleString()}</span>
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="brand">
-          <AccordionTrigger className="text-sm font-medium">
-            Brand
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-3 pt-2">
-              {brands.map((brand) => (
-                <div
-                  key={brand.name}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id={`brand-${brand.name}`} />
-                    <Label
-                      htmlFor={`brand-${brand.name}`}
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      {brand.name}
-                    </Label>
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-normal">
-                    {brand.count}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="category">
-          <AccordionTrigger className="text-sm font-medium">
-            Category
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-3 pt-2">
-              {categories.map((cat) => (
-                <div
-                  key={cat.name}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id={`cat-${cat.name}`} />
-                    <Label
-                      htmlFor={`cat-${cat.name}`}
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      {cat.name}
-                    </Label>
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-normal">
-                    {cat.count}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="color">
-          <AccordionTrigger className="text-sm font-medium">
-            Color
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              {colors.map((color) => (
-                <Button
-                  key={color}
-                  variant="outline"
-                  size="sm"
-                  className="justify-start text-sm font-normal"
-                >
-                  {color}
-                </Button>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="for">
-          <AccordionTrigger className="text-sm font-medium">
-            For
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Button variant="outline" size="sm" className="font-normal">
-                Women
-              </Button>
-              <Button variant="outline" size="sm" className="font-normal">
-                Men
-              </Button>
-              <Button variant="outline" size="sm" className="font-normal">
-                Unisex
-              </Button>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* Collection */}
-        <AccordionItem value="collection">
-          <AccordionTrigger className="text-sm font-medium">
-            Collection
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-between font-normal"
-              >
-                New Arrivals
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-between font-normal"
-              >
-                Best Sellers
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-between font-normal"
-              >
-                Limited Edition
-              </Button>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* Size */}
-        <AccordionItem value="size">
-          <AccordionTrigger className="text-sm font-medium">
-            Size
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-3 gap-2 pt-2">
-              {["Small", "Medium", "Large", "25mm", "30mm", "35mm", "40mm", "45mm"].map(
-                (size) => (
-                  <Button
-                    key={size}
-                    variant="outline"
-                    size="sm"
-                    className="font-normal text-xs"
-                  >
-                    {size}
-                  </Button>
-                )
-              )}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* Metal Type */}
-        <AccordionItem value="metal">
-          <AccordionTrigger className="text-sm font-medium">
-            Metal Type
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-3 pt-2">
-              {metals.map((metal) => (
-                <div
-                  key={metal.name}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id={`metal-${metal.name}`} />
-                    <Label
-                      htmlFor={`metal-${metal.name}`}
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      {metal.name}
-                    </Label>
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-normal">
-                    {metal.count}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* Model */}
-        <AccordionItem value="model">
-          <AccordionTrigger className="text-sm font-medium">
-            Model
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-3 pt-2">
-              {models.map((model) => (
-                <div
-                  key={model.name}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id={`model-${model.name}`} />
-                    <Label
-                      htmlFor={`model-${model.name}`}
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      {model.name}
-                    </Label>
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-normal">
-                    {model.count}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* Movement */}
-        <AccordionItem value="movement">
-          <AccordionTrigger className="text-sm font-medium">
-            Movement
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start font-normal"
-              >
-                Automatic
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start font-normal"
-              >
-                Manual
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start font-normal"
-              >
-                Quartz
-              </Button>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* Diamonds */}
-        <AccordionItem value="diamonds">
-          <AccordionTrigger className="text-sm font-medium">
-            Diamonds
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start font-normal"
-              >
-                With Diamonds
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start font-normal"
-              >
-                Without Diamonds
-              </Button>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-
-      {/* Apply Button */}
-      <Button className="w-full" size="lg">
-        Apply Filters
-      </Button>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -645,7 +510,13 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                     {categoryName}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    <span className="font-medium">{products.length}</span> products available
+                    {loading ? (
+                      "Loading..."
+                    ) : (
+                      <>
+                        <span className="font-medium">{total}</span> products available
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -731,7 +602,16 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
 
             {/* Products Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {products.map((product) => (
+              {loading ? (
+                <div className="col-span-full text-center py-20">
+                  <p className="text-muted-foreground">Loading products...</p>
+                </div>
+              ) : displayProducts.length === 0 ? (
+                <div className="col-span-full text-center py-20">
+                  <p className="text-muted-foreground">No products found in this category</p>
+                </div>
+              ) : (
+                displayProducts.map((product) => (
                 <div
                   key={product.id}
                   className="group relative flex flex-col bg-card border rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
@@ -765,28 +645,11 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
 
                   {/* Content */}
                   <div className="flex flex-col flex-1 p-5">
-                    {/* Brand & Rating */}
-                    <div className="flex items-center justify-between mb-3">
+                    {/* Brand */}
+                    <div className="mb-3">
                       <span className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
                         {product.brand}
                       </span>
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-3.5 w-3.5 ${
-                                i < Math.floor(product.rating)
-                                  ? "fill-amber-400 text-amber-400"
-                                  : "fill-muted text-muted"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-xs font-medium text-muted-foreground ml-1">
-                          ({product.reviews})
-                        </span>
-                      </div>
                     </div>
 
                     {/* Title */}
@@ -844,8 +707,36 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                   {/* Premium Border Effect */}
                   <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-primary/20 transition-all duration-300 pointer-events-none" />
                 </div>
-              ))}
+              ))
+              )}
             </div>
+
+            {/* Pagination */}
+            {!loading && total > pageSize && (
+              <div className="flex items-center justify-center gap-2 mt-12">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setPage(Math.max(0, page - 1));
+                  }}
+                  disabled={page === 0}
+                >
+                  Previous
+                </Button>
+                <div className="text-sm text-muted-foreground">
+                  Page {page + 1} of {Math.ceil(total / pageSize)}
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setPage(page + 1);
+                  }}
+                  disabled={!hasMore}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
 
             {/* Bottom Info Section */}
             <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">

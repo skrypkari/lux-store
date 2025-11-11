@@ -123,9 +123,57 @@
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'generalSans', sans-serif;
-
 }
 
 *{
   font-family: 'satoshi', sans-serif;
+}
+
+/* Product description styles */
+.prose {
+  @apply text-foreground/80;
+}
+
+.prose p {
+  @apply mb-4;
+}
+
+.prose strong {
+  @apply font-semibold text-foreground;
+}
+
+.prose ul {
+  @apply list-disc pl-6 mb-4;
+}
+
+.prose ol {
+  @apply list-decimal pl-6 mb-4;
+}
+
+.prose li {
+  @apply mb-2;
+}
+
+.prose a {
+  @apply text-primary hover:underline;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  @apply font-bold mb-3 mt-6 text-foreground;
+}
+
+.prose h1 {
+  @apply text-3xl;
+}
+
+.prose h2 {
+  @apply text-2xl;
+}
+
+.prose h3 {
+  @apply text-xl;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary/30 pl-4 italic my-4;
 }

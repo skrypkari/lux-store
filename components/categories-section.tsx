@@ -1,53 +1,82 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, ShoppingBag, Watch, Glasses, Gem } from "lucide-react";
+import { ArrowRight, ShoppingBag, Watch, Glasses, Gem, LucideIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const categories = [
-  {
-    id: 1,
-    name: "Handbags",
-    description: "Iconic leather goods",
-    itemCount: "250+ Items",
-    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2006&auto=format&fit=crop",
-    link: "/categories/handbags",
-    icon: ShoppingBag,
-    featured: true,
-  },
-  {
-    id: 2,
-    name: "Watches",
-    description: "Swiss timepieces",
-    itemCount: "180+ Items",
-    image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop",
-    link: "/categories/watches",
-    icon: Watch,
-    featured: true,
-  },
-  {
-    id: 3,
-    name: "Jewelry",
-    description: "Fine gems & diamonds",
-    itemCount: "320+ Items",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop",
-    link: "/categories/jewelry",
-    icon: Gem,
-    featured: false,
-  },
-  {
-    id: 4,
-    name: "Sunglasses",
-    description: "Designer eyewear",
-    itemCount: "150+ Items",
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=2080&auto=format&fit=crop",
-    link: "/categories/sunglasses",
-    icon: Glasses,
-    featured: false,
-  },
-];
+// Иконки для категорий
+const categoryIcons: Record<string, LucideIcon> = {
+  'Handbags': ShoppingBag,
+  'Watches': Watch,
+  'Jewelry': Gem,
+  'Sunglasses': Glasses,
+  'Bags': ShoppingBag,
+  'Watch': Watch,
+  'Jewellery': Gem,
+};
+
+interface Category {
+  id: string;
+  name: string;
+  slug_without_id: string;
+  children: Category[];
+}
+
+interface CategoryDisplay extends Category {
+  description?: string;
+  itemCount?: string;
+  image: string;
+  link: string;
+  icon: LucideIcon;
+  featured?: boolean;
+}
 
 export default function CategoriesSection() {
+  const [categories, setCategories] = useState<CategoryDisplay[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("https://luxstore-backend.vercel.app/categories")
+      .then((res) => res.json())
+      .then((data: Category[]) => {
+        console.log("Categories data:", data);
+        if (Array.isArray(data)) {
+          // Преобразуем данные из API в формат для отображения
+          const displayCategories: CategoryDisplay[] = data.slice(0, 4).map((cat, index) => ({
+            ...cat,
+            description: `Explore ${cat.name.toLowerCase()}`,
+            itemCount: `${cat.children?.length || 0}+ Brands`,
+            image: getDefaultImage(cat.name),
+            link: `/store/${cat.slug_without_id}`,
+            icon: categoryIcons[cat.name] || ShoppingBag,
+            featured: index < 2,
+          }));
+          setCategories(displayCategories);
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  // Функция для получения дефолтных изображений
+  const getDefaultImage = (categoryName: string) => {
+    const imageMap: Record<string, string> = {
+      'Handbags': 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2006&auto=format&fit=crop',
+      'Bags': 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2006&auto=format&fit=crop',
+      'Watches': 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop',
+      'Watch': 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop',
+      'Jewelry': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop',
+      'Jewellery': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop',
+      'Sunglasses': 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=2080&auto=format&fit=crop',
+    };
+    return imageMap[categoryName] || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop';
+  };
   return (
     <section className="relative py-32 bg-background overflow-hidden">
       {/* Background Pattern */}
@@ -83,7 +112,16 @@ export default function CategoriesSection() {
 
         {/* Categories Grid */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {categories.map((category, index) => {
+          {loading ? (
+            <div className="col-span-2 text-center py-20">
+              <p className="text-muted-foreground">Loading categories...</p>
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="col-span-2 text-center py-20">
+              <p className="text-muted-foreground">No categories found</p>
+            </div>
+          ) : (
+            categories.map((category, index) => {
             const Icon = category.icon;
             return (
               <Link
@@ -152,7 +190,8 @@ export default function CategoriesSection() {
                 </div>
               </Link>
             );
-          })}
+          })
+          )}
         </div>
 
         {/* Bottom CTA */}

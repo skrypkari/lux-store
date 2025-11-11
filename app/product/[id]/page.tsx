@@ -1,3 +1,6 @@
+"use client";
+
+import { use, useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
@@ -14,50 +17,182 @@ interface PageProps {
   }>;
 }
 
-export default async function ProductPage({ params }: PageProps) {
-  const { id } = await params;
+export default function ProductPage({ params }: PageProps) {
+  const { id } = use(params);
+  const [productData, setProductData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock product data
+  useEffect(() => {
+    setLoading(true);
+    fetch(`https://luxstore-backend.vercel.app/products/${id}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Product not found');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setProductData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [id]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-20">
+          <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            {/* Animated Logo/Icon */}
+            <div className="relative mb-8">
+              <div className="w-24 h-24 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <svg className="w-12 h-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+              </div>
+            </div>
+            
+            {/* Loading Text */}
+            <h2 className="text-2xl font-bold mb-2">Loading Product</h2>
+            <p className="text-muted-foreground mb-8 text-center max-w-md">
+              Please wait while we retrieve your luxury item details...
+            </p>
+            
+            {/* Loading Progress Animation */}
+            <div className="w-64 h-1 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-primary via-primary/50 to-primary animate-[shimmer_1.5s_ease-in-out_infinite] bg-[length:200%_100%]"></div>
+            </div>
+            
+            {/* Skeleton Loader Preview */}
+            <div className="w-full max-w-5xl mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Image Skeleton */}
+              <div className="space-y-4">
+                <div className="aspect-[4/3] bg-muted rounded-2xl animate-pulse"></div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse"></div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Details Skeleton */}
+              <div className="space-y-4">
+                <div className="h-4 bg-muted rounded w-1/4 animate-pulse"></div>
+                <div className="h-8 bg-muted rounded w-3/4 animate-pulse"></div>
+                <div className="h-6 bg-muted rounded w-1/2 animate-pulse"></div>
+                <div className="h-12 bg-muted rounded w-1/3 animate-pulse mt-8"></div>
+                <div className="space-y-2 mt-8">
+                  <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
+                  <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
+                  <div className="h-4 bg-muted rounded w-4/6 animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+        
+        <style jsx>{`
+          @keyframes shimmer {
+            0% {
+              background-position: -200% 0;
+            }
+            100% {
+              background-position: 200% 0;
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !productData) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mb-30 mx-auto px-4 py-20 text-center">
+          <h1 className="text-3xl font-bold mb-4">Product Not Found</h1>
+          <p className="text-muted-foreground mb-8">The product you're looking for doesn't exist or has been removed.</p>
+          <Button onClick={() => window.location.href = '/store/all'}>
+            Back to Store
+          </Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Get images
+  const images = productData.media?.map((m: any) => m.url_800 || m.url_400 || m.url_200) || [
+    'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=90'
+  ];
+
+  // Calculate price with VAT
+  const price = productData.base_price || 0;
+  const priceVAT = (price * 0.2).toFixed(2);
+
+  // Extract all attributes dynamically
+  const productAttributes = productData.attributes?.reduce((acc: any, attr: any) => {
+    acc[attr.attribute.name] = attr.value;
+    return acc;
+  }, {}) || {};
+
+  // Get description from raw_json or description_html
+  const fullDescription = productData.raw_json?.description || 
+                         productData.description_html?.replace(/<[^>]*>/g, ' ').trim() || 
+                         productData.subtitle || 
+                         "Luxury item from prestigious collection. This item undergoes rigorous authentication by our team of certified experts.";
+
+  // Get category from product data
+  const category = productData.categories?.[0]?.category;
+  const categoryName = category?.name || 'Products';
+  const categorySlug = category?.slug_without_id || 'all';
+
+  // Build specifications from attributes
+  const specifications = [
+    { label: "SKU", value: productData.sku || 'N/A' },
+    { label: "Condition", value: productData.condition || (productData.is_sold_out ? "Sold Out" : "Available") },
+    ...Object.entries(productAttributes).map(([key, value]) => ({
+      label: key,
+      value: value as string,
+    })),
+  ];
+
+  // Format product data
   const product = {
-    id: 1,
-    name: "Hermès Birkin 30 Craie Togo Gold Hardware",
-    brand: "Hermès",
-    price: 14825,
-    priceVAT: 2470.83,
-    sku: "H056018CK10",
-    rating: 5.0,
-    reviews: 127,
-    inStock: true,
-    images: [
-      "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=90",
-      "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&q=90",
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=90",
-      "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=90",
-    ],
-    details: {
-      brand: "Hermès",
-      color: "Craie",
-      selection: "Her",
-      collection: "Birkin",
-      size: "Medium",
+    id: productData.id,
+    name: productData.name,
+    brand: productAttributes['Brand'] || 'Luxury Brand',
+    price: price,
+    priceVAT: parseFloat(priceVAT),
+    sku: productData.sku || 'N/A',
+    rating: 4.5 + Math.random() * 0.5,
+    reviews: Math.floor(Math.random() * 200) + 50,
+    inStock: !productData.is_sold_out,
+    images: images,
+    category: {
+      name: categoryName,
+      slug: categorySlug,
     },
-    description: "This Birkin is in Craie togo leather with gold hardware and has tonal stitching, front flap, two straps with center toggle closure, clochette with lock and two keys, and double rolled handles. The interior is lined with Craie chevre and has one zip pocket with an Hermès engraved zipper pull and an open pocket on the opposite side.",
+    details: productAttributes,
+    description: fullDescription,
     features: [
       "100% Authentic Guaranteed",
       "Comes with original dust bag",
-      "Lock and keys included",
       "Authentication certificate",
-      "Togo leather exterior",
-      "Chevre leather interior",
+      "Secure packaging and shipping",
+      "Premium quality materials",
+      "Expert craftsmanship",
     ],
-    specifications: [
-      { label: "Dimensions", value: "30 x 22 x 16 cm" },
-      { label: "Weight", value: "850g" },
-      { label: "Material", value: "Togo Leather" },
-      { label: "Hardware", value: "Gold-plated" },
-      { label: "Year", value: "2023" },
-      { label: "Condition", value: "Brand New" },
-    ],
+    specifications: specifications,
   };
 
   return (
@@ -70,18 +205,22 @@ export default async function ProductPage({ params }: PageProps) {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <a href="/" className="hover:text-foreground transition-colors">Home</a>
             <span>/</span>
-            <a href="/store/bags" className="hover:text-foreground transition-colors">Handbags</a>
+            <a href="/store/all" className="hover:text-foreground transition-colors">Store</a>
             <span>/</span>
-            <a href="/store/bags?brand=hermes" className="hover:text-foreground transition-colors">{product.brand}</a>
+            <a href={`/store/${product.category.slug}`} className="hover:text-foreground transition-colors">
+              {product.category.name}
+            </a>
             <span>/</span>
-            <span className="text-foreground font-medium truncate">{product.name}</span>
+            <span className="text-foreground font-medium truncate max-w-[300px]">
+              {product.name}
+            </span>
           </div>
         </div>
       </div>
 
       <main className="container mx-auto px-4 py-12">
         {/* Limited Availability Banner */}
-        <div className="mb-8 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+        {/* <div className="mb-8 p-4 bg-primary/5 border border-primary/20 rounded-lg">
           <div className="flex items-center justify-center gap-2 text-sm">
             <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
@@ -89,7 +228,7 @@ export default async function ProductPage({ params }: PageProps) {
             <span className="font-medium">Limited Availability</span>
             <span className="text-muted-foreground">— Only 2 pieces left in stock</span>
           </div>
-        </div>
+        </div> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left Column - Images */}
@@ -254,7 +393,16 @@ export default async function ProductPage({ params }: PageProps) {
             <QuantitySelector inStock={product.inStock} />
 
             {/* Action Buttons */}
-            <ActionButtons inStock={product.inStock} />
+            <ActionButtons 
+              inStock={product.inStock} 
+              product={{
+                id: parseInt(id),
+                name: product.name,
+                brand: product.brand,
+                price: product.price,
+                image: product.images[0] || "",
+              }}
+            />
 
             {/* Product Details */}
             <div className="border rounded-lg p-6 bg-card">
@@ -262,8 +410,8 @@ export default async function ProductPage({ params }: PageProps) {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {Object.entries(product.details).map(([key, value]) => (
                   <div key={key}>
-                    <span className="text-muted-foreground capitalize">{key}:</span>
-                    <span className="ml-2 font-medium">{value}</span>
+                    <span className="text-muted-foreground">{key}:</span>
+                    <span className="ml-2 font-medium">{value as string}</span>
                   </div>
                 ))}
               </div>
@@ -354,28 +502,19 @@ export default async function ProductPage({ params }: PageProps) {
               </div>
               <h2 className="text-2xl font-bold">Description</h2>
             </div>
-            <p className="text-base leading-relaxed text-muted-foreground mb-6">
-              {product.description}
-            </p>
+            <div 
+              className="prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: productData.description_html || product.description }}
+            />
             <div className="pt-6 border-t">
               <h3 className="font-semibold mb-3 text-sm">Product Highlights</h3>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <li className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Handcrafted by skilled artisans in France</span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Premium togo leather with gold-plated hardware</span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Signature double rolled handles</span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <span>Includes original lock, keys, and clochette</span>
-                </li>
+                {product.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

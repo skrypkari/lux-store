@@ -6,8 +6,31 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Star, Heart, Eye, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const bestSellers = [
+interface Product {
+  id: string;
+  name: string;
+  subtitle?: string;
+  sku?: string;
+  base_price?: number;
+  currency: string;
+  main_image?: string;
+  slug_without_id?: string;
+}
+
+interface BestSellerProduct extends Product {
+  brand: string;
+  rating: number;
+  reviews: number;
+  badge: string;
+  badgeColor: string;
+  image: string;
+  price: number;
+  originalPrice?: number;
+}
+
+const defaultProducts = [
   {
     id: 1,
     name: "Hermès Birkin 30",
@@ -126,6 +149,62 @@ const badgeStyles: Record<string, string> = {
 };
 
 export default function BestSellers() {
+  const [products, setProducts] = useState<BestSellerProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("https://luxstore-backend.vercel.app/products/random?limit=8")
+      .then((res) => res.json())
+      .then((data: Product[]) => {
+        console.log("Products data:", data);
+        if (Array.isArray(data)) {
+          // Преобразуем данные из API в формат для отображения
+          const displayProducts: BestSellerProduct[] = data.map((product, index) => ({
+            ...product,
+            brand: extractBrand(product.name),
+            rating: 4.8 + Math.random() * 0.2,
+            reviews: Math.floor(Math.random() * 200) + 50,
+            badge: getBadge(index),
+            badgeColor: getBadgeColor(index),
+            image: product.main_image || getDefaultImage(),
+            price: product.base_price || 0,
+            originalPrice: undefined,
+          }));
+          setProducts(displayProducts);
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  // Функции для генерации данных
+  const extractBrand = (name: string) => {
+    const brands = ['HERMÈS', 'CARTIER', 'ROLEX', 'CHANEL', 'GUCCI', 'LOUIS VUITTON'];
+    for (const brand of brands) {
+      if (name.toUpperCase().includes(brand)) {
+        return brand;
+      }
+    }
+    return name.split(' ')[0].toUpperCase();
+  };
+
+  const getBadge = (index: number) => {
+    const badges = ['Best Seller', 'Trending', 'Limited', 'Popular', 'Iconic', 'Exclusive', 'New', 'Sale'];
+    return badges[index % badges.length];
+  };
+
+  const getBadgeColor = (index: number) => {
+    const colors = ['gold', 'red', 'purple', 'orange', 'blue', 'cyan', 'green', 'amber'];
+    return colors[index % colors.length];
+  };
+
+  const getDefaultImage = () => {
+    return 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop';
+  };
+
   return (
     <section className="py-24 bg-gradient-to-b from-white to-neutral-50">
       <div className="container mx-auto px-4">
@@ -146,7 +225,16 @@ export default function BestSellers() {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {bestSellers.map((product) => (
+          {loading ? (
+            <div className="col-span-full text-center py-20">
+              <p className="text-neutral-600">Loading products...</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="col-span-full text-center py-20">
+              <p className="text-neutral-600">No products found</p>
+            </div>
+          ) : (
+            products.map((product) => (
             <div
               key={product.id}
               className="group"
@@ -249,7 +337,8 @@ export default function BestSellers() {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
 
         {/* View All Button */}

@@ -7,13 +7,27 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus, X, ShoppingBag, ArrowRight, Package, Shield, Truck, Tag, Heart, Clock, Lock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface RelatedProduct {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  media: Array<{ url: string }>;
+  categories: Array<{
+    category: {
+      name: string;
+    };
+  }>;
+}
 
 export default function CartContent() {
   const { cartItems, cartTotal, removeFromCart, updateQuantity } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [promoApplied, setPromoApplied] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
 
   const subtotal = cartTotal;
   const vat = subtotal * 0.2; // 20% VAT
@@ -29,6 +43,32 @@ export default function CartContent() {
       setPromoApplied(true);
     }
   };
+
+  // Fetch related products based on cart items
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      setRelatedProducts([]);
+      return;
+    }
+
+    // Get unique cart item IDs to exclude from recommendations
+    const cartItemIds = cartItems.map(item => item.id);
+
+    // Fetch products from the API - get more products to have better selection after filtering
+    fetch('https://luxstore-backend.vercel.app/products?page=1&limit=20')
+      .then(res => res.json())
+      .then(data => {
+        // Filter out items that are already in cart
+        const filtered = data.products
+          .filter((product: RelatedProduct) => !cartItemIds.includes(product.id))
+          .slice(0, 4); // Take only 4 products for display
+        setRelatedProducts(filtered);
+      })
+      .catch(err => {
+        console.error('Failed to fetch related products:', err);
+        setRelatedProducts([]);
+      });
+  }, [cartItems]);
 
   if (cartItems.length === 0) {
     return (
@@ -716,88 +756,68 @@ export default function CartContent() {
         </div>
       </div>
 
-      {/* Recently Viewed Section */}
-      <div className="mt-16 lg:mt-20">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h2 className="font-satoshi text-2xl font-bold">You May Also Like</h2>
-            <p className="font-general-sans text-sm text-black/60">
-              Handpicked recommendations for you
-            </p>
-          </div>
-          <Link href="/store/all">
-            <Button variant="ghost" className="gap-2 font-semibold">
-              View All
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            {
-              id: 101,
-              name: "Santos de Cartier",
-              brand: "Cartier",
-              price: 7100,
-              image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400&h=400&fit=crop",
-            },
-            {
-              id: 102,
-              name: "Lady Dior Bag",
-              brand: "Dior",
-              price: 5800,
-              image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=400&fit=crop",
-            },
-            {
-              id: 103,
-              name: "Aviator Sunglasses",
-              brand: "Ray-Ban",
-              price: 350,
-              image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&h=400&fit=crop",
-            },
-            {
-              id: 104,
-              name: "Diamond Necklace",
-              brand: "Tiffany & Co.",
-              price: 12500,
-              image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=400&fit=crop",
-            },
-          ].map((product) => (
-            <Link key={product.id} href={`/product/${product.id}`}>
-              <div className="group overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg transition-all duration-300 hover:border-black/20 hover:shadow-2xl">
-                <div className="relative aspect-square overflow-hidden bg-black/5">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    unoptimized
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-2 h-9 w-9 rounded-full bg-white/90 backdrop-blur-sm transition-all hover:scale-110 hover:bg-white"
-                  >
-                    <Heart className="h-5 w-5" />
-                  </Button>
-                </div>
-                <div className="p-4">
-                  <p className="mb-1 font-general-sans text-xs font-medium uppercase tracking-wider text-black/50">
-                    {product.brand}
-                  </p>
-                  <h3 className="mb-2 font-satoshi font-bold leading-tight group-hover:underline">
-                    {product.name}
-                  </h3>
-                  <p className="font-satoshi text-xl font-bold">
-                    ${product.price.toLocaleString()}
-                  </p>
-                </div>
-              </div>
+      {/* You May Also Like Section */}
+      {relatedProducts.length > 0 && (
+        <div className="mt-16 lg:mt-20">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="font-satoshi text-2xl font-bold">You May Also Like</h2>
+              <p className="font-general-sans text-sm text-black/60">
+                Handpicked recommendations for you
+              </p>
+            </div>
+            <Link href="/store/all">
+              <Button variant="ghost" className="gap-2 font-semibold">
+                View All
+                <ArrowRight className="h-4 w-4" />
+              </Button>
             </Link>
-          ))}
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {relatedProducts.map((product) => {
+              const imageUrl = product.media?.[0]?.url 
+                ? `https://d2j6dbq0eux0bg.cloudfront.net/${product.media[0].url}`
+                : "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=400&fit=crop";
+              const brandName = product.categories?.[0]?.category?.name || product.brand;
+
+              return (
+                <Link key={product.id} href={`/product/${product.id}`}>
+                  <div className="group overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg transition-all duration-300 hover:border-black/20 hover:shadow-2xl">
+                    <div className="relative aspect-square overflow-hidden bg-black/5">
+                      <Image
+                        src={imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        unoptimized
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-2 top-2 h-9 w-9 rounded-full bg-white/90 backdrop-blur-sm transition-all hover:scale-110 hover:bg-white"
+                      >
+                        <Heart className="h-5 w-5" />
+                      </Button>
+                    </div>
+                    <div className="p-4">
+                      <p className="mb-1 font-general-sans text-xs font-medium uppercase tracking-wider text-black/50">
+                        {brandName}
+                      </p>
+                      <h3 className="mb-2 font-satoshi font-bold leading-tight group-hover:underline line-clamp-2">
+                        {product.name}
+                      </h3>
+                      <p className="font-satoshi text-xl font-bold">
+                        €{product.price.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Trust Badges */}
       <div className="mt-12 rounded-2xl border-2 border-black/10 bg-gradient-to-r from-black/5 via-white to-black/5 p-8">

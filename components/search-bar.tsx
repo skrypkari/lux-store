@@ -11,65 +11,61 @@ import { Badge } from "@/components/ui/badge";
 interface SearchResult {
   id: number;
   name: string;
-  brand: string;
-  price: number;
-  image: string;
-  category: string;
+  sku: string;
+  base_price: number;
+  media: Array<{ url_original: string }>;
+  categories: Array<{
+    category: {
+      name: string;
+      slug: string;
+    };
+  }>;
+  attributes: Array<{
+    attribute: { name: string };
+    value: string;
+  }>;
 }
-
-// Mock data - в реальном проекте это будет API
-const mockProducts: SearchResult[] = [
-  {
-    id: 1,
-    name: "Birkin 30 Craie Togo Gold Hardware",
-    brand: "Hermès",
-    price: 14825,
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=90",
-    category: "Bags",
-  },
-  {
-    id: 2,
-    name: "Kelly 28 Black Box Leather",
-    brand: "Hermès",
-    price: 12500,
-    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&q=90",
-    category: "Bags",
-  },
-  {
-    id: 3,
-    name: "Classic Flap Medium",
-    brand: "Chanel",
-    price: 8900,
-    image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&q=90",
-    category: "Bags",
-  },
-  {
-    id: 4,
-    name: "Panthère de Cartier Watch",
-    brand: "Cartier",
-    price: 22000,
-    image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400&q=90",
-    category: "Watches",
-  },
-  {
-    id: 5,
-    name: "Lady Dior Medium",
-    brand: "Dior",
-    price: 5200,
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=90",
-    category: "Bags",
-  },
-];
-
-const recentSearches = ["Hermès Birkin", "Chanel Flap", "Cartier Watch"];
-const trendingSearches = ["Birkin 25", "Kelly Bag", "Chanel Classic", "Cartier Love"];
 
 export default function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Array<{ name: string; slug: string }>>([]);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Load categories for quick links
+  useEffect(() => {
+    fetch('https://luxstore-backend.vercel.app/categories')
+      .then(res => res.json())
+      .then(data => {
+        // Get top 4 categories for quick links
+        setCategories(data.slice(0, 4));
+      })
+      .catch(err => console.error('Failed to load categories:', err));
+  }, []);
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('recentSearches');
+    if (saved) {
+      try {
+        setRecentSearches(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to parse recent searches:', e);
+      }
+    }
+  }, []);
+
+  // Save search to recent searches
+  const saveRecentSearch = (searchQuery: string) => {
+    if (!searchQuery.trim()) return;
+    
+    const updated = [searchQuery, ...recentSearches.filter(s => s !== searchQuery)].slice(0, 5);
+    setRecentSearches(updated);
+    localStorage.setItem('recentSearches', JSON.stringify(updated));
+  };
 
   // Close on click outside
   useEffect(() => {
@@ -100,25 +96,39 @@ export default function SearchBar() {
 
     setIsSearching(true);
     const timer = setTimeout(() => {
-      // Simulate API call
-      const filtered = mockProducts.filter(
-        (product) =>
-          product.name.toLowerCase().includes(query.toLowerCase()) ||
-          product.brand.toLowerCase().includes(query.toLowerCase()) ||
-          product.category.toLowerCase().includes(query.toLowerCase())
-      );
-      setResults(filtered);
-      setIsSearching(false);
+      // Fetch from API with search parameter
+      const searchParams = new URLSearchParams({
+        page: '1',
+        limit: '20',
+        search: query,
+      });
+
+      fetch(`https://luxstore-backend.vercel.app/products?${searchParams.toString()}`)
+        .then(res => res.json())
+        .then(data => {
+          setResults(data.products || []);
+          setIsSearching(false);
+        })
+        .catch(err => {
+          console.error('Search failed:', err);
+          setResults([]);
+          setIsSearching(false);
+        });
     }, 300);
 
     return () => clearTimeout(timer);
   }, [query]);
 
   const handleClose = () => {
+    if (query.trim()) {
+      saveRecentSearch(query);
+    }
     setIsOpen(false);
     setQuery("");
     setResults([]);
   };
+
+  const trendingSearches = ["Hermès", "Chanel", "Louis Vuitton", "Cartier"];
 
   return (
     <>
@@ -237,34 +247,41 @@ export default function SearchBar() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {results.slice(0, 6).map((product) => (
-                      <Link
-                        key={product.id}
-                        href={`/product/${product.id}`}
-                        onClick={handleClose}
-                        className="group flex gap-4 p-4 rounded-lg border hover:border-primary hover:shadow-lg transition-all bg-card"
-                      >
-                        <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
-                          <Image
-                            src={product.image}
-                            alt={product.name}
-                            fill
-                            className="object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <Badge variant="secondary" className="text-xs mb-1">
-                            {product.brand}
-                          </Badge>
-                          <h4 className="font-semibold text-sm line-clamp-2 mb-1 group-hover:text-primary transition-colors">
-                            {product.name}
-                          </h4>
-                          <p className="text-sm font-bold">
-                            €{product.price.toLocaleString()}
-                          </p>
-                        </div>
-                      </Link>
-                    ))}
+                    {results.slice(0, 6).map((product) => {
+                      const imageUrl = product.media?.[0]?.url_original;
+                      const brandAttr = product.attributes?.find(attr => attr.attribute.name === "Brand");
+                      const brandName = brandAttr?.value || product.categories?.[0]?.category?.name || "Luxury";
+
+                      return (
+                        <Link
+                          key={product.id}
+                          href={`/product/${product.id}`}
+                          onClick={handleClose}
+                          className="group flex gap-4 p-4 rounded-lg border hover:border-primary hover:shadow-lg transition-all bg-card"
+                        >
+                          <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                            <Image
+                              src={imageUrl}
+                              alt={product.name}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-300"
+                              unoptimized
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <Badge variant="secondary" className="text-xs mb-1">
+                              {brandName}
+                            </Badge>
+                            <h4 className="font-semibold text-sm line-clamp-2 mb-1 group-hover:text-primary transition-colors">
+                              {product.name}
+                            </h4>
+                            <p className="text-sm font-bold">
+                              €{product.base_price.toLocaleString()}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               ) : (
@@ -287,22 +304,20 @@ export default function SearchBar() {
             </div>
 
             {/* Quick Links */}
-            {query.length === 0 && (
+            {query.length === 0 && categories.length > 0 && (
               <div className="max-w-5xl mx-auto mt-8 pt-6 border-t">
                 <div className="flex flex-wrap items-center gap-4 text-sm">
                   <span className="text-muted-foreground">Popular categories:</span>
-                  <Link href="/store/bags" className="text-primary hover:underline" onClick={handleClose}>
-                    Handbags
-                  </Link>
-                  <Link href="/store/watch" className="text-primary hover:underline" onClick={handleClose}>
-                    Watches
-                  </Link>
-                  <Link href="/store/jewellery" className="text-primary hover:underline" onClick={handleClose}>
-                    Jewellery
-                  </Link>
-                  <Link href="/store/sunglasses" className="text-primary hover:underline" onClick={handleClose}>
-                    Sunglasses
-                  </Link>
+                  {categories.map((category) => (
+                    <Link 
+                      key={category.slug}
+                      href={`/store/${category.slug}`} 
+                      className="text-primary hover:underline" 
+                      onClick={handleClose}
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}

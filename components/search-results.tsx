@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { SlidersHorizontal, Grid3x3, Grid2x2, ChevronDown, Star } from "lucide-react";
+import { SlidersHorizontal, Grid3x3, Grid2x2, ChevronDown, Star, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -21,166 +21,133 @@ import {
 interface Product {
   id: number;
   name: string;
-  brand: string;
-  price: number;
-  image: string;
-  category: string;
-  rating: number;
-  reviews: number;
-  inStock: boolean;
+  sku: string;
+  base_price: number;
+  condition: string;
+  media: Array<{ url_original: string }>;
+  categories: Array<{
+    category: {
+      id: number;
+      name: string;
+      slug: string;
+    };
+  }>;
+  attributes: Array<{
+    attribute: { name: string };
+    value: string;
+  }>;
 }
-
-// Mock products database
-const allProducts: Product[] = [
-  {
-    id: 1,
-    name: "Birkin 30 Craie Togo Gold Hardware",
-    brand: "Hermès",
-    price: 14825,
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=90",
-    category: "Bags",
-    rating: 5.0,
-    reviews: 127,
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: "Kelly 28 Black Box Leather",
-    brand: "Hermès",
-    price: 12500,
-    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&q=90",
-    category: "Bags",
-    rating: 4.9,
-    reviews: 89,
-    inStock: true,
-  },
-  {
-    id: 3,
-    name: "Classic Flap Medium",
-    brand: "Chanel",
-    price: 8900,
-    image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=90",
-    category: "Bags",
-    rating: 4.8,
-    reviews: 156,
-    inStock: true,
-  },
-  {
-    id: 4,
-    name: "Panthère de Cartier Watch",
-    brand: "Cartier",
-    price: 22000,
-    image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=800&q=90",
-    category: "Watches",
-    rating: 5.0,
-    reviews: 94,
-    inStock: true,
-  },
-  {
-    id: 5,
-    name: "Lady Dior Medium",
-    brand: "Dior",
-    price: 5200,
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=90",
-    category: "Bags",
-    rating: 4.7,
-    reviews: 203,
-    inStock: false,
-  },
-  {
-    id: 6,
-    name: "Santos de Cartier Large",
-    brand: "Cartier",
-    price: 7450,
-    image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=800&q=90",
-    category: "Watches",
-    rating: 4.9,
-    reviews: 67,
-    inStock: true,
-  },
-  {
-    id: 7,
-    name: "Tank Must Watch",
-    brand: "Cartier",
-    price: 3200,
-    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=800&q=90",
-    category: "Watches",
-    rating: 4.6,
-    reviews: 112,
-    inStock: true,
-  },
-  {
-    id: 8,
-    name: "Ballon Bleu 36mm",
-    brand: "Cartier",
-    price: 8950,
-    image: "https://images.unsplash.com/photo-1622434641406-a158123450f9?w=800&q=90",
-    category: "Watches",
-    rating: 4.9,
-    reviews: 145,
-    inStock: true,
-  },
-];
 
 interface SearchResultsProps {
   initialQuery: string;
 }
 
 export default function SearchResults({ initialQuery }: SearchResultsProps) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("relevance");
   const [viewMode, setViewMode] = useState<"grid-3" | "grid-2">("grid-3");
   const [showInStockOnly, setShowInStockOnly] = useState(false);
+  const [brands, setBrands] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Array<{ id: number; name: string; slug: string }>>([]);
 
-  // Get unique brands and categories
-  const brands = Array.from(new Set(allProducts.map((p) => p.brand))).sort();
-  const categories = Array.from(new Set(allProducts.map((p) => p.category))).sort();
-
-  // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let results = allProducts.filter((product) => {
-      // Search query filter
-      const matchesQuery =
-        product.name.toLowerCase().includes(initialQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(initialQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(initialQuery.toLowerCase());
-
-      // Brand filter
-      const matchesBrand =
-        selectedBrands.length === 0 || selectedBrands.includes(product.brand);
-
-      // Category filter
-      const matchesCategory =
-        selectedCategories.length === 0 || selectedCategories.includes(product.category);
-
-      // Price filter
-      let matchesPrice = true;
-      if (priceRange === "under-5000") matchesPrice = product.price < 5000;
-      else if (priceRange === "5000-10000") matchesPrice = product.price >= 5000 && product.price <= 10000;
-      else if (priceRange === "10000-20000") matchesPrice = product.price >= 10000 && product.price <= 20000;
-      else if (priceRange === "over-20000") matchesPrice = product.price > 20000;
-
-      // Stock filter
-      const matchesStock = !showInStockOnly || product.inStock;
-
-      return matchesQuery && matchesBrand && matchesCategory && matchesPrice && matchesStock;
-    });
-
-    // Sort results
-    if (sortBy === "price-asc") {
-      results.sort((a, b) => a.price - b.price);
-    } else if (sortBy === "price-desc") {
-      results.sort((a, b) => b.price - a.price);
-    } else if (sortBy === "rating") {
-      results.sort((a, b) => b.rating - a.rating);
-    } else if (sortBy === "newest") {
-      results.sort((a, b) => b.id - a.id);
+  // Fetch products based on search query
+  useEffect(() => {
+    setLoading(true);
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('page', '1');
+    params.append('limit', '50');
+    
+    // Add search query
+    if (initialQuery) {
+      params.append('search', initialQuery);
+    }
+    
+    // Add price range filter
+    if (priceRange !== "all") {
+      if (priceRange === "under-5000") {
+        params.append('maxPrice', '5000');
+      } else if (priceRange === "5000-10000") {
+        params.append('minPrice', '5000');
+        params.append('maxPrice', '10000');
+      } else if (priceRange === "10000-20000") {
+        params.append('minPrice', '10000');
+        params.append('maxPrice', '20000');
+      } else if (priceRange === "over-20000") {
+        params.append('minPrice', '20000');
+      }
     }
 
-    return results;
-  }, [initialQuery, selectedBrands, selectedCategories, priceRange, sortBy, showInStockOnly]);
+    fetch(`https://luxstore-backend.vercel.app/products?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        let filteredProducts = data.products || [];
+        
+        // Extract unique brands
+        const uniqueBrands = new Set<string>();
+        filteredProducts.forEach((product: Product) => {
+          const brandAttr = product.attributes?.find(attr => attr.attribute.name === "Brand");
+          if (brandAttr) uniqueBrands.add(brandAttr.value);
+        });
+        setBrands(Array.from(uniqueBrands).sort());
+        
+        // Extract unique categories
+        const uniqueCategories = new Map<number, { id: number; name: string; slug: string }>();
+        filteredProducts.forEach((product: Product) => {
+          product.categories?.forEach((cat) => {
+            if (!uniqueCategories.has(cat.category.id)) {
+              uniqueCategories.set(cat.category.id, cat.category);
+            }
+          });
+        });
+        setCategories(Array.from(uniqueCategories.values()).sort((a, b) => a.name.localeCompare(b.name)));
+        
+        setProducts(filteredProducts);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch products:", err);
+        setLoading(false);
+      });
+  }, [initialQuery, priceRange]);
+
+  // Client-side filtering
+  const filteredProducts = products.filter((product) => {
+    // Brand filter
+    if (selectedBrands.length > 0) {
+      const brandAttr = product.attributes?.find(attr => attr.attribute.name === "Brand");
+      if (!brandAttr || !selectedBrands.includes(brandAttr.value)) {
+        return false;
+      }
+    }
+
+    // Category filter
+    if (selectedCategories.length > 0) {
+      const hasMatchingCategory = product.categories?.some(
+        (cat) => selectedCategories.includes(cat.category.slug)
+      );
+      if (!hasMatchingCategory) return false;
+    }
+
+    return true;
+  });
+
+  // Client-side sorting
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortBy === "price-asc") {
+      return a.base_price - b.base_price;
+    } else if (sortBy === "price-desc") {
+      return b.base_price - a.base_price;
+    } else if (sortBy === "newest") {
+      return b.id - a.id;
+    }
+    return 0;
+  });
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
@@ -188,9 +155,9 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
     );
   };
 
-  const toggleCategory = (category: string) => {
+  const toggleCategory = (categorySlug: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
+      prev.includes(categorySlug) ? prev.filter((c) => c !== categorySlug) : [...prev, categorySlug]
     );
   };
 
@@ -201,7 +168,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
     setShowInStockOnly(false);
   };
 
-  const activeFiltersCount = selectedBrands.length + selectedCategories.length + (priceRange !== "all" ? 1 : 0) + (showInStockOnly ? 1 : 0);
+  const activeFiltersCount = selectedBrands.length + selectedCategories.length + (priceRange !== "all" ? 1 : 0);
 
   // Filters component (reusable for desktop and mobile)
   const FiltersContent = () => (
@@ -216,67 +183,9 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
         </div>
       )}
 
-      {/* Availability */}
-      <div>
-        <h3 className="font-semibold mb-3">Availability</h3>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="in-stock"
-            checked={showInStockOnly}
-            onCheckedChange={(checked) => setShowInStockOnly(checked as boolean)}
-          />
-          <Label htmlFor="in-stock" className="text-sm cursor-pointer">
-            In Stock Only
-          </Label>
-        </div>
-      </div>
-
       <Separator />
 
-      {/* Categories */}
-      <div>
-        <h3 className="font-semibold mb-3">Categories</h3>
-        <div className="space-y-2">
-          {categories.map((category) => (
-            <div key={category} className="flex items-center space-x-2">
-              <Checkbox
-                id={`cat-${category}`}
-                checked={selectedCategories.includes(category)}
-                onCheckedChange={() => toggleCategory(category)}
-              />
-              <Label htmlFor={`cat-${category}`} className="text-sm cursor-pointer">
-                {category}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Brands */}
-      <div>
-        <h3 className="font-semibold mb-3">Brands</h3>
-        <div className="space-y-2">
-          {brands.map((brand) => (
-            <div key={brand} className="flex items-center space-x-2">
-              <Checkbox
-                id={`brand-${brand}`}
-                checked={selectedBrands.includes(brand)}
-                onCheckedChange={() => toggleBrand(brand)}
-              />
-              <Label htmlFor={`brand-${brand}`} className="text-sm cursor-pointer">
-                {brand}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Price Range */}
-      <div>
+      <div className="px-2">
         <h3 className="font-semibold mb-3">Price Range</h3>
         <div className="space-y-2">
           {[
@@ -344,7 +253,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
 
             {/* Results Count */}
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">{filteredProducts.length}</span> products
+              <span className="font-semibold text-foreground">{sortedProducts.length}</span> products
             </p>
           </div>
 
@@ -386,66 +295,69 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
         </div>
 
         {/* Products Grid */}
-        {filteredProducts.length > 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          </div>
+        ) : sortedProducts.length > 0 ? (
           <div className={`grid gap-6 ${viewMode === "grid-3" ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
-            {filteredProducts.map((product) => (
-              <Link
-                key={product.id}
-                href={`/product/${product.id}`}
-                className="group border rounded-lg overflow-hidden bg-card hover:shadow-xl transition-all duration-300"
-              >
-                <div className="relative aspect-square overflow-hidden bg-muted">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  {!product.inStock && (
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                      <span className="text-white text-sm font-semibold tracking-wide">SOLD OUT</span>
-                    </div>
-                  )}
-                </div>
+            {sortedProducts.map((product) => {
+              const imageUrl = product.media?.[0]?.url_original;
+              const brandAttr = product.attributes?.find(attr => attr.attribute.name === "Brand");
+              const brandName = brandAttr?.value || product.categories?.[0]?.category?.name || "Luxury";
+              const inStock = product.condition !== "Sold Out";
 
-                <div className="p-4">
-                  <Badge variant="secondary" className="text-xs mb-2">
-                    {product.brand}
-                  </Badge>
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                    {product.name}
-                  </h3>
-
-                  {/* Rating */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-3 w-3 ${
-                            i < Math.floor(product.rating)
-                              ? "fill-amber-400 text-amber-400"
-                              : "fill-muted text-muted"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      {product.rating} ({product.reviews})
-                    </span>
+              return (
+                <Link
+                  key={product.id}
+                  href={`/product/${product.id}`}
+                  className="group border rounded-lg overflow-hidden bg-card hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="relative aspect-square overflow-hidden bg-muted">
+                    <Image
+                      src={imageUrl}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      unoptimized
+                    />
+                    {!inStock && (
+                      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+                        <span className="text-white text-sm font-semibold tracking-wide">SOLD OUT</span>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <p className="text-2xl font-bold">
-                      €{product.price.toLocaleString()}
-                    </p>
-                    <Button size="sm" variant="outline" className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                      View Details
-                    </Button>
+                  <div className="p-4">
+                    <Badge variant="secondary" className="text-xs mb-2">
+                      {brandName}
+                    </Badge>
+                    <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                      {product.name}
+                    </h3>
+
+                    {/* Condition Badge */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge variant="outline" className="text-xs">
+                        {product.condition}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        SKU: {product.sku}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <p className="text-2xl font-bold">
+                        €{product.base_price.toLocaleString()}
+                      </p>
+                      <Button size="sm" variant="outline" className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        View Details
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         ) : (
           // No Results
