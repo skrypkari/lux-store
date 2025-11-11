@@ -39,7 +39,7 @@ export default function CategoriesSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://luxstore-backend.vercel.app/categories")
+    fetch("http://localhost:5000/categories")
       .then((res) => res.json())
       .then((data: Category[]) => {
         console.log("Categories data:", data);
@@ -192,19 +192,6 @@ export default function CategoriesSection() {
             );
           })
           )}
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="text-center space-y-6 pt-8">
-          <div className="inline-flex items-center gap-4 px-6 py-3 rounded-full bg-muted/50 backdrop-blur-sm">
-            <span className="text-sm text-muted-foreground">Can't find what you're looking for?</span>
-            <Button variant="link" className="p-0 h-auto font-semibold" asChild>
-              <Link href="/categories" className="flex items-center gap-2">
-                View All Categories
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </Button>
-          </div>
         </div>
       </div>
 

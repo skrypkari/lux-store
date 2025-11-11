@@ -33,7 +33,7 @@ export default function ProductPage({ params }: PageProps) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`https://luxstore-backend.vercel.app/products/${id}`)
+    fetch(`http://localhost:5000/products/${id}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error('Product not found');
@@ -139,7 +139,7 @@ export default function ProductPage({ params }: PageProps) {
   }
 
   // Get images
-  const images = productData.media?.map((m: any) => m.url_800 || m.url_400 || m.url_200) || [
+  const images = productData.media?.map((m: any) => m.url_original) || [
     'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=90'
   ];
 

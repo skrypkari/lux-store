@@ -1,159 +1,133 @@
 "use client";
 
-import * as React from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  type CarouselApi,
-} from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
 import { cn } from "@/lib/utils";
 
 const slides = [
   {
     id: 1,
-    title: "Timeless Elegance",
-    subtitle: "Discover our exclusive collection of luxury timepieces",
-    buttonText: "Explore Watches",
-    buttonLink: "/store/watch",
-    image:
-      "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop",
-    alt: "Luxury watches collection",
+    brand: "Cartier",
+    subtitle: "Cartier, the jeweller of kings and the king of jewellers.",
+    videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/b0dc3959dd4da18006a104a452e8c7b5/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2Fb0dc3959dd4da18006a104a452e8c7b5%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
   },
   {
     id: 2,
-    title: "Iconic Handbags",
-    subtitle:
-      "Elevate your style with designer bags from the world's finest brands",
-    buttonText: "Shop Bags",
-    buttonLink: "/store/bags",
-    image:
-      "https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=2070&auto=format&fit=crop",
-    alt: "Designer handbags",
+    brand: "Rolex",
+    subtitle: "A Crown for Every Achievement.",
+    videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/424e4aef0fab4f684e2b8113772137dd/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F424e4aef0fab4f684e2b8113772137dd%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
   },
   {
     id: 3,
-    title: "Exquisite Jewellery",
-    subtitle: "Adorn yourself with rare and precious gemstones",
-    buttonText: "View Collection",
-    buttonLink: "/store/jewellery",
-    image:
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop",
-    alt: "Luxury jewellery",
+    brand: "Hermès",
+    subtitle: "Hermès, the spirit of craftsmanship.",
+    videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/16944a6e01c99951bdedd28afcb0c4b1/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F16944a6e01c99951bdedd28afcb0c4b1%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+  },
+  {
+    id: 4,
+    brand: "Dior",
+    subtitle: "Dior, J'adore.",
+    videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/7d144db8acad2064e38063f899816507/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F7d144db8acad2064e38063f899816507%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+  },
+  {
+    id: 5,
+    brand: "GUCCI",
+    subtitle: "Gucci. The Future is Fluid.",
+    videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/ce15ed6b1091b365e60737e06257372a/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2Fce15ed6b1091b365e60737e06257372a%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+  },
+  {
+    id: 6,
+    brand: "Chanel",
+    subtitle: "Coco Chanel — A name that means fashion.",
+    videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/834ed242ff182576ac5ec43a3a0077e2/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F834ed242ff182576ac5ec43a3a0077e2%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
   },
 ];
 
 export default function HeroSlider() {
-  const [api, setApi] = React.useState<CarouselApi>();
-  const [current, setCurrent] = React.useState(0);
+  const [current, setCurrent] = useState(0);
 
-  const plugin = React.useRef(
-    Autoplay({ delay: 5000, stopOnInteraction: true })
-  );
+  useEffect(() => {
+    // Автопереключение каждые 15 секунд (длительность видео)
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 15000);
 
-  React.useEffect(() => {
-    if (!api) return;
-
-    setCurrent(api.selectedScrollSnap());
-
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <section className="relative w-full h-[calc(100vh-80px)] -mt-20 pt-20 overflow-hidden">
-      <Carousel
-        setApi={setApi}
-        plugins={[plugin.current]}
-        className="w-full h-full"
-        onMouseEnter={plugin.current.stop}
-        onMouseLeave={plugin.current.reset}
-        opts={{
-          loop: true,
-        }}
-      >
-        <CarouselContent className="h-[calc(100vh-80px)]">
-          {slides.map((slide, index) => (
-            <CarouselItem key={slide.id} className={cn("h-full", current === index && "z-10")}>
-              <div className="relative w-full h-full select-none">
-                <div className="absolute inset-0 scale-105 transition-transform duration-[7000ms] ease-out">
-                  <Image
-                    src={slide.image}
-                    alt={slide.alt}
-                    fill
-                    priority={index === 0}
-                    className="object-cover"
-                    quality={95}
-                    sizes="100vw"
-                  />
-                </div>
+    <section className="relative w-full h-[calc(100vh-80px)] overflow-hidden">
+      {/* Video Slides */}
+      {slides.map((slide, index) => (
+        <div
+          key={slide.id}
+          className={cn(
+            "absolute inset-0 w-full h-full transition-opacity duration-1000",
+            current === index ? "opacity-100 z-10" : "opacity-0 z-0"
+          )}
+        >
+          <iframe
+            src={slide.videoUrl}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full min-h-full h-[56.25vw] border-none"
+            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+            allowFullScreen
+          />
+        </div>
+      ))}
 
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60" />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60 z-20" />
 
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="container mx-auto px-4">
-                    <div className="max-w-4xl text-center mx-auto space-y-8">
-                      <h1
-                        className="text-5xl md:text-7xl font-bold text-white tracking-tight animate-in fade-in slide-in-from-bottom-8 duration-1000"
-                        style={{
-                          textShadow: "0 4px 20px rgba(0,0,0,0.5)",
-                          letterSpacing: "0.02em",
-                        }}
-                      >
-                        {slide.title}
-                      </h1>
+      {/* Content */}
+      <div className="absolute inset-0 flex items-center justify-center z-30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl text-center mx-auto space-y-8">
+            <h1
+              key={`brand-${current}`}
+              className="text-5xl md:text-7xl font-bold text-white tracking-tight animate-in fade-in slide-in-from-bottom-8 duration-1000"
+              style={{
+                textShadow: "0 4px 20px rgba(0,0,0,0.5)",
+                letterSpacing: "0.02em",
+              }}
+            >
+              {slides[current].brand}
+            </h1>
 
-                      <div className="flex items-center justify-center gap-4 animate-in fade-in duration-1000 delay-300">
-                        <div className="h-px w-12 md:w-20 bg-gradient-to-r from-transparent to-white/60" />
-                        <div className="h-1 w-1 rounded-full bg-white/80" />
-                        <div className="h-px w-12 md:w-20 bg-gradient-to-l from-transparent to-white/60" />
-                      </div>
+            <div className="flex items-center justify-center gap-4 animate-in fade-in duration-1000 delay-300">
+              <div className="h-px w-12 md:w-20 bg-gradient-to-r from-transparent to-white/60" />
+              <div className="h-1 w-1 rounded-full bg-white/80" />
+              <div className="h-px w-12 md:w-20 bg-gradient-to-l from-transparent to-white/60" />
+            </div>
 
-                      <p
-                        className="text-xl md:text-2xl text-white/95 font-light max-w-3xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-500"
-                        style={{
-                          textShadow: "0 2px 10px rgba(0,0,0,0.4)",
-                        }}
-                      >
-                        {slide.subtitle}
-                      </p>
+            <p
+              key={`subtitle-${current}`}
+              className="text-xl md:text-2xl text-white/95 font-light max-w-3xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-500"
+              style={{
+                textShadow: "0 2px 10px rgba(0,0,0,0.4)",
+              }}
+            >
+              {slides[current].subtitle}
+            </p>
 
-                      <div className="pt-6 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700">
-                        <Button
-                          size="lg"
-                          asChild
-                          className="bg-white text-black hover:bg-white/90 font-semibold px-10 py-7 text-lg shadow-2xl hover:shadow-white/20 hover:scale-105 transition-all duration-300 rounded-full"
-                        >
-                          <a href={slide.buttonLink}>{slide.buttonText}</a>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div className="pt-6 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-700">
+              <Button
+                size="lg"
+                asChild
+                className="bg-white text-black hover:bg-white/90 font-semibold px-10 py-7 text-lg shadow-2xl hover:shadow-white/20 hover:scale-105 transition-all duration-300 rounded-full"
+              >
+                <a href="/store/all">Explore Collection</a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                {/* Elegant Corner Accent */}
-                <div className="absolute top-20 right-8 md:right-16 w-32 h-32 border-t-2 border-r-2 border-white/20 opacity-40" />
-                <div className="absolute bottom-8 left-8 md:left-16 w-32 h-32 border-b-2 border-l-2 border-white/20 opacity-40" />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-
-        <CarouselPrevious className="left-6 md:left-12 h-14 w-14 bg-white/5 backdrop-blur-md border-white/30 text-white hover:bg-white/15 hover:border-white/50 hover:scale-110 transition-all duration-300 z-10 hidden md:flex shadow-xl" />
-        <CarouselNext className="right-6 md:right-12 h-14 w-14 bg-white/5 backdrop-blur-md border-white/30 text-white hover:bg-white/15 hover:border-white/50 hover:scale-110 transition-all duration-300 z-10 hidden md:flex shadow-xl" />
-      </Carousel>
-
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
+      {/* Slide Indicators */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 z-40">
         {slides.map((_, index) => (
           <button
             key={index}
-            onClick={() => api?.scrollTo(index)}
+            onClick={() => setCurrent(index)}
             className={cn(
               "transition-all duration-500 rounded-full",
               current === index
@@ -165,7 +139,12 @@ export default function HeroSlider() {
         ))}
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent shadow-[0_0_20px_rgba(255,255,255,0.3)]" />
+      {/* Elegant Corner Accent */}
+      <div className="absolute top-20 right-8 md:right-16 w-32 h-32 border-t-2 border-r-2 border-white/20 opacity-40 z-40" />
+      <div className="absolute bottom-16 left-8 md:left-16 w-32 h-32 border-b-2 border-l-2 border-white/20 opacity-40 z-40" />
+
+      {/* Bottom Gradient Line */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent shadow-[0_0_20px_rgba(255,255,255,0.3)] z-40" />
     </section>
   );
 }

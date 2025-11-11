@@ -24,15 +24,15 @@ export default function KellyShowcase() {
               <div className="absolute top-6 left-6 z-20">
                 <Badge className="bg-gradient-to-r from-yellow-600 to-yellow-500 text-white font-semibold shadow-xl border-0">
                   <Crown className="w-3 h-3 mr-1" />
-                  ROYAL HERITAGE
+                  BRAND NEW
                 </Badge>
               </div>
 
               {/* Product Image */}
               <div className="relative h-[500px] overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?q=80&w=2071&auto=format&fit=crop"
-                  alt="Hermès Kelly Bag"
+                  src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/525f1367-55f3-4aea-b81d-f7b165770500/public"
+                  alt="Hermès Kelly Sellier 20 Etoupe Epsom Gold Hardware"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
@@ -66,19 +66,19 @@ export default function KellyShowcase() {
                       <Sparkles className="w-4 h-4 text-amber-500 fill-amber-500" />
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold mb-2">Kelly 28</h3>
-                  <p className="text-muted-foreground">Epsom Leather • Palladium Hardware</p>
+                  <h3 className="text-2xl font-bold mb-2">Hermès Kelly Sellier 20 Etoupe Epsom Gold Hardware</h3>
+                  <p className="text-muted-foreground">SKU: H073120CK18</p>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">Price</div>
-                    <div className="text-3xl font-bold">$18,900</div>
+                    <div className="text-3xl font-bold">€14,861</div>
                   </div>
                   <div className="h-12 w-px bg-border" />
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">Condition</div>
-                    <div className="text-lg font-semibold">Pristine</div>
+                    <div className="text-lg font-semibold">Brand New</div>
                   </div>
                 </div>
 
@@ -87,7 +87,7 @@ export default function KellyShowcase() {
                   asChild
                   className="w-full py-6 text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
                 >
-                  <Link href="/products/kelly-28" className="flex items-center justify-center gap-2">
+                  <Link href="/products/768064173" className="flex items-center justify-center gap-2">
                     Shop Now
                     <Crown className="w-5 h-5 group-hover:-translate-y-1 transition-transform duration-300" />
                   </Link>
@@ -123,7 +123,7 @@ export default function KellyShowcase() {
                 </span>
               </h2>
               <p className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed">
-                The epitome of grace and sophistication. Named after Hollywood royalty, Grace Kelly.
+                A timeless emblem of grace and sophistication — the Kelly Bag defines elegance through perfect craftsmanship and refined heritage.
               </p>
             </div>
 
@@ -134,9 +134,9 @@ export default function KellyShowcase() {
                   <History className="w-5 h-5 text-yellow-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-1">Royal Heritage</h3>
+                  <h3 className="font-semibold text-lg mb-1">Iconic Design</h3>
                   <p className="text-muted-foreground font-light">
-                    Originally designed in 1930s, gained fame when Grace Kelly used it to shield her pregnancy
+                    Originally created in the 1930s, the Kelly became a symbol of style after being embraced by Princess Grace of Monaco.
                   </p>
                 </div>
               </div>
@@ -146,9 +146,9 @@ export default function KellyShowcase() {
                   <Sparkles className="w-5 h-5 text-yellow-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-1">Structured Elegance</h3>
+                  <h3 className="font-semibold text-lg mb-1">Artisan Craftsmanship</h3>
                   <p className="text-muted-foreground font-light">
-                    Signature trapezoid shape with single top handle and turn-lock closure
+                    Each Kelly is handmade by a single Hermès artisan, requiring up to 20 hours of precision and mastery.
                   </p>
                 </div>
               </div>
@@ -158,9 +158,9 @@ export default function KellyShowcase() {
                   <Gem className="w-5 h-5 text-yellow-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-1">Ultimate Rarity</h3>
+                  <h3 className="font-semibold text-lg mb-1">Authentic Luxury</h3>
                   <p className="text-muted-foreground font-light">
-                    Even more exclusive than the Birkin, with extremely limited production
+                    Every piece is 100% original, sourced directly from Hermès boutiques, complete with signature packaging and authenticity documentation.
                   </p>
                 </div>
               </div>
@@ -173,12 +173,12 @@ export default function KellyShowcase() {
                 <div className="text-sm text-muted-foreground">First Created</div>
               </div>
               <div className="space-y-1">
-                <div className="text-3xl font-bold">$10K+</div>
+                <div className="text-3xl font-bold">$10K +</div>
                 <div className="text-sm text-muted-foreground">Starting Price</div>
               </div>
               <div className="space-y-1">
-                <div className="text-3xl font-bold">40+</div>
-                <div className="text-sm text-muted-foreground">Colors Available</div>
+                <div className="text-3xl font-bold">20 hrs</div>
+                <div className="text-sm text-muted-foreground">Crafting Time</div>
               </div>
             </div>
 
@@ -186,9 +186,7 @@ export default function KellyShowcase() {
             <div className="relative pl-6 py-4">
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-500 via-amber-500 to-yellow-600 rounded-full" />
               <p className="text-base text-muted-foreground leading-relaxed italic">
-                "The Kelly bag represents the pinnacle of Hermès craftsmanship. Its sophisticated silhouette 
-                and meticulous construction have made it a status symbol worn by royalty, celebrities, and 
-                fashion connoisseurs worldwide for nearly a century."
+                "The Kelly bag represents the pinnacle of Hermès craftsmanship — a perfect balance of structure, elegance, and timeless allure. Its story, steeped in heritage, continues to inspire generations of collectors and connoisseurs."
               </p>
             </div>
 

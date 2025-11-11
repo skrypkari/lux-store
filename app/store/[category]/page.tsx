@@ -58,7 +58,7 @@ interface Product {
   currency: string;
   is_sold_out: boolean;
   description_html?: string;
-  media?: Array<{ url_800?: string }>;
+  media?: Array<{ url_800?: string; url_original?: string }>;
   attributes?: Array<{
     attribute_id: string;
     value: string;
@@ -110,6 +110,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string[]>>({});
   const [priceResetTrigger, setPriceResetTrigger] = useState(0);
   const [isPending, startTransition] = useTransition();
+  const [sortBy, setSortBy] = useState("featured");
   const pageSize = 12;
 
   const categoryName = category
@@ -181,6 +182,11 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     queryParams.append('skip', skip.toString());
     queryParams.append('take', pageSize.toString());
     
+    // Добавляем сортировку
+    if (sortBy) {
+      queryParams.append('sortBy', sortBy);
+    }
+    
     // Добавляем ценовой диапазон
     if (priceRange[0] > 0 || priceRange[1] < 100000) {
       queryParams.append('minPrice', priceRange[0].toString());
@@ -201,15 +207,19 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     
     // If category is "all", fetch all products, otherwise fetch by category
     const baseUrl = category === 'all' 
-      ? `https://luxstore-backend.vercel.app/products`
-      : `https://luxstore-backend.vercel.app/products/category/${category}`;
+      ? `http://localhost:5000/products`
+      : `http://localhost:5000/products/category/${category}`;
     
     const url = `${baseUrl}?${queryParams.toString()}`;
+    
+    console.log("Fetching products with URL:", url);
+    console.log("Sort by:", sortBy);
     
     fetch(url)
       .then((res) => res.json())
       .then((data: ProductsResponse) => {
-        console.log("Products data:", data);
+        console.log("Products response:", data);
+        console.log("Number of products:", data.products?.length);
         setProducts(data.products || []);
         setTotal(data.total || 0);
         setHasMore(data.hasMore || false);
@@ -221,7 +231,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
         setTotal(0);
         setLoading(false);
       });
-  }, [category, page, priceRange, appliedFilters, brand]);
+  }, [category, page, priceRange, appliedFilters, brand, sortBy]);
 
   // Загрузка атрибутов (фильтров) - адаптивных на основе примененных фильтров
   useEffect(() => {
@@ -255,7 +265,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       });
     });
     
-    const url = `https://luxstore-backend.vercel.app/attributes/available/filtered?${queryParams.toString()}`;
+    const url = `http://localhost:5000/attributes/available/filtered?${queryParams.toString()}`;
     
     fetch(url)
       .then((res) => res.json())
@@ -276,7 +286,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     ...product,
     brand: getBrandFromProduct(product),
     price: product.base_price || 0,
-    image: product.media?.[0]?.url_800 || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop',
+    image: product.media?.[0]?.url_original || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop',
     rating: 4.5 + Math.random() * 0.5,
     reviews: Math.floor(Math.random() * 200) + 50,
     inStock: !product.is_sold_out,
@@ -322,15 +332,23 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
 
   const PriceSlider = () => {
     // Локальное состояние для плавного движения слайдера
-    const [localPrice, setLocalPrice] = useState([0, 100000]);
+    const [localPrice, setLocalPrice] = useState(() => tempPriceRef.current);
+    const [isInitialized, setIsInitialized] = useState(false);
     
     // Синхронизируем локальное состояние при сбросе фильтров
     useEffect(() => {
       setLocalPrice(tempPriceRef.current);
+      setIsInitialized(true);
     }, [priceResetTrigger]);
     
     // Применяем ценовой фильтр автоматически с задержкой
     useEffect(() => {
+      // Не применяем на первом рендере
+      if (!isInitialized) {
+        setIsInitialized(true);
+        return;
+      }
+      
       const timer = setTimeout(() => {
         setPriceRange(localPrice);
         setPage(0);
@@ -598,20 +616,10 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
-                <div className="hidden sm:flex items-center gap-1 border rounded-md p-1">
-                  <Button variant="ghost" size="icon" className="h-7 w-7">
-                    <Grid3x3 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 bg-muted"
-                  >
-                    <LayoutGrid className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <Select defaultValue="featured">
+                <Select value={sortBy} onValueChange={(value) => {
+                  setSortBy(value);
+                  setPage(0); // Сбрасываем на первую страницу при изменении сортировки
+                }}>
                   <SelectTrigger className="w-full sm:w-[200px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>

@@ -30,7 +30,7 @@ export default function BirkinShowcase() {
                 </span>
               </h2>
               <p className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed">
-                The world's most coveted handbag. A timeless symbol of luxury and exclusivity.
+                The world&apos;s most desired handbag. A symbol of timeless elegance, exceptional craftsmanship, and ultimate exclusivity.
               </p>
             </div>
 
@@ -41,9 +41,9 @@ export default function BirkinShowcase() {
                   <Sparkles className="w-5 h-5 text-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-1">Handcrafted Excellence</h3>
+                  <h3 className="font-semibold text-lg mb-1">Handcrafted Mastery</h3>
                   <p className="text-muted-foreground font-light">
-                    Each bag takes 18-24 hours to craft by a single artisan
+                    Each Birkin is meticulously handmade by a single artisan, requiring up to 24 hours of dedicated craftsmanship.
                   </p>
                 </div>
               </div>
@@ -53,9 +53,9 @@ export default function BirkinShowcase() {
                   <TrendingUp className="w-5 h-5 text-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-1">Investment Piece</h3>
+                  <h3 className="font-semibold text-lg mb-1">Enduring Value</h3>
                   <p className="text-muted-foreground font-light">
-                    Proven to appreciate in value, outperforming gold and stocks
+                    An icon that transcends trends — the Birkin consistently appreciates in value, becoming a lasting investment in luxury.
                   </p>
                 </div>
               </div>
@@ -65,9 +65,9 @@ export default function BirkinShowcase() {
                   <Shield className="w-5 h-5 text-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-1">Authenticated & Certified</h3>
+                  <h3 className="font-semibold text-lg mb-1">Authentic Origin</h3>
                   <p className="text-muted-foreground font-light">
-                    100% genuine with complete authentication documentation
+                    100% original and sourced exclusively from official Hermès boutiques, complete with original packaging and documentation.
                   </p>
                 </div>
               </div>
@@ -80,20 +80,18 @@ export default function BirkinShowcase() {
                 <div className="text-sm text-muted-foreground">First Created</div>
               </div>
               <div className="space-y-1">
-                <div className="text-3xl font-bold">$12K+</div>
+                <div className="text-3xl font-bold">$12K +</div>
                 <div className="text-sm text-muted-foreground">Starting Price</div>
               </div>
               <div className="space-y-1">
-                <div className="text-3xl font-bold">2-6yr</div>
-                <div className="text-sm text-muted-foreground">Waitlist Time</div>
+                <div className="text-3xl font-bold">25–40 hrs</div>
+                <div className="text-sm text-muted-foreground">Crafting Time</div>
               </div>
             </div>
 
             {/* Description */}
             <p className="text-base text-muted-foreground leading-relaxed border-l-2 border-foreground/20 pl-6 italic">
-              "Named after actress and singer Jane Birkin, this iconic bag has become synonymous with 
-              ultimate luxury. Its exclusive nature and meticulous craftsmanship make it one of the most 
-              sought-after accessories in the world."
+              "Named after actress and style muse Jane Birkin, this legendary creation embodies the Hermès spirit of artistry and refinement. Its meticulous construction and rarity have made it one of the most coveted pieces in the world of fashion."
             </p>
           </div>
 
@@ -107,15 +105,15 @@ export default function BirkinShowcase() {
               {/* Premium Badge */}
               <div className="absolute top-6 right-6 z-20">
                 <Badge className="bg-foreground text-background font-semibold shadow-xl">
-                  EXCLUSIVE
+                  BRAND NEW
                 </Badge>
               </div>
 
               {/* Product Image */}
               <div className="relative h-[500px] overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=2070&auto=format&fit=crop"
-                  alt="Hermès Birkin Bag"
+                  src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/7ca69595-da46-4fcd-1085-45c20e9dc100/public"
+                  alt="Hermès Birkin 30 Black Togo Palladium Hardware"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
@@ -141,19 +139,19 @@ export default function BirkinShowcase() {
                       <Sparkles className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold mb-2">Birkin 30</h3>
-                  <p className="text-muted-foreground">Togo Leather • Gold Hardware</p>
+                  <h3 className="text-2xl font-bold mb-2">Hermès Birkin 30 Black Togo Palladium Hardware</h3>
+                  <p className="text-muted-foreground">SKU: H056018CK89/04</p>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">Price</div>
-                    <div className="text-3xl font-bold">$15,750</div>
+                    <div className="text-3xl font-bold">€14,610</div>
                   </div>
                   <div className="h-12 w-px bg-border" />
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">Condition</div>
-                    <div className="text-lg font-semibold">Excellent</div>
+                    <div className="text-lg font-semibold">Brand New</div>
                   </div>
                 </div>
 
@@ -162,7 +160,7 @@ export default function BirkinShowcase() {
                   asChild
                   className="w-full py-6 text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
                 >
-                  <Link href="/products/birkin-30" className="flex items-center justify-center gap-2">
+                  <Link href="/product/768026209" className="flex items-center justify-center gap-2">
                     Shop Now
                     <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
                   </Link>

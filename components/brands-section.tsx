@@ -125,7 +125,7 @@ export default function BrandsSection() {
             >
               <Card className="relative overflow-hidden border-2 hover:border-foreground/20 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 bg-card/50 backdrop-blur p-0">
                 <CardContent className="p-0">
-                  <div className="relative h-96 overflow-hidden">
+                  <div className="relative h-64 lg:h-96 overflow-hidden">
                     {/* Since Badge */}
                     <div className="absolute top-4 right-4 z-20">
                       <Badge className="bg-white/90 text-black backdrop-blur-sm border-0 shadow-lg font-semibold">
