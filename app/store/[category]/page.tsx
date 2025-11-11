@@ -207,8 +207,8 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     
     // If category is "all", fetch all products, otherwise fetch by category
     const baseUrl = category === 'all' 
-      ? `http://localhost:5000/products`
-      : `http://localhost:5000/products/category/${category}`;
+      ? `https://luxstore-backend.vercel.app/products`
+      : `https://luxstore-backend.vercel.app/products/category/${category}`;
     
     const url = `${baseUrl}?${queryParams.toString()}`;
     
@@ -265,7 +265,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       });
     });
     
-    const url = `http://localhost:5000/attributes/available/filtered?${queryParams.toString()}`;
+    const url = `https://luxstore-backend.vercel.app/attributes/available/filtered?${queryParams.toString()}`;
     
     fetch(url)
       .then((res) => res.json())
