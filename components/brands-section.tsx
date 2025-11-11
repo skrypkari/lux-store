@@ -12,7 +12,7 @@ const brands = [
   {
     id: 1,
     name: "HERMÈS",
-    description: "Timeless French luxury",
+    description: "The spirit of craftsmanship",
     established: "1837",
     category: "Fashion House",
     image: "https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=2070&auto=format&fit=crop",
@@ -21,7 +21,7 @@ const brands = [
   {
     id: 2,
     name: "CARTIER",
-    description: "Jeweler of kings",
+    description: "The jeweller of kings and the king of jewellers",
     established: "1847",
     category: "Jewelry",
     image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=2070&auto=format&fit=crop",
@@ -30,7 +30,7 @@ const brands = [
   {
     id: 3,
     name: "ROLEX",
-    description: "Swiss precision",
+    description: "A Crown for Every Achievement",
     established: "1905",
     category: "Timepieces",
     image: "https://images.unsplash.com/photo-1622434641406-a158123450f9?q=80&w=2070&auto=format&fit=crop",
@@ -39,7 +39,7 @@ const brands = [
   {
     id: 4,
     name: "CHANEL",
-    description: "Iconic sophistication",
+    description: "A name that means fashion",
     established: "1910",
     category: "Fashion House",
     image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=2080&auto=format&fit=crop",
@@ -48,7 +48,7 @@ const brands = [
   {
     id: 5,
     name: "GUCCI",
-    description: "Italian craftsmanship",
+    description: "The Future is Fluid",
     established: "1921",
     category: "Fashion House",
     image: "https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?q=80&w=2070&auto=format&fit=crop",
@@ -56,12 +56,12 @@ const brands = [
   },
   {
     id: 6,
-    name: "LOUIS VUITTON",
-    description: "Art of travel",
-    established: "1854",
-    category: "Leather Goods",
-    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2006&auto=format&fit=crop",
-    link: "/brands/louis-vuitton",
+    name: "DIOR",
+    description: "J'adore",
+    established: "1946",
+    category: "Fashion House",
+    image: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=2070&auto=format&fit=crop",
+    link: "/brands/dior",
   },
 ];
 
@@ -126,11 +126,10 @@ export default function BrandsSection() {
               <Card className="relative overflow-hidden border-2 hover:border-foreground/20 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 bg-card/50 backdrop-blur p-0">
                 <CardContent className="p-0">
                   <div className="relative h-96 overflow-hidden">
-                    {/* Premium Badge */}
+                    {/* Since Badge */}
                     <div className="absolute top-4 right-4 z-20">
-                      <Badge className="bg-white/90 text-black backdrop-blur-sm border-0 shadow-lg">
-                        <Crown className="w-3 h-3 mr-1" />
-                        Premium
+                      <Badge className="bg-white/90 text-black backdrop-blur-sm border-0 shadow-lg font-semibold">
+                        Since {brand.established}
                       </Badge>
                     </div>
 
@@ -153,7 +152,6 @@ export default function BrandsSection() {
                         <Badge variant="secondary" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
                           {brand.category}
                         </Badge>
-                        <span className="text-sm text-white/70 font-light">Est. {brand.established}</span>
                       </div>
 
                       {/* Brand Name */}
@@ -203,7 +201,7 @@ export default function BrandsSection() {
             asChild
             className="px-12 py-7 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 bg-foreground text-background group"
           >
-            <Link href="/brands" className="flex items-center gap-2">
+            <Link href="/store/all" className="flex items-center gap-2">
               View All Brands
               <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
             </Link>

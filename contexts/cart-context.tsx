@@ -10,6 +10,7 @@ export interface CartItem {
   image: string;
   quantity: number;
   inStock: boolean;
+  options?: Record<string, string>;
 }
 
 interface CartContextType {
@@ -46,11 +47,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (item: Omit<CartItem, "quantity">) => {
     setCartItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      // Check if item with same id AND same options exists
+      const existing = prev.find((i) => {
+        if (i.id !== item.id) return false;
+        
+        // Compare options
+        const iOptionsStr = JSON.stringify(i.options || {});
+        const itemOptionsStr = JSON.stringify(item.options || {});
+        return iOptionsStr === itemOptionsStr;
+      });
+      
       if (existing) {
-        return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
+        return prev.map((i) => {
+          const iOptionsStr = JSON.stringify(i.options || {});
+          const itemOptionsStr = JSON.stringify(item.options || {});
+          
+          return i.id === item.id && iOptionsStr === itemOptionsStr
+            ? { ...i, quantity: i.quantity + 1 }
+            : i;
+        });
       }
       return [...prev, { ...item, quantity: 1 }];
     });

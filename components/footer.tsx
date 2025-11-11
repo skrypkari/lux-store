@@ -8,14 +8,11 @@ export default function Footer() {
     { name: "Privacy Policy", href: "/privacy" },
     { name: "Cookie Settings", href: "/cookies" },
     { name: "About Us", href: "/about" },
-    { name: "Careers", href: "/careers" },
   ];
 
   const customerService = [
-    { name: "Orders & Payment", href: "/orders" },
-    { name: "Delivery Information", href: "/delivery" },
+    { name: "Payment & Delivery", href: "/orders" },
     { name: "Returns & Exchanges", href: "/returns" },
-    { name: "FAQ", href: "/faq" },
     { name: "Contact Us", href: "/contact" },
   ];
 
@@ -98,10 +95,11 @@ export default function Footer() {
           {/* Column 4 - Concierge & Authentication */}
           <div className="space-y-6">
             <h3 className="text-sm font-semibold text-white tracking-[0.2em] uppercase">
-              Concierge & Authentication
+              The World of Timeless Luxury
             </h3>
             <p className="text-sm text-neutral-400 leading-relaxed">
-              Personalized concierge service for private viewings, appraisal requests and assisted purchases. Our authentication team issues detailed condition reports and provenance documentation on request.
+              Buy exclusive creations from the most prestigious fashion houses — Cartier, Hermès, Dior, Gucci, Chanel, and Rolex. Each piece in our collection embodies craftsmanship, heritage, and modern elegance.
+              At LUX STORE, we curate only authentic designer bags, watches, and accessories that reflect refined taste and sophistication.
             </p>
           </div>
         </div>

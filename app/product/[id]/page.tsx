@@ -10,6 +10,13 @@ import ImageGallery from "@/components/product/image-gallery";
 import QuantitySelector from "@/components/product/quantity-selector";
 import ActionButtons from "@/components/product/action-buttons";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PageProps {
   params: Promise<{
@@ -22,6 +29,7 @@ export default function ProductPage({ params }: PageProps) {
   const [productData, setProductData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setLoading(true);
@@ -389,6 +397,54 @@ export default function ProductPage({ params }: PageProps) {
 
             <Separator />
 
+            {/* Product Options */}
+            {productData.raw_json.options && productData.raw_json.options.length > 0 && (
+              <>
+                <div className="space-y-4">
+                  {productData.raw_json.options.map((option: any) => {
+                    const choices = productData.raw_json.defaultOptionsOverrides?.pricesOverrides?.optionsChoicesWithModifiersAndTaxes?.find(
+                      (opt: any) => opt.optionId === option.optionId
+                    )?.choices || [];
+
+                    return (
+                      <div key={option.optionId}>
+                        <label className="text-sm font-semibold mb-2 block">
+                          {option.optionText}
+                          {option.required && <span className="text-red-500 ml-1">*</span>}
+                        </label>
+                        <Select
+                          value={selectedOptions[option.optionId] || ""}
+                          onValueChange={(value) => {
+                            setSelectedOptions(prev => ({
+                              ...prev,
+                              [option.optionId]: value
+                            }));
+                          }}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder={`Select ${option.optionText}`} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {choices.map((choice: any) => (
+                              <SelectItem key={choice.choiceId} value={choice.choiceId}>
+                                {choice.choiceName}
+                                {choice.modifierFormatted && (
+                                  <span className="text-muted-foreground ml-2">
+                                    {choice.modifierFormatted}
+                                  </span>
+                                )}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    );
+                  })}
+                </div>
+                <Separator />
+              </>
+            )}
+
             {/* Quantity */}
             <QuantitySelector inStock={product.inStock} />
 
@@ -401,7 +457,11 @@ export default function ProductPage({ params }: PageProps) {
                 brand: product.brand,
                 price: product.price,
                 image: product.images[0] || "",
+                options: selectedOptions,
               }}
+              disabled={
+                productData.options?.some((opt: any) => opt.required && !selectedOptions[opt.optionId])
+              }
             />
 
             {/* Product Details */}

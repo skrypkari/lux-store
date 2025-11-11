@@ -83,7 +83,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
       }
     }
 
-    fetch(`https://luxstore-backend.vercel.app/products?${params.toString()}`)
+    fetch(`https://luxstore-backend.vercel.app/ams.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         let filteredProducts = data.products || [];

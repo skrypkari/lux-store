@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, User, Menu } from "lucide-react";
+import { Search, Truck, Menu } from "lucide-react";
 import Link from "next/link";
 import {
   Sheet,
@@ -85,11 +85,11 @@ export default function MobileMenu() {
             <Button
               variant="ghost"
               asChild
-              className="justify-start w-full"
+              className="justify-start w-full px-0!"
             >
               <Link href="/account">
-                <User className="mr-2 h-4 w-4" />
-                Account
+                <Truck className="mr-2 h-4 w-4" />
+                Track Order
               </Link>
             </Button>
           </div>

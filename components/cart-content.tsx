@@ -55,7 +55,7 @@ export default function CartContent() {
     const cartItemIds = cartItems.map(item => item.id);
 
     // Fetch products from the API - get more products to have better selection after filtering
-    fetch('https://luxstore-backend.vercel.app/products?page=1&limit=20')
+    fetch('https://luxstore-backend.vercel.app/1&limit=20')
       .then(res => res.json())
       .then(data => {
         // Filter out items that are already in cart
@@ -281,6 +281,18 @@ export default function CartContent() {
                           <h3 className="mb-3 font-satoshi text-xl font-bold leading-tight">
                             {item.name}
                           </h3>
+                          {item.options && Object.keys(item.options).length > 0 && (
+                            <div className="mb-2 flex flex-wrap gap-2">
+                              {Object.entries(item.options).map(([key, value]) => (
+                                <span
+                                  key={key}
+                                  className="rounded-full border border-black/20 bg-white px-3 py-1 font-general-sans text-xs font-medium text-black"
+                                >
+                                  {key}: {value}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                           <div className="flex flex-wrap gap-2">
                             <span className="flex items-center gap-1.5 rounded-full border border-black/10 bg-black/5 px-3 py-1 font-general-sans text-xs font-medium text-black/70">
                               <Truck className="h-3 w-3" />
@@ -393,6 +405,18 @@ export default function CartContent() {
                       <h3 className="mb-2 font-satoshi text-base font-bold leading-tight">
                         {item.name}
                       </h3>
+                      {item.options && Object.keys(item.options).length > 0 && (
+                        <div className="mb-1 flex flex-wrap gap-1">
+                          {Object.entries(item.options).map(([key, value]) => (
+                            <span
+                              key={key}
+                              className="rounded-full border border-black/20 bg-white px-2 py-0.5 font-general-sans text-[10px] font-medium text-black"
+                            >
+                              {key}: {value}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       <p className="font-satoshi text-xl font-bold">
                         ${(item.price * item.quantity).toLocaleString()}
                       </p>

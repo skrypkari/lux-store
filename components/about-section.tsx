@@ -51,30 +51,92 @@ export default function AboutSection() {
               </p>
             </div>
           </div>
-          <div className="relative order-2">
-            <div className="relative">
-              {/* Decorative Frame */}
-              <div className="absolute -inset-4 bg-gradient-to-br from-amber-400/20 via-transparent to-amber-600/20 rounded-2xl" />
-              <div className="absolute -inset-2 border border-amber-400/30 rounded-xl" />
+          <div className="relative order-2 space-y-8">
+            {/* Premium Logo Container with Elegant Frame */}
+            <div className="relative group">
+              {/* Outer Decorative Frame */}
+              <div className="absolute -inset-6 bg-gradient-to-br from-amber-500/10 via-transparent to-amber-600/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               
-              {/* Logo Container */}
-              <div className="relative bg-black rounded-lg overflow-hidden shadow-2xl">
-                <Image
-                  src="/aboutus.png"
-                  alt="LUX STORE"
-                  width={2000}
-                  height={2000}
-                  className="w-full h-auto"
-                  priority
-                />
+              {/* Main Logo Container */}
+              <div className="relative bg-gradient-to-br from-neutral-900 via-black to-neutral-900 rounded-2xl shadow-2xl border border-amber-500/20">
+                {/* Inner Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent rounded-2xl" />
                 
-                {/* Shine Effect */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent" />
+                {/* Logo */}
+                <div className="relative">
+                  <Image
+                    src="/aboutus.png"
+                    alt="LUX STORE"
+                    width={280}
+                    height={280}
+                    className="w-54 mx-auto relative z-10"
+                    priority
+                  />
+                  {/* Subtle Shine Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                </div>
+                
+                {/* Corner Accents */}
+                <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-amber-500/40" />
+                <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-amber-500/40" />
               </div>
+            </div>
 
-              {/* Decorative Corner Elements */}
-              <div className="absolute -top-6 -left-6 w-12 h-12 border-t-2 border-l-2 border-amber-500/50" />
-              <div className="absolute -bottom-6 -right-6 w-12 h-12 border-b-2 border-r-2 border-amber-500/50" />
+            {/* Premium Authentication Card */}
+            <div className="relative group">
+              {/* Gradient Border Effect */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 rounded-2xl opacity-75 group-hover:opacity-100 blur-sm transition-all duration-500" />
+              
+              <div className="relative bg-white rounded-2xl p-8 shadow-xl">
+                {/* Decorative Top Line */}
+                <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+                
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center shadow-lg">
+                    <Shield className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-neutral-900 mb-2 tracking-tight">
+                      How we authenticate
+                    </h3>
+                    <div className="h-0.5 w-16 bg-gradient-to-r from-amber-500 to-transparent" />
+                  </div>
+                </div>
+                
+                <p className="text-neutral-600 leading-relaxed text-base">
+                  Our specialists inspect serials, hallmarks and provenance, cross-checking with manufacturer records and established databases. For high-jewellery and watches we provide full condition reports and certificates where available.
+                </p>
+                
+                {/* Subtle Bottom Accent */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent rounded-b-2xl" />
+              </div>
+            </div>
+
+            {/* Premium Shipping Card */}
+            <div className="relative group">
+              {/* Subtle Border Glow */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-neutral-200/50 backdrop-blur-sm">
+                {/* Decorative Top Line */}
+                <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent" />
+                
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center shadow-md border border-neutral-200">
+                    <Globe className="w-6 h-6 text-neutral-700" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-neutral-900 mb-2 tracking-tight">
+                      Shipping & returns
+                    </h3>
+                    <div className="h-0.5 w-16 bg-gradient-to-r from-neutral-400 to-transparent" />
+                  </div>
+                </div>
+                
+                <p className="text-neutral-600 leading-relaxed text-base">
+                  We ship globally with insured carriers. Returns accepted within 14 days provided the item is in the original condition — contact us to start a return.
+                </p>
+              </div>
             </div>
           </div>
         </div>

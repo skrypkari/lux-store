@@ -1,24 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 
 export default function CartButton() {
   const { cartCount } = useCart();
 
   return (
-    <Button variant="ghost" size="icon" asChild className="relative group">
-      <Link href="/cart" aria-label="Shopping cart">
-        <ShoppingBag className="h-5 w-5 transition-transform group-hover:scale-110" />
+    <Link href="/cart">
+      <button className="flex items-center gap-1.5 px-3 py-1.5 border border-black rounded-full hover:bg-white/40 cursor-pointer transition-colors relative text-sm">
+        <ShoppingCart className="h-4 w-4" />
+        <span className="font-medium hidden md:flex">Cart</span>
         {cartCount > 0 && (
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs animate-in zoom-in duration-300">
+          <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-medium">
             {cartCount}
-          </Badge>
+          </span>
         )}
-      </Link>
-    </Button>
+      </button>
+    </Link>
   );
 }

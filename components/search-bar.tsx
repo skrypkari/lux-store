@@ -34,6 +34,7 @@ export default function SearchBar() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [categories, setCategories] = useState<Array<{ name: string; slug: string }>>([]);
   const searchRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Load categories for quick links
   useEffect(() => {
@@ -132,15 +133,15 @@ export default function SearchBar() {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="flex"
-        aria-label="Search"
+      <button
+        ref={buttonRef}
+        className="flex items-center gap-1.5 px-3 py-1.5 border border-black rounded-full hover:bg-white/40 cursor-pointer transition-colors text-sm"
         onClick={() => setIsOpen(true)}
+        aria-label="Search"
       >
-        <Search className="h-5 w-5" />
-      </Button>
+        <Search className="h-4 w-4" />
+        <span className="font-medium hidden md:flex">Search</span>
+      </button>
 
       {/* Backdrop */}
       {isOpen && (

@@ -39,7 +39,7 @@ export default function CategoriesSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://luxstore-backend.vercel.app/categories")
+    fetch("https://luxstore-backend.vercel.app/")
       .then((res) => res.json())
       .then((data: Category[]) => {
         console.log("Categories data:", data);

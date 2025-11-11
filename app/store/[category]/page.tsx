@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect, useRef } from "react";
+import { use, useState, useEffect, useRef, useTransition } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
@@ -99,6 +99,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string[]>>({});
   const [priceResetTrigger, setPriceResetTrigger] = useState(0);
+  const [isPending, startTransition] = useTransition();
   const pageSize = 12;
 
   const categoryName = category
@@ -115,22 +116,33 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
 
   // Функция для переключения фильтра
   const toggleFilter = (attributeName: string, value: string) => {
-    setSelectedFilters(prev => {
-      const currentValues = prev[attributeName] || [];
-      const isSelected = currentValues.includes(value);
-      
-      if (isSelected) {
-        // Убираем значение
-        const newValues = currentValues.filter(v => v !== value);
-        if (newValues.length === 0) {
-          const { [attributeName]: _, ...rest } = prev;
-          return rest;
-        }
-        return { ...prev, [attributeName]: newValues };
+    // Синхронно обновляем UI
+    const currentValues = selectedFilters[attributeName] || [];
+    const isSelected = currentValues.includes(value);
+    
+    let newFilters;
+    if (isSelected) {
+      // Убираем значение
+      const newValues = currentValues.filter(v => v !== value);
+      if (newValues.length === 0) {
+        const { [attributeName]: _, ...rest } = selectedFilters;
+        newFilters = rest;
       } else {
-        // Добавляем значение
-        return { ...prev, [attributeName]: [...currentValues, value] };
+        newFilters = { ...selectedFilters, [attributeName]: newValues };
       }
+    } else {
+      // Добавляем значение
+      newFilters = { ...selectedFilters, [attributeName]: [...currentValues, value] };
+    }
+    
+    // Обновляем состояние сразу (синхронно)
+    setSelectedFilters(newFilters);
+    
+    // Применяем фильтры в фоне
+    startTransition(() => {
+      setAppliedFilters(newFilters);
+      setPage(0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   };
 
@@ -142,14 +154,6 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     setPriceRange([0, 100000]);
     setPriceResetTrigger(prev => prev + 1); // Триггер для сброса PriceSlider
     setPage(0);
-  };
-
-  // Функция для применения фильтров
-  const applyFilters = () => {
-    setPriceRange(tempPriceRef.current);
-    setAppliedFilters(selectedFilters);
-    setPage(0); // Сбрасываем на первую страницу при изменении фильтров
-    // Плавная прокрутка наверх
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -171,6 +175,11 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     if (priceRange[0] > 0 || priceRange[1] < 100000) {
       queryParams.append('minPrice', priceRange[0].toString());
       queryParams.append('maxPrice', priceRange[1].toString());
+    }
+    
+    // Добавляем brand из URL если есть
+    if (brand) {
+      queryParams.append('Brand', brand);
     }
     
     // Добавляем атрибуты (используем appliedFilters вместо selectedFilters)
@@ -202,16 +211,46 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
         setTotal(0);
         setLoading(false);
       });
-  }, [category, page, priceRange, appliedFilters]);
+  }, [category, page, priceRange, appliedFilters, brand]);
 
-  // Загрузка атрибутов (фильтров)
+  // Загрузка атрибутов (фильтров) - адаптивных на основе примененных фильтров
   useEffect(() => {
     setLoadingFilters(true);
     
-    fetch(`https://luxstore-backend.vercel.app/attributes/category/${category}`)
+    // Строим query параметры для получения доступных фильтров
+    const queryParams = new URLSearchParams();
+    
+    // Добавляем категорию
+    if (category && category !== 'all') {
+      queryParams.append('categorySlug', category);
+    } else {
+      queryParams.append('categorySlug', 'all');
+    }
+    
+    // Добавляем ценовой диапазон
+    if (priceRange[0] > 0 || priceRange[1] < 100000) {
+      queryParams.append('minPrice', priceRange[0].toString());
+      queryParams.append('maxPrice', priceRange[1].toString());
+    }
+    
+    // Добавляем brand из URL если есть
+    if (brand) {
+      queryParams.append('Brand', brand);
+    }
+    
+    // Добавляем примененные фильтры
+    Object.entries(appliedFilters).forEach(([attributeName, values]) => {
+      values.forEach(value => {
+        queryParams.append(attributeName, value);
+      });
+    });
+    
+    const url = `https://luxstore-backend.vercel.app/attributes/available/filtered?${queryParams.toString()}`;
+    
+    fetch(url)
       .then((res) => res.json())
       .then((data: AttributeValue[]) => {
-        console.log("Attributes data:", data);
+        console.log("Available attributes:", data);
         setAttributes(data || []);
         setLoadingFilters(false);
       })
@@ -220,7 +259,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
         setAttributes([]);
         setLoadingFilters(false);
       });
-  }, [category]);
+  }, [category, appliedFilters, priceRange, brand]);
 
   // Преобразование данных из API в формат для отображения
   const displayProducts = products.map((product) => ({
@@ -253,6 +292,16 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     useEffect(() => {
       setLocalPrice(tempPriceRef.current);
     }, [priceResetTrigger]);
+    
+    // Применяем ценовой фильтр автоматически с задержкой
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setPriceRange(localPrice);
+        setPage(0);
+      }, 300); // Задержка 300мс после последнего изменения
+      
+      return () => clearTimeout(timer);
+    }, [localPrice]);
     
     return (
       <AccordionItem value="price">
@@ -389,15 +438,6 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
             </AccordionItem>
           ))}
         </Accordion>
-
-        {/* Apply Button */}
-        <Button 
-          className="w-full" 
-          size="lg"
-          onClick={applyFilters}
-        >
-          Apply Filters
-        </Button>
       </div>
     );
   };
@@ -677,11 +717,11 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                       <div className="flex flex-col">
                         {product.originalPrice && (
                           <span className="text-xs text-muted-foreground line-through mb-0.5">
-                            ${product.originalPrice.toLocaleString()}
+                            €{product.originalPrice.toLocaleString()}
                           </span>
                         )}
                         <span className="text-2xl font-bold tracking-tight">
-                          ${product.price.toLocaleString()}
+                          €{product.price.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">

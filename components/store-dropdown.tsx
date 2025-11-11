@@ -21,13 +21,13 @@ interface Category {
 export default function StoreDropdown() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     fetch("https://luxstore-backend.vercel.app/categories")
       .then((res) => res.json())
       .then((data) => {
         console.log("Received data:", data);
-        // Убедимся, что data это массив
         if (Array.isArray(data)) {
           setCategories(data);
         } else {
@@ -78,10 +78,18 @@ export default function StoreDropdown() {
               </DropdownMenuTrigger>
               {category.children.length > 0 && (
                 <DropdownMenuContent side="right" sideOffset={0} alignOffset={-8} align="start" className="w-[200px] p-2">
+                  <Link 
+                    href={`/store/${category.slug_without_id}`} 
+                    className="block"
+                  >
+                    <DropdownMenuItem className="cursor-pointer font-medium">
+                      View All
+                    </DropdownMenuItem>
+                  </Link>
                   {category.children.map((subcategory) => (
                     <Link 
                       key={subcategory.id}
-                      href={`/store/${category.slug_without_id}/${subcategory.slug_without_id}`} 
+                      href={`/store/${category.slug_without_id}?brand=${subcategory.slug_without_id}`} 
                       className="block"
                     >
                       <DropdownMenuItem className="cursor-pointer">

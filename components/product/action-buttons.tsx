@@ -20,10 +20,12 @@ interface ActionButtonsProps {
     brand: string;
     price: number;
     image: string;
+    options?: Record<string, string>;
   };
+  disabled?: boolean;
 }
 
-export default function ActionButtons({ inStock, product }: ActionButtonsProps) {
+export default function ActionButtons({ inStock, product, disabled }: ActionButtonsProps) {
   const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -31,7 +33,7 @@ export default function ActionButtons({ inStock, product }: ActionButtonsProps) 
   const [copied, setCopied] = useState(false);
 
   const handleAddToCart = async () => {
-    if (!inStock) return;
+    if (!inStock || disabled) return;
     
     setIsAdding(true);
     
@@ -43,6 +45,7 @@ export default function ActionButtons({ inStock, product }: ActionButtonsProps) 
       addToCart({
         ...product,
         inStock,
+        options: product.options,
       });
     } else {
       addToCart({

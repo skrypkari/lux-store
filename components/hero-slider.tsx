@@ -80,7 +80,7 @@ export default function HeroSlider() {
       >
         <CarouselContent className="h-[calc(100vh-80px)]">
           {slides.map((slide, index) => (
-            <CarouselItem key={slide.id} className="h-full">
+            <CarouselItem key={slide.id} className={cn("h-full", current === index && "z-10")}>
               <div className="relative w-full h-full select-none">
                 <div className="absolute inset-0 scale-105 transition-transform duration-[7000ms] ease-out">
                   <Image
