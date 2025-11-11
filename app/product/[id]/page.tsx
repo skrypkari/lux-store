@@ -33,7 +33,7 @@ export default function ProductPage({ params }: PageProps) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:5000/products/${id}`)
+    fetch(`https://luxstore-backend.vercel.app/products/${id}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error('Product not found');

@@ -38,7 +38,7 @@ export default function SearchBar() {
 
   // Load categories for quick links
   useEffect(() => {
-    fetch('http://localhost:5000/categories')
+    fetch('https://luxstore-backend.vercel.app/categories')
       .then(res => res.json())
       .then(data => {
         // Get top 4 categories for quick links
@@ -104,7 +104,7 @@ export default function SearchBar() {
         search: query,
       });
 
-      fetch(`http://localhost:5000/products?${searchParams.toString()}`)
+      fetch(`https://luxstore-backend.vercel.app/products?${searchParams.toString()}`)
         .then(res => res.json())
         .then(data => {
           setResults(data.products || []);

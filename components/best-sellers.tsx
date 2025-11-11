@@ -153,7 +153,7 @@ export default function BestSellers() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/products/random?limit=8")
+    fetch("https://luxstore-backend.vercel.app/products/random?limit=8")
       .then((res) => res.json())
       .then((data: Product[]) => {
         console.log("Products data:", data);
