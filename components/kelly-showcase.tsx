@@ -19,7 +19,7 @@ export default function KellyShowcase() {
             <div className="absolute -top-6 -left-6 w-72 h-72 bg-foreground/5 rounded-full blur-3xl" />
             <div className="absolute -bottom-6 -right-6 w-72 h-72 bg-foreground/5 rounded-full blur-3xl" />
             
-            <Card className="relative overflow-hidden border-2 shadow-2xl bg-card/50 backdrop-blur group py-0">
+            <Card className="relative overflow-hidden border-2 shadow-2xl bg-white backdrop-blur group py-0">
               {/* Royal Badge */}
               <div className="absolute top-6 left-6 z-20">
                 <Badge className="bg-gradient-to-r from-yellow-600 to-yellow-500 text-white font-semibold shadow-xl border-0">
@@ -33,9 +33,10 @@ export default function KellyShowcase() {
                 <Image
                   src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/525f1367-55f3-4aea-b81d-f7b165770500/public"
                   alt="Hermès Kelly Sellier 20 Etoupe Epsom Gold Hardware"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover transition-transform duration-700 h-[500px] w-auto mx-auto p-10 group-hover:scale-105"
                   priority
+                  width={1080}
+                  height={1080}
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 

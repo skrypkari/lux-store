@@ -101,7 +101,7 @@ export default function BirkinShowcase() {
             <div className="absolute -top-6 -right-6 w-72 h-72 bg-foreground/5 rounded-full blur-3xl" />
             <div className="absolute -bottom-6 -left-6 w-72 h-72 bg-foreground/5 rounded-full blur-3xl" />
             
-            <Card className="relative overflow-hidden border-2 shadow-2xl bg-card/50 backdrop-blur group py-0">
+            <Card className="relative overflow-hidden border-2 shadow-2xl bg-white backdrop-blur group py-0">
               {/* Premium Badge */}
               <div className="absolute top-6 right-6 z-20">
                 <Badge className="bg-foreground text-background font-semibold shadow-xl">
@@ -114,9 +114,10 @@ export default function BirkinShowcase() {
                 <Image
                   src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/7ca69595-da46-4fcd-1085-45c20e9dc100/public"
                   alt="Hermès Birkin 30 Black Togo Palladium Hardware"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="transition-transform duration-700 group-hover:scale-105 h-[500px] w-auto mx-auto p-10"
                   priority
+                  width={1080}
+                  height={1080}
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 
