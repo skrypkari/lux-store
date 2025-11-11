@@ -55,7 +55,7 @@ export default function CartContent() {
     const cartItemIds = cartItems.map(item => item.id);
 
     // Fetch products from the API - get more products to have better selection after filtering
-    fetch('https://luxstore-backend.vercel.app/1&limit=20')
+    fetch('http://localhost:5000/1&limit=20')
       .then(res => res.json())
       .then(data => {
         // Filter out items that are already in cart

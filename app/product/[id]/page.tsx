@@ -33,7 +33,7 @@ export default function ProductPage({ params }: PageProps) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`https://luxstore-backend.vercel.app/products/${id}`)
+    fetch(`http://localhost:5000/products/${id}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error('Product not found');
@@ -197,8 +197,6 @@ export default function ProductPage({ params }: PageProps) {
       "Comes with original dust bag",
       "Authentication certificate",
       "Secure packaging and shipping",
-      "Premium quality materials",
-      "Expert craftsmanship",
     ],
     specifications: specifications,
   };
@@ -251,8 +249,8 @@ export default function ProductPage({ params }: PageProps) {
             <div className="grid grid-cols-3 gap-4 mt-8 p-6 bg-muted/30 rounded-lg border">
               <div className="text-center">
                 <ShieldCheck className="w-8 h-8 mx-auto mb-2 text-primary" />
-                <div className="text-xs font-semibold">Authenticated</div>
-                <div className="text-xs text-muted-foreground mt-1">By Experts</div>
+                <div className="text-xs font-semibold">100% Authentic</div>
+                <div className="text-xs text-muted-foreground mt-1">Product</div>
               </div>
               <div className="text-center">
                 <Truck className="w-8 h-8 mx-auto mb-2 text-primary" />
@@ -265,41 +263,6 @@ export default function ProductPage({ params }: PageProps) {
                 <div className="text-xs text-muted-foreground mt-1">30 Days</div>
               </div>
             </div>
-
-            {/* Why Buy From Us */}
-            <div className="border rounded-lg p-6 bg-card">
-              <h3 className="font-semibold mb-4 text-sm">Why Buy From Us</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3 text-sm">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <div>
-                    <span className="font-medium">Certified Authentic</span>
-                    <p className="text-xs text-muted-foreground mt-0.5">Every item verified by industry experts</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3 text-sm">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <div>
-                    <span className="font-medium">White Glove Service</span>
-                    <p className="text-xs text-muted-foreground mt-0.5">Premium packaging and handling</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3 text-sm">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <div>
-                    <span className="font-medium">Secure Transaction</span>
-                    <p className="text-xs text-muted-foreground mt-0.5">Bank-level encryption & buyer protection</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3 text-sm">
-                  <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  <div>
-                    <span className="font-medium">Concierge Support</span>
-                    <p className="text-xs text-muted-foreground mt-0.5">Dedicated team available 24/7</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
           </div>
 
           {/* Right Column - Product Info */}
@@ -311,28 +274,14 @@ export default function ProductPage({ params }: PageProps) {
               </span>
             </div>
 
-            {/* Title & Rating */}
+            {/* Title & Condition Badge */}
             <div>
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 {product.name}
               </h1>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < Math.floor(product.rating)
-                            ? "fill-amber-400 text-amber-400"
-                            : "fill-muted text-muted"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm font-medium">{product.rating}</span>
-                  <span className="text-sm text-muted-foreground">({product.reviews} reviews)</span>
-                </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200 rounded-md">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-xs font-semibold tracking-wide text-emerald-700">BRAND NEW</span>
               </div>
             </div>
 
@@ -350,7 +299,7 @@ export default function ProductPage({ params }: PageProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
-                <span>1,247 views</span>
+                <span>{productData?.views ? productData.views.toLocaleString() : '0'} views</span>
               </div>
             </div>
 
@@ -369,15 +318,6 @@ export default function ProductPage({ params }: PageProps) {
               <p className="text-sm text-muted-foreground mb-2">
                 Price incl. VAT (20%) €{product.priceVAT.toLocaleString()}
               </p>
-              <div className="flex items-center gap-4 text-sm">
-                <button className="text-primary hover:underline font-medium">
-                  Request Payment Plan
-                </button>
-                <Separator orientation="vertical" className="h-4" />
-                <button className="text-primary hover:underline font-medium">
-                  Currency Converter
-                </button>
-              </div>
             </div>
 
             {/* Stock Status */}
@@ -489,69 +429,10 @@ export default function ProductPage({ params }: PageProps) {
                 ))}
               </ul>
             </div>
-
-            {/* Special Services */}
-            <div className="grid grid-cols-2 gap-3">
-              <button className="border rounded-lg p-4 text-left hover:border-primary transition-colors group">
-                <svg className="w-5 h-5 text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                </svg>
-                <div className="text-sm font-semibold mb-1 group-hover:text-primary transition-colors">Gift Wrapping</div>
-                <div className="text-xs text-muted-foreground">Complimentary luxury packaging</div>
-              </button>
-              <button className="border rounded-lg p-4 text-left hover:border-primary transition-colors group">
-                <svg className="w-5 h-5 text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <div className="text-sm font-semibold mb-1 group-hover:text-primary transition-colors">Personalization</div>
-                <div className="text-xs text-muted-foreground">Add custom engraving</div>
-              </button>
-              <button className="border rounded-lg p-4 text-left hover:border-primary transition-colors group">
-                <svg className="w-5 h-5 text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <div className="text-sm font-semibold mb-1 group-hover:text-primary transition-colors">Reserve Now</div>
-                <div className="text-xs text-muted-foreground">Schedule private viewing</div>
-              </button>
-              <button className="border rounded-lg p-4 text-left hover:border-primary transition-colors group">
-                <svg className="w-5 h-5 text-primary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <div className="text-sm font-semibold mb-1 group-hover:text-primary transition-colors">Trade-In</div>
-                <div className="text-xs text-muted-foreground">Exchange your luxury item</div>
-              </button>
-            </div>
           </div>
         </div>
-
-        {/* Expert Analysis Banner */}
-        <div className="mt-16 border-t border-b py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">100%</div>
-              <div className="text-sm font-medium mb-1">Authentic</div>
-              <div className="text-xs text-muted-foreground">Verified by experts</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">24/7</div>
-              <div className="text-sm font-medium mb-1">Support</div>
-              <div className="text-xs text-muted-foreground">Always here to help</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">2-5</div>
-              <div className="text-sm font-medium mb-1">Business Days</div>
-              <div className="text-xs text-muted-foreground">Express delivery</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">30</div>
-              <div className="text-sm font-medium mb-1">Day Returns</div>
-              <div className="text-xs text-muted-foreground">Hassle-free policy</div>
-            </div>
-          </div>
-        </div>
-
         {/* Product Information Sections */}
-        <div className="mt-16 space-y-8">
+        <div className="mt-16 space-y-8 border-t pt-10">
           {/* Description */}
           <div className="border rounded-lg p-8 bg-card">
             <div className="flex items-center gap-3 mb-6">
@@ -566,17 +447,7 @@ export default function ProductPage({ params }: PageProps) {
               className="prose max-w-none"
               dangerouslySetInnerHTML={{ __html: productData.description_html || product.description }}
             />
-            <div className="pt-6 border-t">
-              <h3 className="font-semibold mb-3 text-sm">Product Highlights</h3>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {product.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            
           </div>
 
           {/* Specifications */}
@@ -599,62 +470,6 @@ export default function ProductPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Care Instructions */}
-          <div className="border rounded-lg p-8 bg-card">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold">Care Instructions</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-semibold mb-3 text-sm">Do's</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Store in provided dust bag when not in use</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Clean with soft, dry cloth regularly</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Keep away from direct sunlight and heat</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Handle hardware with care to prevent scratches</span>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-3 text-sm">Don'ts</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <X className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                    <span>Avoid contact with water and liquids</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <X className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                    <span>Do not use chemical cleaners or abrasives</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <X className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                    <span>Avoid overloading to maintain shape</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <X className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                    <span>Keep away from sharp objects and rough surfaces</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
           {/* Shipping & Returns */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="border rounded-lg p-6 bg-card">
@@ -663,16 +478,16 @@ export default function ProductPage({ params }: PageProps) {
                 Shipping Information
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                We offer worldwide express shipping with full insurance and tracking.
+                We offer worldwide DHL express shipping with full insurance and tracking.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  Free shipping on orders over €500
+                  Free shipping on all orders
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                  Express delivery: 2-5 business days
+                  Delivery time: 21 - 35 days
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
@@ -718,64 +533,43 @@ export default function ProductPage({ params }: PageProps) {
           <div className="border rounded-lg p-8 bg-card text-center">
             <ShieldCheck className="h-16 w-16 mx-auto mb-4 text-primary" />
             <h2 className="text-2xl font-bold mb-4">100% Authenticity Guaranteed</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto mb-4">
+              Every item in our collection is original and sourced directly from official brand boutiques and authorized retailers.
+            </p>
+            <p className="text-muted-foreground max-w-2xl mx-auto mb-4">
+              We guarantee the authenticity of all products — every piece is a genuine creation by the brand, delivered with its original packaging and documentation.
+            </p>
             <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-              Every item in our collection undergoes a rigorous authentication process by our team of certified experts. We guarantee that all products are 100% authentic or your money back.
+              All items are brand new and never pre-owned, ensuring you receive an authentic product of certified origin.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
               <div>
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-3xl font-bold text-primary">1</span>
                 </div>
-                <h4 className="font-semibold mb-2">Expert Inspection</h4>
+                <h4 className="font-semibold mb-2">Direct Brand Source</h4>
                 <p className="text-sm text-muted-foreground">
-                  Verified by certified authenticators with 15+ years experience
+                  All products come directly from official brand stores or authorized partners.
                 </p>
               </div>
               <div>
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-3xl font-bold text-primary">2</span>
                 </div>
-                <h4 className="font-semibold mb-2">Documentation</h4>
+                <h4 className="font-semibold mb-2">Original Packaging</h4>
                 <p className="text-sm text-muted-foreground">
-                  Signed certificate of authenticity with detailed item report
+                  Each item includes the brand's original box, dust bag, and authenticity documents.
                 </p>
               </div>
               <div>
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-3xl font-bold text-primary">3</span>
                 </div>
-                <h4 className="font-semibold mb-2">Money-Back</h4>
+                <h4 className="font-semibold mb-2">Guaranteed Authenticity</h4>
                 <p className="text-sm text-muted-foreground">
-                  Full refund within 30 days if authenticity is disputed
+                  We guarantee every item is 100% genuine — or your money back.
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Customer Confidence Section */}
-        <div className="mt-16 bg-muted/30 rounded-lg p-8 border">
-          <h2 className="text-2xl font-bold mb-8 text-center">Trusted by Luxury Collectors Worldwide</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <div className="text-3xl font-bold mb-2">4.9/5</div>
-              <div className="text-sm text-muted-foreground">Average Rating</div>
-              <div className="text-xs text-muted-foreground mt-1">From 2,847 verified reviews</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold mb-2">50K+</div>
-              <div className="text-sm text-muted-foreground">Items Sold</div>
-              <div className="text-xs text-muted-foreground mt-1">To collectors in 89 countries</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold mb-2">99.8%</div>
-              <div className="text-sm text-muted-foreground">Satisfaction Rate</div>
-              <div className="text-xs text-muted-foreground mt-1">Based on customer feedback</div>
             </div>
           </div>
         </div>
@@ -787,23 +581,29 @@ export default function ProductPage({ params }: PageProps) {
             Our luxury specialists are available 24/7 to assist you with any questions about this item or to schedule a private viewing.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" variant="outline">
-              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              Call: +1 (555) 123-4567
+            <Button size="lg" variant="outline" asChild>
+              <a href="tel:+445557771234">
+                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                Call: +44-555-777-1234
+              </a>
             </Button>
-            <Button size="lg" variant="outline">
-              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-              Live Chat
+            <Button size="lg" variant="outline" asChild>
+              <a href="https://wa.me/445557771234" target="_blank" rel="noopener noreferrer">
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                WhatsApp
+              </a>
             </Button>
-            <Button size="lg" variant="outline">
-              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              Email Us
+            <Button size="lg" variant="outline" asChild>
+              <a href="https://t.me/lux_store_eu" target="_blank" rel="noopener noreferrer">
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
+                Telegram
+              </a>
             </Button>
           </div>
         </div>

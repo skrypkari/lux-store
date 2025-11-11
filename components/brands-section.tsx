@@ -15,8 +15,8 @@ const brands = [
     description: "The spirit of craftsmanship",
     established: "1837",
     category: "Fashion House",
-    image: "https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=2070&auto=format&fit=crop",
-    link: "/brands/hermes",
+    image: "/hermes_logo.png",
+    link: "/store/all?brand=HERMÈS",
   },
   {
     id: 2,
@@ -24,8 +24,8 @@ const brands = [
     description: "The jeweller of kings and the king of jewellers",
     established: "1847",
     category: "Jewelry",
-    image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=2070&auto=format&fit=crop",
-    link: "/brands/cartier",
+    image: "/cartier_logo.png",
+    link: "/store/all?brand=CARTIER",
   },
   {
     id: 3,
@@ -33,8 +33,8 @@ const brands = [
     description: "A Crown for Every Achievement",
     established: "1905",
     category: "Timepieces",
-    image: "https://images.unsplash.com/photo-1622434641406-a158123450f9?q=80&w=2070&auto=format&fit=crop",
-    link: "/brands/rolex",
+    image: "/rolex_logo.png",
+    link: "/store/all?brand=ROLEX",
   },
   {
     id: 4,
@@ -42,8 +42,8 @@ const brands = [
     description: "A name that means fashion",
     established: "1910",
     category: "Fashion House",
-    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=2080&auto=format&fit=crop",
-    link: "/brands/chanel",
+    image: "/chanel_logo.png",
+    link: "/store/all?brand=CHANEL",
   },
   {
     id: 5,
@@ -51,8 +51,8 @@ const brands = [
     description: "The Future is Fluid",
     established: "1921",
     category: "Fashion House",
-    image: "https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?q=80&w=2070&auto=format&fit=crop",
-    link: "/brands/gucci",
+    image: "/gucci_logo.png",
+    link: "/store/all?brand=GUCCI",
   },
   {
     id: 6,
@@ -60,8 +60,8 @@ const brands = [
     description: "J'adore",
     established: "1946",
     category: "Fashion House",
-    image: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=2070&auto=format&fit=crop",
-    link: "/brands/dior",
+    image: "/dior_logo.png",
+    link: "/store/all?brand=DIOR",
   },
 ];
 

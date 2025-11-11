@@ -129,6 +129,59 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'satoshi', sans-serif;
 }
 
+/* Custom Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333333 #f5f5f5;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 5px;
+  border: 2px solid #f5f5f5;
+  transition: background 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #000000;
+}
+
+*::-webkit-scrollbar-corner {
+  background: #f5f5f5;
+}
+
+/* Dark mode scrollbar */
+.dark * {
+  scrollbar-color: #cccccc #1a1a1a;
+}
+
+.dark *::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border: 2px solid #1a1a1a;
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+}
+
+.dark *::-webkit-scrollbar-corner {
+  background: #1a1a1a;
+}
+
 /* Product description styles */
 .prose {
   @apply text-foreground/80;

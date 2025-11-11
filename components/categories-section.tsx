@@ -39,7 +39,7 @@ export default function CategoriesSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://luxstore-backend.vercel.app/")
+    fetch("http://localhost:5000/categories")
       .then((res) => res.json())
       .then((data: Category[]) => {
         console.log("Categories data:", data);
@@ -67,13 +67,13 @@ export default function CategoriesSection() {
   // Функция для получения дефолтных изображений
   const getDefaultImage = (categoryName: string) => {
     const imageMap: Record<string, string> = {
-      'Handbags': 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2006&auto=format&fit=crop',
-      'Bags': 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2006&auto=format&fit=crop',
-      'Watches': 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop',
-      'Watch': 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop',
-      'Jewelry': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop',
-      'Jewellery': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop',
-      'Sunglasses': 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=2080&auto=format&fit=crop',
+      'Handbags': '/bags_main.png',
+      'Bags': '/bags_main.png',
+      'Watches': '/watch_main.png',
+      'Watch': '/watch_main.png',
+      'Jewelry': '/jewelry_main.png',
+      'Jewellery': '/jewelry_main.png',
+      'Sunglasses': '/sunglasses_main.png',
     };
     return imageMap[categoryName] || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop';
   };

@@ -20,11 +20,11 @@ export default function Footer() {
     "Visa",
     "Mastercard",
     "Amex",
-    "PayPal",
     "Apple Pay",
     "Google Pay",
-    "Klarna",
-    "Bank Transfer",
+    "SEPA",
+    "Open Banking",
+    "Cryptocurrency"
   ];
 
   return (

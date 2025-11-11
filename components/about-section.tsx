@@ -121,21 +121,56 @@ export default function AboutSection() {
                 {/* Decorative Top Line */}
                 <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-neutral-300/50 to-transparent" />
                 
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center shadow-md border border-neutral-200">
-                    <Globe className="w-6 h-6 text-neutral-700" />
+                <div className="space-y-6">
+                  {/* Shipping Section */}
+                  <div>
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center shadow-md border border-neutral-200">
+                        <Globe className="w-6 h-6 text-neutral-700" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-2xl font-bold text-neutral-900 mb-2 tracking-tight">
+                          Shipping
+                        </h3>
+                        <div className="h-0.5 w-16 bg-gradient-to-r from-neutral-400 to-transparent" />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3 text-neutral-600 leading-relaxed text-base">
+                      <p>
+                        We offer complimentary worldwide delivery via DHL Express, ensuring a secure and fully insured service to your door.
+                      </p>
+                      <p>
+                        Each item is carefully packaged and shipped with tracking information provided upon dispatch.
+                      </p>
+                      <p>
+                        All customs duties, taxes, and import fees are included in the product price.
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-neutral-900 mb-2 tracking-tight">
-                      Shipping & returns
+
+                  {/* Divider */}
+                  <div className="h-px bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
+
+                  {/* Returns & Exchanges Section */}
+                  <div>
+                    <h3 className="text-2xl font-bold text-neutral-900 mb-4 tracking-tight">
+                      Returns & Exchanges
                     </h3>
-                    <div className="h-0.5 w-16 bg-gradient-to-r from-neutral-400 to-transparent" />
+                    
+                    <div className="space-y-3 text-neutral-600 leading-relaxed text-base">
+                      <p>
+                        We accept returns and exchanges worldwide within 30 days from the date of delivery.
+                      </p>
+                      <p>
+                        Once your return is received and inspected, a refund will be issued to your original payment method.
+                      </p>
+                      <p>
+                        Return shipping is available through DHL Express with full insurance and tracking for your convenience.
+                      </p>
+                    </div>
                   </div>
                 </div>
-                
-                <p className="text-neutral-600 leading-relaxed text-base">
-                  We ship globally with insured carriers. Returns accepted within 14 days provided the item is in the original condition — contact us to start a return.
-                </p>
               </div>
             </div>
           </div>

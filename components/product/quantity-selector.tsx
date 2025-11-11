@@ -11,28 +11,19 @@ interface QuantitySelectorProps {
 export default function QuantitySelector({ inStock }: QuantitySelectorProps) {
   const [quantity, setQuantity] = useState(1);
 
-  // Calculate delivery estimate (2-5 business days from now)
+  // Calculate delivery estimate (21-35 days from now)
   const today = new Date();
-  const minDays = 2;
-  const maxDays = 5;
+  const minDays = 21;
+  const maxDays = 35;
   
-  const getBusinessDate = (startDate: Date, daysToAdd: number) => {
-    let currentDate = new Date(startDate);
-    let daysAdded = 0;
-    
-    while (daysAdded < daysToAdd) {
-      currentDate.setDate(currentDate.getDate() + 1);
-      const dayOfWeek = currentDate.getDay();
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Skip weekends
-        daysAdded++;
-      }
-    }
-    
-    return currentDate;
+  const addDays = (date: Date, days: number) => {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
   };
 
-  const minDate = getBusinessDate(today, minDays);
-  const maxDate = getBusinessDate(today, maxDays);
+  const minDate = addDays(today, minDays);
+  const maxDate = addDays(today, maxDays);
   
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -78,7 +69,7 @@ export default function QuantitySelector({ inStock }: QuantitySelectorProps) {
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
-            <span>Express shipping included</span>
+            <span>DHL Express shipping included</span>
           </div>
         </div>
       </div>

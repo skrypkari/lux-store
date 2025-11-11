@@ -57,7 +57,17 @@ interface Product {
   base_price?: number;
   currency: string;
   is_sold_out: boolean;
+  description_html?: string;
   media?: Array<{ url_800?: string }>;
+  attributes?: Array<{
+    attribute_id: string;
+    value: string;
+    attribute: {
+      id: string;
+      name: string;
+      type: string;
+    };
+  }>;
   // Display properties
   brand?: string;
   price?: number;
@@ -191,8 +201,8 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     
     // If category is "all", fetch all products, otherwise fetch by category
     const baseUrl = category === 'all' 
-      ? `https://luxstore-backend.vercel.app/products`
-      : `https://luxstore-backend.vercel.app/products/category/${category}`;
+      ? `http://localhost:5000/products`
+      : `http://localhost:5000/products/category/${category}`;
     
     const url = `${baseUrl}?${queryParams.toString()}`;
     
@@ -245,7 +255,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       });
     });
     
-    const url = `https://luxstore-backend.vercel.app/attributes/available/filtered?${queryParams.toString()}`;
+    const url = `http://localhost:5000/attributes/available/filtered?${queryParams.toString()}`;
     
     fetch(url)
       .then((res) => res.json())
@@ -264,24 +274,50 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   // Преобразование данных из API в формат для отображения
   const displayProducts = products.map((product) => ({
     ...product,
-    brand: extractBrand(product.name),
+    brand: getBrandFromProduct(product),
     price: product.base_price || 0,
     image: product.media?.[0]?.url_800 || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop',
     rating: 4.5 + Math.random() * 0.5,
     reviews: Math.floor(Math.random() * 200) + 50,
     inStock: !product.is_sold_out,
-    description: product.subtitle || "Luxury item from prestigious collection",
+    description: getCollectionFromProduct(product),
   }));
 
-  // Функция для извлечения бренда из названия
-  function extractBrand(name: string) {
-    const brands = ['HERMÈS', 'CARTIER', 'ROLEX', 'CHANEL', 'GUCCI', 'LOUIS VUITTON', 'PATEK PHILIPPE'];
+  // Функция для извлечения бренда из атрибутов или названия
+  function getBrandFromProduct(product: Product): string {
+    // Сначала пытаемся найти бренд в атрибутах
+    const brandAttribute = product.attributes?.find(
+      attr => attr.attribute.name === 'Brand' || attr.attribute.type === 'BRAND'
+    );
+    
+    if (brandAttribute) {
+      return brandAttribute.value;
+    }
+    
+    // Если не найден в атрибутах, пытаемся извлечь из названия
+    const brands = ['HERMÈS', 'CARTIER', 'ROLEX', 'CHANEL', 'GUCCI', 'LOUIS VUITTON', 'PATEK PHILIPPE', 'DIOR'];
     for (const brand of brands) {
-      if (name.toUpperCase().includes(brand)) {
+      if (product.name.toUpperCase().includes(brand)) {
         return brand;
       }
     }
-    return name.split(' ')[0].toUpperCase();
+    
+    // В крайнем случае берем первое слово из названия
+    return product.name.split(' ')[0].toUpperCase();
+  }
+
+  // Функция для извлечения коллекции из атрибутов
+  function getCollectionFromProduct(product: Product): string {
+    // Ищем атрибут Collection
+    const collectionAttribute = product.attributes?.find(
+      attr => attr.attribute.name === 'Collection'
+    );
+    
+    if (collectionAttribute) {
+      return collectionAttribute.value;
+    }
+    
+    return "Luxury Collection";
   }
 
   const PriceSlider = () => {
@@ -651,13 +687,18 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                   <p className="text-muted-foreground">No products found in this category</p>
                 </div>
               ) : (
-                displayProducts.map((product) => (
+                displayProducts.map((product) => {
+                  console.log('Product:', product);
+                  return (
                 <div
                   key={product.id}
                   className="group relative flex flex-col bg-card border rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
                 >
                   {/* Image Container */}
-                  <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                  <div 
+                    className="relative aspect-[4/3] overflow-hidden bg-muted cursor-pointer"
+                    onClick={() => window.location.href = `/product/${product.id}`}
+                  >
                     <Image
                       src={product.image}
                       alt={product.name}
@@ -747,7 +788,8 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                   {/* Premium Border Effect */}
                   <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-primary/20 transition-all duration-300 pointer-events-none" />
                 </div>
-              ))
+              );
+                })
               )}
             </div>
 

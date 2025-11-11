@@ -89,10 +89,10 @@ export default function ImageGallery({ images, productName, inStock }: ImageGall
             <button
               key={index}
               onClick={() => setSelectedImage(index)}
-              className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+              className={`relative aspect-square overflow-hidden rounded-lg border transition-all ${
                 selectedImage === index
-                  ? "border-primary shadow-lg scale-105"
-                  : "border-transparent hover:border-muted-foreground/50"
+                  ? "border-primary ring-2 ring-primary/20 shadow-lg"
+                  : "border-border hover:border-primary/50"
               }`}
             >
               <Image
@@ -109,15 +109,15 @@ export default function ImageGallery({ images, productName, inStock }: ImageGall
       {/* More Images Indicator (if more than 4 images) */}
       {totalImages > 4 && (
         <div className="flex items-center justify-between gap-4">
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
             {images.slice(4).map((image, index) => (
               <button
                 key={index + 4}
                 onClick={() => setSelectedImage(index + 4)}
-                className={`relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                className={`relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg border transition-all ${
                   selectedImage === index + 4
-                    ? "border-primary shadow-lg scale-105"
-                    : "border-transparent hover:border-muted-foreground/50"
+                    ? "border-primary ring-2 ring-primary/20 shadow-lg"
+                    : "border-border hover:border-primary/50"
                 }`}
               >
                 <Image
@@ -133,15 +133,11 @@ export default function ImageGallery({ images, productName, inStock }: ImageGall
       )}
 
       {/* Image Navigation Info */}
-      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-        {hasMultipleImages && (
-          <>
-            <span>Image {selectedImage + 1} of {totalImages}</span>
-            <span>•</span>
-          </>
-        )}
-        <button className="hover:text-foreground transition-colors font-medium">View 360°</button>
-      </div>
+      {hasMultipleImages && (
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <span>Image {selectedImage + 1} of {totalImages}</span>
+        </div>
+      )}
     </>
   );
 }
