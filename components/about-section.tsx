@@ -69,7 +69,7 @@ export default function AboutSection() {
                     alt="LUX STORE"
                     width={280}
                     height={280}
-                    className="w-96 mx-auto relative z-10"
+                    className="w-86 mx-auto relative z-10"
                     priority
                   />
                   {/* Subtle Shine Effect */}
