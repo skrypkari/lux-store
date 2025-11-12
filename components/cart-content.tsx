@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 interface RelatedProduct {
   id: number;
   name: string;
+  slug_without_id: string;
   brand: string;
   price: number;
   media: Array<{ url: string }>;
@@ -846,7 +847,7 @@ export default function CartContent() {
               const brandName = product.categories?.[0]?.category?.name || product.brand;
 
               return (
-                <Link key={product.id} href={`/product/${product.id}`}>
+                <Link key={product.id} href={`/products/${product.slug_without_id}`}>
                   <div className="group overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg transition-all duration-300 hover:border-black/20 hover:shadow-2xl">
                     <div className="relative aspect-square overflow-hidden bg-black/5">
                       <Image

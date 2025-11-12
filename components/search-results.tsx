@@ -22,6 +22,7 @@ interface Product {
   id: number;
   name: string;
   sku: string;
+  slug_without_id: string;
   base_price: number;
   condition: string;
   media: Array<{ url_original: string }>;
@@ -334,7 +335,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
               return (
                 <Link
                   key={product.id}
-                  href={`/product/${product.id}`}
+                  href={`/products/${product.slug_without_id}`}
                   className="group border rounded-lg overflow-hidden bg-card hover:shadow-xl transition-all duration-300"
                 >
                   <div className="relative aspect-square overflow-hidden bg-muted">

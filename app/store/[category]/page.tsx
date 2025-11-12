@@ -61,6 +61,7 @@ interface PageProps {
 interface Product {
   id: string;
   name: string;
+  slug_without_id: string;
   subtitle?: string;
   sku?: string;
   base_price?: number;
@@ -142,6 +143,71 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ")
     : null;
+
+  // Определение категории, бренда и модели
+  // URL: /store/bags - общая категория
+  // URL: /store/bags?brand=hermes - бренд Hermès
+  // URL: /store/hermes-kelly - модель Kelly
+  // URL: /store/jewellery?brand=earrings - подкатегория ювелирных изделий
+  const getCategoryInfo = () => {
+    const lowerCategory = category.toLowerCase();
+    const normalizedBrand = brandName?.toLowerCase().replace(/è|e/g, 'e');
+    
+    // Hermès models (специальные URL для моделей)
+    if (lowerCategory === "hermes-kelly" || lowerCategory === "hermès-kelly") {
+      return { type: "bags", brand: "Hermès", model: "Kelly" };
+    }
+    if (lowerCategory === "hermes-birkin" || lowerCategory === "hermès-birkin") {
+      return { type: "bags", brand: "Hermès", model: "Birkin" };
+    }
+    if (lowerCategory === "hermes-constance" || lowerCategory === "hermès-constance") {
+      return { type: "bags", brand: "Hermès", model: "Constance" };
+    }
+    
+    // Jewellery с подкатегориями через brand параметр
+    if (lowerCategory === "jewellery" || lowerCategory === "jewelry") {
+      // Нормализуем бренд для корректного отображения
+      let displayBrand = brandName;
+      if (normalizedBrand === "hermes") {
+        displayBrand = "Hermès";
+      }
+      
+      // Если brand указывает на подкатегорию (earrings, rings, bracelets, necklaces)
+      const jewelryCategories = ["earrings", "rings", "bracelets", "necklaces"];
+      if (brandName && jewelryCategories.includes(brandName.toLowerCase())) {
+        return {
+          type: brandName.toLowerCase(),
+          brand: null,
+          model: null
+        };
+      }
+      
+      return { 
+        type: "jewelry", 
+        brand: displayBrand || null, 
+        model: null 
+      };
+    }
+    
+    // Обычная категория с опциональным брендом из query параметра
+    if (lowerCategory === "bags" || lowerCategory === "watches" || lowerCategory === "sunglasses") {
+      // Нормализуем бренд для корректного отображения
+      let displayBrand = brandName;
+      if (normalizedBrand === "hermes") {
+        displayBrand = "Hermès";
+      }
+      
+      return { 
+        type: lowerCategory, 
+        brand: displayBrand || null, 
+        model: null 
+      };
+    }
+    
+    return { type: category, brand: brandName || null, model: null };
+  };
+
+  const categoryInfo = getCategoryInfo();
 
   // Инициализация фильтров из URL при первой загрузке
   useEffect(() => {
@@ -658,7 +724,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       {/* Premium Page Header */}
       <div className="border-b bg-gradient-to-b from-muted/30 to-background">
         <div className="container mx-auto px-4 py-12">
-          <div className="max-w-2xl">
+          <div className="max-w-4xl">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
               <span>Home</span>
               <span>/</span>
@@ -680,9 +746,11 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                 products
               </p>
             )}
-            <p className="text-muted-foreground mt-2">
-              Discover our curated collection of authentic luxury items
-            </p>
+            {!brandName && (
+              <p className="text-muted-foreground mt-2">
+                Discover our curated collection of authentic luxury items
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -983,7 +1051,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                       <div
                         className="relative aspect-square overflow-hidden bg-muted cursor-pointer"
                         onClick={() =>
-                          (window.location.href = `/product/${product.id}`)
+                          (window.location.href = `/products/${product.slug_without_id}`)
                         }
                       >
                         <Image
@@ -1068,7 +1136,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                               size="sm"
                               className="font-semibold"
                               onClick={() =>
-                                (window.location.href = `/product/${product.id}`)
+                                (window.location.href = `/products/${product.slug_without_id}`)
                               }
                             >
                               Details
@@ -1204,6 +1272,500 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                 </p>
               </div>
             </div>
+
+            {/* Category Description for SEO */}
+            {/* Priority: Model > Brand > Category */}
+            
+            {/* Bags - Hermès - Kelly */}
+            {categoryInfo.type === "bags" && categoryInfo.brand === "Hermès" && categoryInfo.model === "Kelly" ? (
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Hermès Kelly Bags</h2>
+                  
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy a Hermès Kelly bag</span> — the ultimate symbol of elegance and refined Parisian style.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Handcrafted by Hermès artisans, the Kelly embodies precision, grace, and timeless allure. Its iconic trapezoid silhouette, signature clasp, and meticulous stitching make it a masterpiece recognized around the world.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Hermès Kelly bags in a variety of sizes, leathers, and colors — each piece a rare blend of heritage and modern sophistication.
+                  </p>
+                  
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy an Hermès Kelly bag</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            ) : categoryInfo.type === "bags" && categoryInfo.brand === "Hermès" && categoryInfo.model === "Birkin" ? (
+              /* Bags - Hermès - Birkin */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Hermès Birkin Bags</h2>
+                  
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy a Hermès Birkin bag</span> — the ultimate icon of luxury, craftsmanship, and timeless allure.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Handcrafted in France by Hermès artisans, each Birkin represents perfection in every stitch, made from the finest leathers and rare materials. From classic neutral tones to limited-edition colors, the Birkin bag is a masterpiece that transcends fashion and becomes a legacy.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Hermès Birkin bags — symbols of elegance, prestige, and individuality.
+                  </p>
+                  
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy an Hermès Birkin bag</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            ) : categoryInfo.type === "bags" && categoryInfo.brand === "Hermès" && categoryInfo.model === "Constance" ? (
+              /* Bags - Hermès - Constance */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Hermès Constance Bags</h2>
+                  
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy a Hermès Constance bag</span> — the embodiment of discreet elegance and timeless Parisian chic.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Handcrafted by Hermès artisans, the Constance is celebrated for its sleek silhouette, iconic "H" clasp, and effortless sophistication. Each bag reflects the Maison's devotion to craftsmanship, precision, and refined simplicity.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Hermès Constance bags in classic and modern hues — crafted from the world's finest leathers.
+                  </p>
+                  
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy an Hermès Constance bag</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            ) : categoryInfo.type === "bags" && categoryInfo.brand === "Cartier" ? (
+              /* Bags - Cartier */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Cartier Bags</h2>
+                  
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Cartier bags</span> and embrace timeless elegance and refined taste. Each Cartier bag reflects the Maison's legendary craftsmanship — a perfect fusion of artistry and luxury.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Graceful lines, noble shapes, and exquisite details define every creation — from the iconic <span className="font-medium text-foreground">Panthère de Cartier</span> to the sophisticated <span className="font-medium text-foreground">Double C de Cartier</span>.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic women's and men's Cartier bags — symbols of distinction and modern grace.
+                  </p>
+                  
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy a Cartier bag</span> with an authenticity guarantee and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            ) : categoryInfo.type === "bags" && categoryInfo.brand === "Hermès" ? (
+              /* Bags - Hermès (general) */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Hermès Bags</h2>
+                  
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Hermès bags</span> and experience the essence of true French luxury. Each Hermès creation is handcrafted by skilled artisans, reflecting generations of craftsmanship and timeless elegance.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    From the legendary <span className="font-medium text-foreground">Birkin</span> and <span className="font-medium text-foreground">Kelly</span> to the refined <span className="font-medium text-foreground">Constance</span>, every Hermès bag embodies perfection in form, rare materials, and impeccable quality.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic women's and men's Hermès bags — icons of status, taste, and enduring sophistication.
+                  </p>
+                  
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy an Hermès bag</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            ) : categoryInfo.type === "bags" && categoryInfo.brand === "Dior" ? (
+              /* Bags - Dior */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Dior Bags</h2>
+                  
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Dior bags</span> and enter the world of Parisian elegance and haute couture craftsmanship.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each Dior bag embodies femininity, grace, and the artistic vision of the House of Dior — where luxury meets timeless design. From the iconic <span className="font-medium text-foreground">Lady Dior</span> and <span className="font-medium text-foreground">Saddle Bag</span> to the modern <span className="font-medium text-foreground">Book Tote</span> and <span className="font-medium text-foreground">Caro</span>, every creation reflects exceptional attention to detail and refined sophistication.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Dior handbags crafted from the finest materials, blending heritage with contemporary allure.
+                  </p>
+                  
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy a Dior bag</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            ) : categoryInfo.type === "bags" && categoryInfo.brand === "Chanel" ? (
+              /* Bags - Chanel */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Chanel Bags</h2>
+                  
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Chanel bags</span> and embrace the essence of timeless Parisian elegance.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each Chanel creation — from the legendary <span className="font-medium text-foreground">Classic Flap</span> and <span className="font-medium text-foreground">2.55</span> to the modern <span className="font-medium text-foreground">Boy</span> and <span className="font-medium text-foreground">19 Bag</span> — embodies the spirit of Coco Chanel: sophistication, freedom, and impeccable taste.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Handcrafted from the finest leathers with signature quilted patterns, chain straps, and the iconic interlocking CC, every bag is a masterpiece of style. Discover authentic Chanel handbags — symbols of grace, confidence, and enduring allure.
+                  </p>
+                  
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy a Chanel bag</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            ) : categoryInfo.type === "bags" && categoryInfo.brand === "Gucci" ? (
+              /* Bags - Gucci */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Gucci Bags</h2>
+                  
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Gucci bags</span> and step into the world of Italian elegance, where every detail reflects timeless style and refined taste.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Gucci collections blend Florentine craftsmanship with modern design — from the iconic <span className="font-medium text-foreground">GG monogram</span> and <span className="font-medium text-foreground">Web stripes</span> to bold contemporary silhouettes.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic women's and men's Gucci bags: classic <span className="font-medium text-foreground">Jackie</span> and <span className="font-medium text-foreground">Dionysus</span>, or the trend-setting <span className="font-medium text-foreground">GG Marmont</span> and <span className="font-medium text-foreground">Gucci Giglio</span>.
+                  </p>
+                  
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy a Gucci bag</span> with an authenticity guarantee and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            ) : categoryInfo.type === "bags" && !categoryInfo.brand ? (
+              /* Bags - All brands */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">About Luxury Designer Bags Collection</h2>
+                  
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy luxury designer bags</span> and discover the timeless elegance of the world's most iconic fashion houses — <span className="font-medium">Hermès, Cartier, Dior, Chanel, and Gucci</span>.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each masterpiece reflects heritage, craftsmanship, and refined taste: from the legendary <span className="font-medium text-foreground">Birkin</span> and <span className="font-medium text-foreground">Kelly</span> to the elegant <span className="font-medium text-foreground">Lady Dior</span>, <span className="font-medium text-foreground">Chanel Classic Flap</span>, and <span className="font-medium text-foreground">Gucci Marmont</span>.
+                  </p>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Every bag is a symbol of sophistication, created with the finest materials and meticulous attention to detail.
+                  </p>
+                  
+                  <p className="text-foreground/90 leading-relaxed">
+                    Explore our curated collection of authentic luxury handbags and <span className="font-semibold">buy designer bags</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "watches" && categoryInfo.brand === "Cartier" ? (
+              /* Watches - Cartier */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Cartier Watches</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Cartier watches</span> and experience the perfect harmony of timeless elegance and fine craftsmanship.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each Cartier timepiece reflects the Maison's legacy of precision, artistry, and Parisian sophistication. From the iconic <span className="font-medium text-foreground">Tank</span> and <span className="font-medium text-foreground">Santos de Cartier</span> to the refined <span className="font-medium text-foreground">Ballon Bleu</span> and <span className="font-medium text-foreground">Pasha</span>, every watch embodies luxury in its purest form.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Cartier watches for men and women — created with passion, innovation, and attention to every detail.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy a Cartier watch</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "watches" && categoryInfo.brand === "Rolex" ? (
+              /* Watches - Rolex */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Rolex Watches</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Rolex watches</span> and experience the unmatched prestige of Swiss craftsmanship.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Every Rolex timepiece is a symbol of precision, innovation, and timeless excellence — created for those who value perfection and achievement. From the legendary <span className="font-medium text-foreground">Submariner</span> and <span className="font-medium text-foreground">Day-Date</span> to the elegant <span className="font-medium text-foreground">Datejust</span> and <span className="font-medium text-foreground">GMT-Master II</span>, each watch combines technical mastery with iconic design.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Rolex watches for men and women — crafted to endure generations.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy a Rolex watch</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "watches" && categoryInfo.brand === "Chanel" ? (
+              /* Watches - Chanel */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Chanel Watches</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Chanel watches</span> and embrace the perfect balance of timeless elegance and modern allure.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each Chanel timepiece reflects the spirit of Mademoiselle Chanel — refined, bold, and effortlessly chic. From the iconic <span className="font-medium text-foreground">J12</span> and <span className="font-medium text-foreground">Première</span> to the sophisticated <span className="font-medium text-foreground">Boy·Friend</span> and <span className="font-medium text-foreground">Code Coco</span>, every watch unites Swiss precision with Parisian style.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Chanel watches for women and men — crafted with exceptional craftsmanship and artistic design.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy a Chanel watch</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "watches" && categoryInfo.brand === "Gucci" ? (
+              /* Watches - Gucci */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Gucci Watches</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Gucci watches</span> and explore the bold fusion of Italian creativity and Swiss precision.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each timepiece embodies the House's unmistakable style — expressive, luxurious, and contemporary. From the elegant <span className="font-medium text-foreground">G-Timeless</span> and <span className="font-medium text-foreground">Grip</span> to the avant-garde <span className="font-medium text-foreground">Gucci 25H collection</span>, every Gucci watch reflects individuality and artistic craftsmanship.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Gucci watches for men and women — designed for those who value fashion and excellence in every detail.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy a Gucci watch</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "watches" && !categoryInfo.brand ? (
+              /* Watches - All brands */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Luxury Watches</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy luxury watches</span> and discover timeless craftsmanship from the world's most iconic brands — <span className="font-medium">Cartier, Rolex, Chanel, and Gucci</span>.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each timepiece tells a story of precision, elegance, and innovation, uniting Swiss excellence with artistic design. From the refined sophistication of Cartier and the prestige of Rolex to the Parisian allure of Chanel and the bold creativity of Gucci — every watch is a masterpiece of style and heritage.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Explore our curated collection of authentic luxury watches and <span className="font-semibold">buy designer timepieces</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "sunglasses" && categoryInfo.brand === "Cartier" ? (
+              /* Sunglasses - Cartier */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Cartier Sunglasses</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Cartier sunglasses</span> and experience the perfect blend of luxury, craftsmanship, and timeless elegance.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each pair embodies the Maison's iconic design philosophy — where fine jewelry artistry meets modern eyewear sophistication. From classic aviators to bold contemporary silhouettes, Cartier sunglasses reflect confidence, refinement, and unmistakable prestige.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Cartier sunglasses for men and women — crafted from premium materials with signature details in gold and platinum finishes.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy Cartier sunglasses</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "sunglasses" && categoryInfo.brand === "Dior" ? (
+              /* Sunglasses - Dior */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Dior Sunglasses</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Dior sunglasses</span> and step into the world of Parisian elegance and haute couture sophistication.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each pair embodies the House of Dior's signature balance of femininity, innovation, and timeless design. From the iconic <span className="font-medium text-foreground">DiorSoLight</span> and <span className="font-medium text-foreground">DiorStellaire</span> to the bold <span className="font-medium text-foreground">CD Diamond</span> and <span className="font-medium text-foreground">DiorBlackSuit</span>, every model reflects modern glamour and meticulous craftsmanship.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Dior sunglasses for men and women — designed to express individuality with effortless style.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy Dior sunglasses</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "sunglasses" && categoryInfo.brand === "Chanel" ? (
+              /* Sunglasses - Chanel */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Chanel Sunglasses</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Chanel sunglasses</span> and discover the essence of Parisian chic and timeless sophistication.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each pair reflects the spirit of Coco Chanel — elegant, bold, and effortlessly modern. From classic oversized frames to the iconic <span className="font-medium text-foreground">Butterfly</span>, <span className="font-medium text-foreground">Square</span>, and <span className="font-medium text-foreground">Round</span> designs, every creation combines luxury craftsmanship with distinctive style.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Chanel sunglasses for women and men — handcrafted with precision and adorned with the signature CC emblem.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy Chanel sunglasses</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "sunglasses" && categoryInfo.brand === "Gucci" ? (
+              /* Sunglasses - Gucci */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Gucci Sunglasses</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy Gucci sunglasses</span> and explore the world of bold Italian style and contemporary luxury.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each pair reflects the House's unique blend of creativity, elegance, and expressive design. From classic aviators and oversized frames to avant-garde statement pieces, Gucci sunglasses redefine modern fashion with unmistakable charm.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Discover authentic Gucci sunglasses for men and women — crafted in Italy with signature details, premium materials, and flawless craftsmanship.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy Gucci sunglasses</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "sunglasses" && !categoryInfo.brand ? (
+              /* Sunglasses - All brands */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Luxury Sunglasses</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy luxury sunglasses</span> and discover timeless elegance from the world's most iconic fashion houses — <span className="font-medium">Dior, Chanel, Cartier, and Gucci</span>.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each pair embodies sophistication, craftsmanship, and modern glamour, blending haute couture design with exceptional comfort. From Dior's refined silhouettes and Chanel's Parisian chic to Cartier's jewelry-inspired details and Gucci's bold Italian flair — every creation is a statement of individuality and taste.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Explore our collection of authentic designer sunglasses and <span className="font-semibold">buy luxury eyewear</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "jewelry" && !categoryInfo.brand ? (
+              /* Jewelry - All brands */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Designer Jewelry</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy designer jewelry</span> and discover the timeless elegance of <span className="font-medium">Dior, Chanel, Cartier, and Gucci</span> — the world's most iconic luxury maisons.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each piece reflects exceptional craftsmanship and unique identity: Dior's poetic femininity, Chanel's Parisian sophistication, Cartier's jewelry perfection, and Gucci's daring creativity. From rings and bracelets to necklaces and earrings, every creation combines artistry, emotion, and impeccable detail.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Explore our exclusive collection of authentic luxury jewelry and <span className="font-semibold">buy designer pieces</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "bracelets" && !categoryInfo.brand ? (
+              /* Bracelets */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Designer Bracelets</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy designer bracelets</span> and embrace the timeless beauty of <span className="font-medium">Dior, Chanel, Cartier, and Gucci</span>.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each piece reflects the unique DNA of its Maison — from Cartier's jewelry artistry and Dior's feminine grace to Chanel's Parisian sophistication and Gucci's bold creativity. Discover exquisite gold, silver, and enamel bracelets, adorned with signature emblems and crafted with exceptional attention to detail.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Every bracelet is a symbol of luxury and individuality — created to elevate any look with effortless elegance.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Choose yours and <span className="font-semibold">buy luxury bracelets</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "rings" && !categoryInfo.brand ? (
+              /* Rings */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Designer Rings</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy designer rings</span> and discover the artistry of <span className="font-medium">Dior, Chanel, Cartier, and Gucci</span> — the world's most celebrated luxury maisons.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each creation tells a story of elegance and craftsmanship: Cartier's timeless sophistication, Dior's romantic flair, Chanel's iconic minimalism, and Gucci's bold modern edge. From delicate gold bands and signature motifs to statement cocktail rings, every piece reflects perfection in design and detail.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Explore our curated collection of authentic luxury rings and <span className="font-semibold">buy designer jewelry</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "necklaces" && !categoryInfo.brand ? (
+              /* Necklaces */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Designer Necklaces</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy designer necklaces</span> and pendants from <span className="font-medium">Dior, Chanel, Cartier, and Gucci</span> — where timeless beauty meets exceptional craftsmanship.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each piece captures the essence of its Maison: Dior's romantic femininity, Chanel's Parisian elegance, Cartier's jewelry excellence, and Gucci's bold contemporary style. From delicate chains and diamond pendants to statement gold necklaces, every creation is designed to illuminate individuality and grace.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Discover our collection of authentic luxury jewelry and <span className="font-semibold">buy necklaces and pendants</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            
+            ) : categoryInfo.type === "earrings" && !categoryInfo.brand ? (
+              /* Earrings */
+              <div className="mt-16 max-w-4xl mx-auto">
+                <div className="prose prose-lg max-w-none">
+                  <h2 className="text-2xl font-bold mb-6">Designer Earrings</h2>
+                  <p className="text-foreground/90 leading-relaxed mb-4">
+                    <span className="font-semibold">Buy designer earrings</span> from <span className="font-medium">Dior, Chanel, Cartier, and Gucci</span> — where timeless elegance meets contemporary artistry.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Each pair reflects the spirit of its Maison: Dior's romantic refinement, Chanel's effortless chic, Cartier's jewelry mastery, and Gucci's bold modern design. From elegant studs and signature hoops to statement drop earrings, every creation showcases exquisite craftsmanship and unmistakable style.
+                  </p>
+                  <p className="text-foreground/90 leading-relaxed">
+                    Discover authentic luxury earrings and <span className="font-semibold">buy designer jewelry</span> with guaranteed authenticity and worldwide delivery.
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </main>

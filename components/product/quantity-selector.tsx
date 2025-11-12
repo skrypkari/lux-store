@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin, Clock } from "lucide-react";
 
 interface QuantitySelectorProps {
   inStock: boolean;
+  quantity: number;
+  onQuantityChange: (quantity: number) => void;
 }
 
-export default function QuantitySelector({ inStock }: QuantitySelectorProps) {
-  const [quantity, setQuantity] = useState(1);
+export default function QuantitySelector({ inStock, quantity, onQuantityChange }: QuantitySelectorProps) {
 
   // Calculate delivery estimate (21-35 days from now)
   const today = new Date();
@@ -38,7 +38,7 @@ export default function QuantitySelector({ inStock }: QuantitySelectorProps) {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+            onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
             disabled={!inStock}
             className="h-11 w-11"
           >
@@ -48,7 +48,7 @@ export default function QuantitySelector({ inStock }: QuantitySelectorProps) {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setQuantity(quantity + 1)}
+            onClick={() => onQuantityChange(quantity + 1)}
             disabled={!inStock}
             className="h-11 w-11"
           >

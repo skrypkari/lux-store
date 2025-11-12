@@ -161,7 +161,7 @@ export default function BirkinShowcase() {
                   asChild
                   className="w-full py-6 text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
                 >
-                  <Link href="/product/768026209" className="flex items-center justify-center gap-2">
+                  <Link href="/products/768026209" className="flex items-center justify-center gap-2">
                     Shop Now
                     <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
                   </Link>

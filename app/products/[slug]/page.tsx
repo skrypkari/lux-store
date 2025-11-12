@@ -1,136 +1,96 @@
-"use client";
-
-import { use, useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Star, Truck, ShieldCheck, RotateCcw, Check, X } from "lucide-react";
 import ImageGallery from "@/components/product/image-gallery";
-import QuantitySelector from "@/components/product/quantity-selector";
-import ActionButtons from "@/components/product/action-buttons";
+import ProductInteractive from "@/components/product/product-interactive";
+import ChatButton from "@/components/chat-button";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Metadata } from "next";
 
 interface PageProps {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 }
 
-export default function ProductPage({ params }: PageProps) {
-  const { id } = use(params);
-  const [productData, setProductData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    setLoading(true);
-    fetch(`https://luxstore-backend.vercel.app/products/${id}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Product not found');
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setProductData(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, [id]);
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-20">
-          <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            {/* Animated Logo/Icon */}
-            <div className="relative mb-8">
-              <div className="w-24 h-24 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <svg className="w-12 h-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-              </div>
-            </div>
-            
-            {/* Loading Text */}
-            <h2 className="text-2xl font-bold mb-2">Loading Product</h2>
-            <p className="text-muted-foreground mb-8 text-center max-w-md">
-              Please wait while we retrieve your luxury item details...
-            </p>
-            
-            {/* Loading Progress Animation */}
-            <div className="w-64 h-1 bg-muted rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-primary via-primary/50 to-primary animate-[shimmer_1.5s_ease-in-out_infinite] bg-[length:200%_100%]"></div>
-            </div>
-            
-            {/* Skeleton Loader Preview */}
-            <div className="w-full max-w-5xl mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Image Skeleton */}
-              <div className="space-y-4">
-                <div className="aspect-[4/3] bg-muted rounded-2xl animate-pulse"></div>
-                <div className="grid grid-cols-4 gap-2">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse"></div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Details Skeleton */}
-              <div className="space-y-4">
-                <div className="h-4 bg-muted rounded w-1/4 animate-pulse"></div>
-                <div className="h-8 bg-muted rounded w-3/4 animate-pulse"></div>
-                <div className="h-6 bg-muted rounded w-1/2 animate-pulse"></div>
-                <div className="h-12 bg-muted rounded w-1/3 animate-pulse mt-8"></div>
-                <div className="space-y-2 mt-8">
-                  <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
-                  <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
-                  <div className="h-4 bg-muted rounded w-4/6 animate-pulse"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <Footer />
-        
-        <style jsx>{`
-          @keyframes shimmer {
-            0% {
-              background-position: -200% 0;
-            }
-            100% {
-              background-position: 200% 0;
-            }
-          }
-        `}</style>
-      </div>
-    );
+async function getProductBySlug(slug: string) {
+  const res = await fetch(`https://luxstore-backend.vercel.app/products/slug/${slug}`, {
+    cache: 'no-store', // Always fetch fresh data
+  });
+  
+  if (!res.ok) {
+    throw new Error('Product not found');
   }
+  
+  return res.json();
+}
 
-  // Error state
-  if (error || !productData) {
+// Generate metadata for SEO
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  
+  try {
+    const productData = await getProductBySlug(slug);
+    const price = productData.base_price || 0;
+    const brand = productData.attributes?.find((attr: any) => attr.attribute.name === 'Brand')?.value || 'Luxury Brand';
+    
+    return {
+      title: productData.seo?.title || productData.name,
+      description: productData.seo?.description || productData.subtitle,
+      openGraph: {
+        title: productData.seo?.og_title || productData.name,
+        description: productData.seo?.og_description || productData.subtitle,
+        images: [
+          {
+            url: productData.media?.[0]?.url_original || productData.seo?.og_image,
+            width: 1200,
+            height: 630,
+            alt: productData.name,
+          }
+        ],
+        type: 'website',
+        siteName: 'LUX STORE',
+        locale: 'en_US',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: productData.seo?.twitter_title || productData.name,
+        description: productData.seo?.twitter_description || productData.subtitle,
+        images: [productData.media?.[0]?.url_original || productData.seo?.twitter_image],
+      },
+      alternates: {
+        canonical: productData.seo?.canonical_url || `https://lux-store.eu/products/${productData.slug_without_id}`,
+      },
+      robots: {
+        index: true,
+        follow: true,
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Product Not Found',
+      description: 'The product you are looking for does not exist.',
+    };
+  }
+}
+
+export default async function ProductPage({ params }: PageProps) {
+  const { slug } = await params;
+  
+  let productData;
+  try {
+    productData = await getProductBySlug(slug);
+  } catch (error) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mb-30 mx-auto px-4 py-20 text-center">
           <h1 className="text-3xl font-bold mb-4">Product Not Found</h1>
           <p className="text-muted-foreground mb-8">The product you're looking for doesn't exist or has been removed.</p>
-          <Button onClick={() => window.location.href = '/store/all'}>
-            Back to Store
+          <Button asChild>
+            <a href="/store/all">Back to Store</a>
           </Button>
         </div>
         <Footer />
@@ -202,10 +162,77 @@ export default function ProductPage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.name,
+            "image": product.images,
+            "description": product.description,
+            "brand": {
+              "@type": "Brand",
+              "name": product.brand
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": `https://lux-store.eu/products/${productData.slug_without_id}`,
+              "priceCurrency": "EUR",
+              "price": product.price,
+              "availability": product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+              "itemCondition": "https://schema.org/NewCondition"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": product.rating.toFixed(1),
+              "reviewCount": product.reviews
+            }
+          })
+        }}
+      />
+      
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://lux-store.eu"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Store",
+                "item": "https://lux-store.eu/store/all"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": product.category.name,
+                "item": `https://lux-store.eu/store/${product.category.slug}`
+              },
+              {
+                "@type": "ListItem",
+                "position": 4,
+                "name": product.name
+              }
+            ]
+          })
+        }}
+      />
 
-      {/* Breadcrumb */}
+      <div className="min-h-screen bg-background">
+        <Header />
+
+        {/* Breadcrumb */}
       <div className="border-b bg-muted/30">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -337,70 +364,23 @@ export default function ProductPage({ params }: PageProps) {
 
             <Separator />
 
-            {/* Product Options */}
-            {productData.raw_json.options && productData.raw_json.options.length > 0 && (
-              <>
-                <div className="space-y-4">
-                  {productData.raw_json.options.map((option: any) => {
-                    const choices = productData.raw_json.defaultOptionsOverrides?.pricesOverrides?.optionsChoicesWithModifiersAndTaxes?.find(
-                      (opt: any) => opt.optionId === option.optionId
-                    )?.choices || [];
-
-                    return (
-                      <div key={option.optionId}>
-                        <label className="text-sm font-semibold mb-2 block">
-                          {option.optionText}
-                          {option.required && <span className="text-red-500 ml-1">*</span>}
-                        </label>
-                        <Select
-                          value={selectedOptions[option.optionId] || ""}
-                          onValueChange={(value) => {
-                            setSelectedOptions(prev => ({
-                              ...prev,
-                              [option.optionId]: value
-                            }));
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder={`Select ${option.optionText}`} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {choices.map((choice: any) => (
-                              <SelectItem key={choice.choiceId} value={choice.choiceId}>
-                                {choice.choiceName}
-                                {choice.modifierFormatted && (
-                                  <span className="text-muted-foreground ml-2">
-                                    {choice.modifierFormatted}
-                                  </span>
-                                )}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    );
-                  })}
-                </div>
-                <Separator />
-              </>
-            )}
-
-            {/* Quantity */}
-            <QuantitySelector inStock={product.inStock} />
-
-            {/* Action Buttons */}
-            <ActionButtons 
-              inStock={product.inStock} 
-              product={{
-                id: parseInt(id),
-                name: product.name,
-                brand: product.brand,
-                price: product.price,
-                image: product.images[0] || "",
-                options: selectedOptions,
-              }}
-              disabled={
-                productData.options?.some((opt: any) => opt.required && !selectedOptions[opt.optionId])
+            {/* Product Options & Actions (Client Component) */}
+            <ProductInteractive
+              productId={productData.id}
+              productName={product.name}
+              productBrand={product.brand}
+              productPrice={product.price}
+              productImage={product.images[0] || ""}
+              inStock={product.inStock}
+              options={productData.raw_json?.options}
+              optionsChoices={
+                productData.raw_json?.defaultOptionsOverrides?.pricesOverrides?.optionsChoicesWithModifiersAndTaxes?.reduce(
+                  (acc: Record<string, any[]>, opt: any) => {
+                    acc[opt.optionId] = opt.choices || [];
+                    return acc;
+                  },
+                  {}
+                )
               }
             />
 
@@ -597,17 +577,13 @@ export default function ProductPage({ params }: PageProps) {
                 Email Us
               </a>
             </Button>
-            <Button size="lg" variant="outline" onClick={() => console.log('Opening chat...')}>
-              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              Online Chat
-            </Button>
+            <ChatButton />
           </div>
         </div>
       </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 }

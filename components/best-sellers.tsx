@@ -426,7 +426,7 @@ export default function BestSellers() {
                   }} />
                 </div>
                 
-                <Link href={`/product/${product.id}`}>
+                <Link href={`/products/${product.id}`}>
                   <div className="relative w-full aspect-square overflow-hidden bg-[#f4f4f4]">
                     <Image
                       src={product.image}
@@ -467,7 +467,7 @@ export default function BestSellers() {
                   </div>
 
                   <div className="flex gap-2 pt-1">
-                    <Link href={`/product/${product.id}`} className="flex-1 relative z-10">
+                    <Link href={`/products/${product.id}`} className="flex-1 relative z-10">
                       <Button
                         variant="outline"
                         size="sm"

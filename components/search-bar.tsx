@@ -12,6 +12,7 @@ interface SearchResult {
   id: number;
   name: string;
   sku: string;
+  slug_without_id: string;
   base_price: number;
   media: Array<{ url_original: string }>;
   categories: Array<{
@@ -256,7 +257,7 @@ export default function SearchBar() {
                       return (
                         <Link
                           key={product.id}
-                          href={`/product/${product.id}`}
+                          href={`/products/${product.slug_without_id}`}
                           onClick={handleClose}
                           className="group flex gap-4 p-4 rounded-lg border hover:border-primary hover:shadow-lg transition-all bg-card"
                         >

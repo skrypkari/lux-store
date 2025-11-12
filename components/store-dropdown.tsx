@@ -86,17 +86,75 @@ export default function StoreDropdown() {
                       View All
                     </DropdownMenuItem>
                   </Link>
-                  {category.children.map((subcategory) => (
-                    <Link 
-                      key={subcategory.id}
-                      href={`/store/${category.slug_without_id}?brand=${subcategory.slug_without_id}`} 
-                      className="block"
-                    >
-                      <DropdownMenuItem className="cursor-pointer">
-                        {subcategory.name.toUpperCase()}
-                      </DropdownMenuItem>
-                    </Link>
-                  ))}
+                  {category.children.map((subcategory) => {
+                    // Проверяем, есть ли у этого бренда модели (для Hermès в категории Bags)
+                    const isHermes = subcategory.name.toLowerCase().includes('herm') && 
+                                     category.slug_without_id === 'bags';
+                    
+                    if (isHermes) {
+                      // Hermès с вложенным меню моделей
+                      return (
+                        <DropdownMenu key={subcategory.id}>
+                          <DropdownMenuTrigger asChild>
+                            <DropdownMenuItem 
+                              className="cursor-pointer justify-between"
+                              onSelect={(e) => e.preventDefault()}
+                            >
+                              <span>{subcategory.name.toUpperCase()}</span>
+                              <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
+                            </DropdownMenuItem>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent side="right" sideOffset={0} alignOffset={-8} align="start" className="w-[200px] p-2">
+                            <Link 
+                              href={`/store/${category.slug_without_id}?brand=${subcategory.slug_without_id}`} 
+                              className="block"
+                            >
+                              <DropdownMenuItem className="cursor-pointer font-medium">
+                                View All
+                              </DropdownMenuItem>
+                            </Link>
+                            <Link 
+                              href="/store/hermes-birkin" 
+                              className="block"
+                            >
+                              <DropdownMenuItem className="cursor-pointer">
+                                HERMÈS BIRKIN
+                              </DropdownMenuItem>
+                            </Link>
+                            <Link 
+                              href="/store/hermes-kelly" 
+                              className="block"
+                            >
+                              <DropdownMenuItem className="cursor-pointer">
+                                HERMÈS KELLY
+                              </DropdownMenuItem>
+                            </Link>
+                            <Link 
+                              href="/store/hermes-constance" 
+                              className="block"
+                            >
+                              <DropdownMenuItem className="cursor-pointer">
+                                HERMÈS CONSTANCE
+                              </DropdownMenuItem>
+                            </Link>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      );
+                    }
+                    
+                    // Обычный бренд без моделей
+                    return (
+                      <Link 
+                        key={subcategory.id}
+                        href={`/store/${category.slug_without_id}?brand=${subcategory.slug_without_id}`} 
+                        className="block"
+                      >
+                        <DropdownMenuItem className="cursor-pointer">
+                          {subcategory.name.toUpperCase()}
+                        </DropdownMenuItem>
+                      </Link>
+                    );
+                  })}
                 </DropdownMenuContent>
               )}
             </DropdownMenu>

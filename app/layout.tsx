@@ -16,8 +16,59 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Lux Store",
-  description: "Premium luxury shopping experience",
+  title: "LUX STORE - Authorized store of premium brands. Chanel, Dior, Cartier, Rolex, Hermes.",
+  description: "LUX STORE — your official online destination for luxury brands. Authentic accessories and jewelry from Cartier, Dior, Rolex, Chanel, GUCCI and Hermès. Guaranteed authenticity, premium service, fast delivery.",
+  icons: {
+    icon: [
+      {
+        url: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/f8235840-ece3-48f1-32f5-f1663b407f00/public",
+        sizes: "32x32",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/808169a6-1490-4769-094b-3c80c8d8e400/public",
+      },
+    ],
+  },
+  openGraph: {
+    title: "LUX STORE - Authorized store of premium brands. Chanel, Dior, Cartier, Rolex, Hermes.",
+    description: "LUX STORE — your official online destination for luxury brands. Authentic accessories and jewelry from Cartier, Dior, Rolex, Chanel, GUCCI and Hermès. Guaranteed authenticity, premium service, fast delivery.",
+    images: [
+      {
+        url: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/b9a02796-9f1d-49f9-68f1-fb419997fc00/public",
+        secureUrl: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/b9a02796-9f1d-49f9-68f1-fb419997fc00/public",
+        width: 1200,
+        height: 630,
+        alt: "LUX STORE - Premium luxury brands",
+      },
+    ],
+    type: "website",
+    siteName: "LUX STORE",
+    locale: "en_US",
+    url: "https://lux-store.eu",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LUX STORE - Authorized store of premium brands. Chanel, Dior, Cartier, Rolex, Hermes.",
+    description: "LUX STORE — your official online destination for luxury brands. Authentic accessories and jewelry from Cartier, Dior, Rolex, Chanel, GUCCI and Hermès. Guaranteed authenticity, premium service, fast delivery.",
+    images: ["https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/b9a02796-9f1d-49f9-68f1-fb419997fc00/public"],
+  },
+  alternates: {
+    canonical: "https://lux-store.eu",
+    languages: {
+      "x-default": "https://lux-store.eu/",
+    },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 };
 
 export default function RootLayout({
