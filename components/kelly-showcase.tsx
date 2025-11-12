@@ -88,7 +88,7 @@ export default function KellyShowcase() {
                   asChild
                   className="w-full py-6 text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
                 >
-                  <Link href="/product/768064173" className="flex items-center justify-center gap-2">
+                  <Link href="/product/768026216" className="flex items-center justify-center gap-2">
                     Shop Now
                     <Crown className="w-5 h-5 group-hover:-translate-y-1 transition-transform duration-300" />
                   </Link>
@@ -189,22 +189,6 @@ export default function KellyShowcase() {
               <p className="text-base text-muted-foreground leading-relaxed italic">
                 "The Kelly bag represents the pinnacle of Hermès craftsmanship — a perfect balance of structure, elegance, and timeless allure. Its story, steeped in heritage, continues to inspire generations of collectors and connoisseurs."
               </p>
-            </div>
-
-            {/* Additional Info */}
-            <div className="flex flex-wrap gap-3 pt-4">
-              <Badge variant="outline" className="text-xs">
-                <Sparkles className="w-3 h-3 mr-1" />
-                Handstitched
-              </Badge>
-              <Badge variant="outline" className="text-xs">
-                <Crown className="w-3 h-3 mr-1" />
-                Celebrity Favorite
-              </Badge>
-              <Badge variant="outline" className="text-xs">
-                <Gem className="w-3 h-3 mr-1" />
-                Investment Quality
-              </Badge>
             </div>
           </div>
         </div>

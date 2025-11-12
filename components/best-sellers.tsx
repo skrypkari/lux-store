@@ -516,7 +516,7 @@ export default function BestSellers() {
             className="border-2 border-neutral-900 hover:bg-neutral-900 hover:text-white px-8 group"
             asChild
           >
-            <Link href="/products">
+            <Link href="/store/all">
               View All Products
               <TrendingUp className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
