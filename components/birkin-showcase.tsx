@@ -110,11 +110,11 @@ export default function BirkinShowcase() {
               </div>
 
               {/* Product Image */}
-              <div className="relative h-[500px] overflow-hidden">
+              <div className="relative aspect-square md:h-[500px] md:aspect-auto overflow-hidden">
                 <Image
                   src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/7ca69595-da46-4fcd-1085-45c20e9dc100/public"
                   alt="Hermès Birkin 30 Black Togo Palladium Hardware"
-                  className="transition-transform duration-700 group-hover:scale-105 h-[500px] w-auto mx-auto p-10"
+                  className="transition-transform duration-700 group-hover:scale-105 h-full w-auto mx-auto p-10"
                   priority
                   width={1080}
                   height={1080}
@@ -147,7 +147,7 @@ export default function BirkinShowcase() {
                 <div className="flex items-center gap-4">
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">Price</div>
-                    <div className="text-3xl font-bold">€14,610</div>
+                    <div className="text-3xl font-bold">€15,722</div>
                   </div>
                   <div className="h-12 w-px bg-border" />
                   <div>

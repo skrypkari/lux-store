@@ -10,36 +10,42 @@ const slides = [
     brand: "Cartier",
     subtitle: "Cartier, the jeweller of kings and the king of jewellers.",
     videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/b0dc3959dd4da18006a104a452e8c7b5/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2Fb0dc3959dd4da18006a104a452e8c7b5%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+    duration: 6000, // 6 секунд
   },
   {
     id: 2,
     brand: "Rolex",
     subtitle: "A Crown for Every Achievement.",
     videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/424e4aef0fab4f684e2b8113772137dd/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F424e4aef0fab4f684e2b8113772137dd%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+    duration: 8000, // 8 секунд
   },
   {
     id: 3,
     brand: "Hermès",
     subtitle: "Hermès, the spirit of craftsmanship.",
     videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/16944a6e01c99951bdedd28afcb0c4b1/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F16944a6e01c99951bdedd28afcb0c4b1%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+    duration: 7000, // 7 секунд
   },
   {
     id: 4,
     brand: "Dior",
     subtitle: "Dior, J'adore.",
     videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/7d144db8acad2064e38063f899816507/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F7d144db8acad2064e38063f899816507%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+    duration: 11000, // 11 секунд
   },
   {
     id: 5,
     brand: "GUCCI",
     subtitle: "Gucci. The Future is Fluid.",
     videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/ce15ed6b1091b365e60737e06257372a/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2Fce15ed6b1091b365e60737e06257372a%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+    duration: 12000, // 12 секунд
   },
   {
     id: 6,
     brand: "Chanel",
     subtitle: "Coco Chanel — A name that means fashion.",
     videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/834ed242ff182576ac5ec43a3a0077e2/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F834ed242ff182576ac5ec43a3a0077e2%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+    duration: 9000, // 9 секунд
   },
 ];
 
@@ -47,13 +53,13 @@ export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    // Автопереключение каждые 15 секунд (длительность видео)
-    const timer = setInterval(() => {
+    // Автопереключение с учетом длительности текущего слайда
+    const timer = setTimeout(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
-    }, 15000);
+    }, slides[current].duration);
 
-    return () => clearInterval(timer);
-  }, []);
+    return () => clearTimeout(timer);
+  }, [current]);
 
   return (
     <section className="relative w-full h-[calc(100vh-80px)] overflow-hidden">

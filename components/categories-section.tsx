@@ -136,9 +136,7 @@ export default function CategoriesSection() {
                   category.featured ? 'md:row-span-1' : ''
                 }`}>
                   {/* Image Container */}
-                  <div className={`relative overflow-hidden ${
-                    category.featured ? 'h-[500px]' : 'h-[400px]'
-                  }`}>
+                  <div className={`relative overflow-hidden h-[400px]`}>
                     <Image
                       src={category.image}
                       alt={category.name}
@@ -159,7 +157,7 @@ export default function CategoriesSection() {
                     <div className="absolute inset-0 flex flex-col justify-end p-8 text-white">
                       {/* Item Count Badge */}
                       <Badge className="w-fit mb-4 bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
-                        {category.itemCount}
+                        {index === 0 ? '5 Brands' : '4 Brands'}
                       </Badge>
 
                       {/* Category Name */}

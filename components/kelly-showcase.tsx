@@ -29,11 +29,11 @@ export default function KellyShowcase() {
               </div>
 
               {/* Product Image */}
-              <div className="relative h-[500px] overflow-hidden">
+              <div className="relative aspect-square md:h-[500px] md:aspect-auto overflow-hidden">
                 <Image
                   src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/525f1367-55f3-4aea-b81d-f7b165770500/public"
                   alt="Hermès Kelly Sellier 20 Etoupe Epsom Gold Hardware"
-                  className="object-cover transition-transform duration-700 h-[500px] w-auto mx-auto p-10 group-hover:scale-105"
+                  className="object-cover transition-transform duration-700 h-full w-auto mx-auto p-10 group-hover:scale-105"
                   priority
                   width={1080}
                   height={1080}
@@ -88,7 +88,7 @@ export default function KellyShowcase() {
                   asChild
                   className="w-full py-6 text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
                 >
-                  <Link href="/products/768064173" className="flex items-center justify-center gap-2">
+                  <Link href="/product/768064173" className="flex items-center justify-center gap-2">
                     Shop Now
                     <Crown className="w-5 h-5 group-hover:-translate-y-1 transition-transform duration-300" />
                   </Link>

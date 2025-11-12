@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, ShoppingCart, Eye } from "lucide-react";
+import { useCart } from "@/contexts/cart-context";
+import { useState } from "react";
 
 interface BestSellerProduct {
   id: string;
@@ -309,6 +311,54 @@ const staticProducts: BestSellerProduct[] = [
     badgeColor: "blue",
     currency: "EUR",
   },
+  {
+    id: '791181355',
+    name: "GUCCI 25H watch",
+    brand: "GUCCI",
+    sku: "673301I16F01108",
+    price: 8960,
+    originalPrice: undefined,
+    image: "/5296080061.jpg",
+    badge: "Diamond",
+    badgeColor: "purple",
+    currency: "EUR",
+  },
+  {
+    id: '791085849',
+    name: "Dionysus medium shoulder bag",
+    brand: "GUCCI",
+    sku: "49962392TJN8660",
+    price: 2160,
+    originalPrice: undefined,
+    image: "/5293673508.jpg",
+    badge: "Trendy",
+    badgeColor: "cyan",
+    currency: "EUR",
+  },
+  {
+    id: '790971882',
+    name: "Gucci Horsebit 1955 crystals small shoulder bag",
+    brand: "GUCCI",
+    sku: "67580121HRG2687",
+    price: 2640,
+    originalPrice: undefined,
+    image: "/5291991111.jpg",
+    badge: "Crystal",
+    badgeColor: "amber",
+    currency: "EUR",
+  },
+  {
+    id: '790950714',
+    name: "GG Marmont large shoulder bag",
+    brand: "GUCCI",
+    sku: "850659AAFS11000",
+    price: 2320,
+    originalPrice: undefined,
+    image: "/5291572082.jpg",
+    badge: "Classic",
+    badgeColor: "gold",
+    currency: "EUR",
+  },
 ];
 
 const badgeStyles: Record<string, string> = {
@@ -325,6 +375,24 @@ const badgeStyles: Record<string, string> = {
 export default function BestSellers() {
   // Используем статические данные - они не меняются
   const products = staticProducts;
+  const { addToCart } = useCart();
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
+
+  const handleAddToCart = (product: BestSellerProduct) => {
+    setAddingToCart(product.id);
+    addToCart({
+      id: parseInt(product.id),
+      name: product.name,
+      brand: product.brand,
+      price: product.price,
+      image: product.image,
+      inStock: true,
+    });
+    
+    setTimeout(() => {
+      setAddingToCart(null);
+    }, 1000);
+  };
 
   return (
     <section className="py-24 bg-gradient-to-b from-white to-neutral-50">
@@ -399,24 +467,39 @@ export default function BestSellers() {
                   </div>
 
                   <div className="flex gap-2 pt-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 border-neutral-900 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-xs font-medium tracking-wide"
-                      asChild
-                    >
-                      <Link href={`/products/${product.id}`}>
+                    <Link href={`/product/${product.id}`} className="flex-1 relative z-10">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full border-neutral-900 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-all duration-300 text-xs font-medium tracking-wide group/btn"
+                      >
+                        <Eye className="w-3.5 h-3.5 mr-1.5 transition-transform group-hover/btn:scale-110" />
                         Details
-                      </Link>
-                    </Button>
+                      </Button>
+                    </Link>
                     <Button
                       size="sm"
-                      className="flex-1 bg-neutral-900 text-white hover:bg-neutral-800 transition-all duration-300 text-xs font-medium tracking-wide"
-                      onClick={(e) => {
-                        e.preventDefault();
-                      }}
+                      className="flex-1 bg-neutral-900 text-white hover:bg-neutral-800 transition-all duration-300 text-xs font-medium tracking-wide relative overflow-hidden group/cart"
+                      onClick={() => handleAddToCart(product)}
+                      disabled={addingToCart === product.id}
                     >
-                      Add to Cart
+                      <span className="flex items-center justify-center">
+                        {addingToCart === product.id ? (
+                          <>
+                            <span className="animate-bounce">✓</span>
+                            <span className="ml-1">Added!</span>
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-3.5 h-3.5 mr-1.5 transition-transform group-hover/cart:scale-110" />
+                            Add to Cart
+                          </>
+                        )}
+                      </span>
+                      {/* Ripple effect */}
+                      {addingToCart === product.id && (
+                        <span className="absolute inset-0 bg-white/20 animate-ping rounded" />
+                      )}
                     </Button>
                   </div>
                 </div>

@@ -113,7 +113,7 @@ export default function Footer() {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
           {/* Copyright */}
           <p className="text-sm text-neutral-500">
-            All rights reserved © {new Date().getFullYear()} | LUX STORE | LUX ACE LTD
+            All rights reserved © {new Date().getFullYear()} | LUX STORE | LUX TRADE L.P.
           </p>
 
           {/* Payment Methods */}
