@@ -327,8 +327,8 @@ export default function CookiesPage() {
               If you have any questions about our use of cookies or other technologies, please contact us:
             </p>
             <div className="space-y-1 font-general-sans text-sm font-semibold text-black">
-              <p>LUX ACE LTD</p>
-              <p>6 Brindley Place, Birmingham, England, B1 2JB, United Kingdom</p>
+              <p>LUX TRADE L.P.</p>
+              <p>272 Bath Street, Glasgow, Scotland, G2 4JR</p>
               <p>
                 <a href="mailto:info@lux-store.eu" className="underline underline-offset-2 hover:text-black/70">
                   info@lux-store.eu

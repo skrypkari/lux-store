@@ -209,19 +209,6 @@ export default function ContactForm() {
             </>
           )}
         </Button>
-
-        {/* Additional Info */}
-        <div className="text-center">
-          <p className="font-general-sans text-sm text-black/60">
-            Need immediate assistance?{" "}
-            <a
-              href="tel:+445557771234"
-              className="font-semibold text-black hover:underline"
-            >
-              Call us now
-            </a>
-          </p>
-        </div>
       </form>
     </div>
   );

@@ -34,6 +34,23 @@ export default function CartContent() {
   const shipping = cartItems.length > 0 ? 0 : 0; // Free shipping
   const total = subtotal + vat + shipping - discount;
 
+  // Calculate delivery date range (25-35 days from now)
+  const getDeliveryDateRange = () => {
+    const today = new Date();
+    const minDate = new Date(today);
+    minDate.setDate(today.getDate() + 25);
+    const maxDate = new Date(today);
+    maxDate.setDate(today.getDate() + 35);
+    
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+    
+    return `${formatDate(minDate)}-${formatDate(maxDate).split(' ')[1]}`;
+  };
+
+  const deliveryRange = getDeliveryDateRange();
+
   const applyPromoCode = () => {
     if (promoCode.toUpperCase() === "LUXURY10") {
       setDiscount(subtotal * 0.1);
@@ -311,7 +328,7 @@ export default function CartContent() {
                         <div className="h-9 mr-2 flex items-center gap-2 rounded-full border border-black/10 bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-sm">
                             <Clock className="h-3 w-3 text-black/60" />
                             <span className="font-general-sans text-xs font-medium text-black/80">
-                            Arrives Nov 10-12
+                            Arrives {deliveryRange}
                             </span>
                         </div>
                         <Button
@@ -442,7 +459,7 @@ export default function CartContent() {
                   <div className="mb-3 flex items-center gap-2 rounded-lg border border-black/10 bg-black/5 px-3 py-2">
                     <Clock className="h-3.5 w-3.5 text-black/60" />
                     <span className="font-general-sans text-xs font-medium text-black/70">
-                      Arrives Nov 10-12
+                      Arrives {deliveryRange}
                     </span>
                   </div>
 
@@ -707,22 +724,45 @@ export default function CartContent() {
                   </Button>
                 </Link>
                 
-                <div className="rounded-xl border border-black/10 bg-white mt-4 p-4">
-                  <p className="mb-2 font-satoshi text-sm font-bold">Accepted Payment Methods</p>
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-12 items-center justify-center rounded border border-black/10 bg-white font-general-sans text-xs font-bold">
-                      VISA
+                <div className="rounded-xl border border-black/10 bg-gradient-to-br from-[#FAFAFA] via-white to-[#F5F5F5] mt-4 p-5 shadow-sm">
+                  <p className="mb-4 font-satoshi text-sm font-bold tracking-tight">Accepted Payment Methods</p>
+                  <div className="grid grid-cols-2 gap-2.5 select-none">
+                    <div className="group relative overflow-hidden rounded-lg border border-black/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-black/20 hover:shadow-md">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#1A1F71]/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <span className="relative font-general-sans text-[12px] font-bold tracking-wide text-black">Visa</span>
                     </div>
-                    <div className="flex h-8 w-12 items-center justify-center rounded border border-black/10 bg-white font-general-sans text-xs font-bold">
-                      MC
+                    <div className="group relative overflow-hidden rounded-lg border border-black/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-black/20 hover:shadow-md">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#EB001B]/5 to-[#F79E1B]/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <span className="relative font-general-sans text-[12px] font-bold tracking-wide text-black">Mastercard</span>
                     </div>
-                    <div className="flex h-8 w-12 items-center justify-center rounded border border-black/10 bg-white font-general-sans text-xs font-bold">
-                      AMEX
+                    <div className="group relative overflow-hidden rounded-lg border border-black/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-black/20 hover:shadow-md">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#006FCF]/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <span className="relative font-general-sans text-[12px] font-bold tracking-wide text-black">Amex</span>
                     </div>
-                    <div className="flex h-8 w-12 items-center justify-center rounded border border-black/10 bg-white font-general-sans text-xs font-bold">
-                      PayPal
+                    <div className="group relative overflow-hidden rounded-lg border border-black/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-black/20 hover:shadow-md">
+                      <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <span className="relative font-general-sans text-[12px] font-bold tracking-wide text-black">Apple Pay</span>
+                    </div>
+                    <div className="group relative overflow-hidden rounded-lg border border-black/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-black/20 hover:shadow-md">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#4285F4]/5 via-[#EA4335]/5 to-[#FBBC05]/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <span className="relative font-general-sans text-[12px] font-bold tracking-wide text-black">Google Pay</span>
+                    </div>
+                    <div className="group relative overflow-hidden rounded-lg border border-black/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-black/20 hover:shadow-md">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#003399]/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <span className="relative font-general-sans text-[12px] font-bold tracking-wide text-black">SEPA</span>
+                    </div>
+                    <div className="group relative overflow-hidden rounded-lg border border-black/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-black/20 hover:shadow-md">
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <span className="relative font-general-sans text-[12px] font-bold tracking-wide text-black">Open Banking</span>
+                    </div>
+                    <div className="group relative overflow-hidden rounded-lg border border-black/10 bg-white p-2.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-black/20 hover:shadow-md">
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-orange-500/5 to-amber-600/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <span className="relative font-general-sans text-[12px] font-bold tracking-wide text-black">Crypto</span>
                     </div>
                   </div>
+                  <p className="mt-3 text-center font-general-sans text-[10px] text-black/40 tracking-wide">
+                    All transactions are secure and encrypted
+                  </p>
                 </div>
               </div>
             </div>
@@ -738,10 +778,10 @@ export default function CartContent() {
                 <div className="flex-1">
                   <h3 className="mb-1 font-satoshi font-bold">Complimentary Shipping</h3>
                   <p className="font-general-sans text-sm text-black/60">
-                    Express worldwide delivery on all orders
+                    Free DHL Express worldwide delivery on all orders
                   </p>
                   <p className="mt-1 font-general-sans text-xs text-black/40">
-                    2-3 business days
+                    20-35 days
                   </p>
                 </div>
               </div>
@@ -852,9 +892,9 @@ export default function CartContent() {
                 <Clock className="h-6 w-6 text-white" />
               </div>
             </div>
-            <h3 className="mb-2 font-satoshi text-lg font-bold">2-3 Days Delivery</h3>
+            <h3 className="mb-2 font-satoshi text-lg font-bold">20-35 Days Delivery</h3>
             <p className="font-general-sans text-sm text-black/60">
-              Express worldwide shipping on all orders
+              Free DHL Express worldwide shipping on all orders
             </p>
           </div>
           <div className="text-center">

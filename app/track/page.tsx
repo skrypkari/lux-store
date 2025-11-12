@@ -55,7 +55,7 @@ export default async function TrackPage() {
               </div>
               <div className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 backdrop-blur-sm sm:gap-2 sm:px-4 sm:py-2">
                 <Truck className="h-3.5 w-3.5 text-white/80 sm:h-4 sm:w-4" />
-                <span className="font-general-sans text-[10px] font-medium text-white/80 sm:text-xs">Express</span>
+                <span className="font-general-sans text-[10px] font-medium text-white/80 sm:text-xs">DHL Express</span>
               </div>
               <div className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 backdrop-blur-sm sm:gap-2 sm:px-4 sm:py-2">
                 <Globe className="h-3.5 w-3.5 text-white/80 sm:h-4 sm:w-4" />
@@ -121,7 +121,7 @@ export default async function TrackPage() {
                 </div>
               </a>
 
-              <a href="tel:+445557771234" className="group sm:col-span-2 lg:col-span-1">
+              <a href="tel:+447700184435" className="group sm:col-span-2 lg:col-span-1">
                 <div className="relative overflow-hidden rounded-xl border border-black/10 bg-white p-5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl sm:rounded-2xl sm:p-6">
                   <div className="mb-3 inline-flex rounded-lg bg-black p-2.5 sm:mb-4 sm:rounded-xl sm:p-3">
                     <svg className="h-5 w-5 text-white sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +130,7 @@ export default async function TrackPage() {
                   </div>
                   <h3 className="mb-1.5 font-satoshi text-base font-bold sm:mb-2 sm:text-lg">Call Direct</h3>
                   <p className="font-general-sans text-xs text-black/60 sm:text-sm">
-                    +44-555-777-1234
+                    +44-7700-18-44-35
                   </p>
                 </div>
               </a>

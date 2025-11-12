@@ -43,7 +43,7 @@ export default async function AboutPage() {
               <span className="font-satoshi text-3xl font-bold">LUX STORE</span> is a trusted online 
               boutique for true connoisseurs of luxury. We specialize in offering authentic, certified 
               products from the world's most prestigious brands — including{" "}
-              <span className="font-semibold">Cartier, Rolex, Dior, GUCCI</span> and{" "}
+              <span className="font-semibold">Cartier, Rolex, Dior, GUCCI, Chanel</span> and{" "}
               <span className="font-semibold">Hermès</span>.
             </p>
             <p className="font-general-sans text-xl leading-relaxed text-black/70">
@@ -55,8 +55,8 @@ export default async function AboutPage() {
           {/* Stats */}
           <div className="mb-24 grid gap-8 md:grid-cols-4">
             {[
-              { number: "2000+", label: "Luxury Items" },
-              { number: "50+", label: "Premium Brands" },
+              { number: "5000+", label: "Luxury Items" },
+              { number: "6", label: "Premium Brands" },
               { number: "120+", label: "Countries Served" },
               { number: "100%", label: "Authentic Guarantee" },
             ].map((stat, index) => (
@@ -83,11 +83,13 @@ export default async function AboutPage() {
               {/* Left Side - Image */}
               <div className="relative h-[500px] bg-black/5">
                 <Image
-                  src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=500&fit=crop"
+                  src="/office_img.jpeg"
                   alt="LUX STORE Office"
                   fill
                   className="object-cover"
-                  unoptimized
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  quality={75}
+                  priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               </div>
@@ -101,8 +103,8 @@ export default async function AboutPage() {
                   <h2 className="font-satoshi text-3xl font-bold">Our Legacy</h2>
                 </div>
                 <p className="mb-6 font-general-sans text-lg leading-relaxed text-black/80">
-                  Owned and operated by <span className="font-bold">LUX ACE LTD</span>, a UK-registered 
-                  company (Company Number: <span className="font-semibold">14915840</span>), with our head 
+                  Owned and operated by <span className="font-bold">LUX TRADE L.P.</span>, a UK-registered 
+                  company (Company Number: <span className="font-semibold">SL021977</span>), with our head 
                   office located at 6 Brindley Place, Birmingham, England, UK.
                 </p>
                 <p className="mb-8 font-general-sans text-lg leading-relaxed text-black/80">
@@ -154,11 +156,12 @@ export default async function AboutPage() {
                 {/* Right Side - Image */}
                 <div className="relative h-[500px]">
                   <Image
-                    src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=800&h=500&fit=crop"
+                    src="/langkawi.jpg"
                     alt="Langkawi Malaysia"
                     fill
                     className="object-cover"
-                    unoptimized
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    quality={85}
                   />
                   <div className="absolute inset-0 bg-gradient-to-l from-black/50 to-transparent" />
                 </div>
@@ -200,7 +203,7 @@ export default async function AboutPage() {
               {
                 icon: Globe,
                 title: "Worldwide Delivery",
-                description: "Express shipping to over 120 countries with full insurance and premium packaging included.",
+                description: "DHL Express free shipping to over 120 countries with full insurance and premium packaging included.",
               },
               {
                 icon: Award,
@@ -251,7 +254,7 @@ export default async function AboutPage() {
               Authorized Dealer For
             </p>
             <div className="flex flex-wrap items-center justify-center gap-12">
-              {["Cartier", "Rolex", "Hermès", "Dior", "GUCCI", "Tiffany & Co."].map((brand) => (
+              {["Cartier", "Rolex", "Hermès", "Dior", "GUCCI", "Chanel"].map((brand) => (
                 <div
                   key={brand}
                   className="font-satoshi text-2xl font-bold tracking-tight text-black/40 transition-all duration-300 hover:scale-110 hover:text-black"

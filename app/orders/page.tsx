@@ -83,13 +83,8 @@ export default function OrdersPage() {
                     <strong>Online:</strong> you can pay with the following credit cards (American Express, Visa, Mastercard).
                   </p>
                   <p>
-                    You can also choose to pay by <strong>Bank transfer</strong>, <strong>PayPal</strong> or <strong>Cryptocurrency</strong>.
+                    You can also choose to pay by <strong>Credit Card</strong>, <strong>Apple Pay</strong>, <strong>Google Pay</strong>, <strong>SEPA</strong>, <strong>Open Banking</strong>, <strong>Bank Transfer</strong> or <strong>Cryptocurrency</strong>.
                   </p>
-                  <div className="rounded-lg border border-black/10 bg-black/5 p-4">
-                    <p className="text-sm">
-                      <strong>Please note:</strong> The Paypal payment method is only available for orders below €25,000. In case of low product availability it will not be possible to pay with Paypal.
-                    </p>
-                  </div>
                 </div>
               </div>
 

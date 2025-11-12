@@ -53,15 +53,20 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [brands, setBrands] = useState<string[]>([]);
   const [categories, setCategories] = useState<Array<{ id: number; name: string; slug: string }>>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const productsPerPage = 24;
 
   // Fetch products based on search query
   useEffect(() => {
     setLoading(true);
+    setCurrentPage(1); // Reset to first page on filter change
     
     // Build query parameters
     const params = new URLSearchParams();
     params.append('page', '1');
-    params.append('limit', '50');
+    params.append('limit', '1000'); // Get all products
     
     // Add search query
     if (initialQuery) {
@@ -108,6 +113,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
         setCategories(Array.from(uniqueCategories.values()).sort((a, b) => a.name.localeCompare(b.name)));
         
         setProducts(filteredProducts);
+        setTotalProducts(filteredProducts.length);
         setLoading(false);
       })
       .catch((err) => {
@@ -148,6 +154,18 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
     }
     return 0;
   });
+
+  // Pagination
+  const totalFilteredProducts = sortedProducts.length;
+  const totalPagesCount = Math.ceil(totalFilteredProducts / productsPerPage);
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const endIndex = startIndex + productsPerPage;
+  const paginatedProducts = sortedProducts.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedBrands, selectedCategories, sortBy]);
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
@@ -253,7 +271,12 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
 
             {/* Results Count */}
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">{sortedProducts.length}</span> products
+              <span className="font-semibold text-foreground">{totalFilteredProducts}</span> products
+              {totalPagesCount > 1 && (
+                <span className="ml-2">
+                  (Page {currentPage} of {totalPagesCount})
+                </span>
+              )}
             </p>
           </div>
 
@@ -300,8 +323,9 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
           </div>
         ) : sortedProducts.length > 0 ? (
-          <div className={`grid gap-6 ${viewMode === "grid-3" ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
-            {sortedProducts.map((product) => {
+          <>
+            <div className={`grid gap-6 ${viewMode === "grid-3" ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
+              {paginatedProducts.map((product) => {
               const imageUrl = product.media?.[0]?.url_original;
               const brandAttr = product.attributes?.find(attr => attr.attribute.name === "Brand");
               const brandName = brandAttr?.value || product.categories?.[0]?.category?.name || "Luxury";
@@ -357,8 +381,56 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
                   </div>
                 </Link>
               );
-            })}
-          </div>
+              })}
+            </div>
+
+            {/* Pagination */}
+            {totalPagesCount > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-12">
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                
+                <div className="flex gap-1">
+                  {Array.from({ length: totalPagesCount }, (_, i) => i + 1).map((page) => {
+                    // Show first page, last page, current page, and pages around current
+                    if (
+                      page === 1 ||
+                      page === totalPagesCount ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                          className="min-w-[40px]"
+                        >
+                          {page}
+                        </Button>
+                      );
+                    } else if (page === currentPage - 2 || page === currentPage + 2) {
+                      return <span key={page} className="px-2">...</span>;
+                    }
+                    return null;
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPagesCount, prev + 1))}
+                  disabled={currentPage === totalPagesCount}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </>
         ) : (
           // No Results
           <div className="flex flex-col items-center justify-center py-16 text-center">

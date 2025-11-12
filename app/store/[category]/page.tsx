@@ -37,7 +37,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { SlidersHorizontal, Grid3x3, LayoutGrid, X, Star, ShoppingCart } from "lucide-react";
+import {
+  SlidersHorizontal,
+  Grid3x3,
+  LayoutGrid,
+  X,
+  Star,
+  ShoppingCart,
+} from "lucide-react";
 import Image from "next/image";
 
 interface PageProps {
@@ -106,8 +113,12 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   const [hasMore, setHasMore] = useState(false);
   const [attributes, setAttributes] = useState<AttributeValue[]>([]);
   const [loadingFilters, setLoadingFilters] = useState(true);
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string[]>>({});
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({});
+  const [appliedFilters, setAppliedFilters] = useState<
+    Record<string, string[]>
+  >({});
   const [priceResetTrigger, setPriceResetTrigger] = useState(0);
   const [isPending, startTransition] = useTransition();
   const [sortBy, setSortBy] = useState("featured");
@@ -130,11 +141,11 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     // Синхронно обновляем UI
     const currentValues = selectedFilters[attributeName] || [];
     const isSelected = currentValues.includes(value);
-    
+
     let newFilters;
     if (isSelected) {
       // Убираем значение
-      const newValues = currentValues.filter(v => v !== value);
+      const newValues = currentValues.filter((v) => v !== value);
       if (newValues.length === 0) {
         const { [attributeName]: _, ...rest } = selectedFilters;
         newFilters = rest;
@@ -143,17 +154,20 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       }
     } else {
       // Добавляем значение
-      newFilters = { ...selectedFilters, [attributeName]: [...currentValues, value] };
+      newFilters = {
+        ...selectedFilters,
+        [attributeName]: [...currentValues, value],
+      };
     }
-    
+
     // Обновляем состояние сразу (синхронно)
     setSelectedFilters(newFilters);
-    
+
     // Применяем фильтры в фоне
     startTransition(() => {
       setAppliedFilters(newFilters);
       setPage(0);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
   };
 
@@ -163,9 +177,9 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     setAppliedFilters({});
     tempPriceRef.current = [0, 100000];
     setPriceRange([0, 100000]);
-    setPriceResetTrigger(prev => prev + 1); // Триггер для сброса PriceSlider
+    setPriceResetTrigger((prev) => prev + 1); // Триггер для сброса PriceSlider
     setPage(0);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Загрузка товаров
@@ -173,48 +187,49 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     setLoading(true);
     // Плавная прокрутка наверх при смене страницы
     if (page > 0) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
     const skip = page * pageSize;
-    
+
     // Строим query параметры для фильтров
     const queryParams = new URLSearchParams();
-    queryParams.append('skip', skip.toString());
-    queryParams.append('take', pageSize.toString());
-    
+    queryParams.append("skip", skip.toString());
+    queryParams.append("take", pageSize.toString());
+
     // Добавляем сортировку
     if (sortBy) {
-      queryParams.append('sortBy', sortBy);
+      queryParams.append("sortBy", sortBy);
     }
-    
+
     // Добавляем ценовой диапазон
     if (priceRange[0] > 0 || priceRange[1] < 100000) {
-      queryParams.append('minPrice', priceRange[0].toString());
-      queryParams.append('maxPrice', priceRange[1].toString());
+      queryParams.append("minPrice", priceRange[0].toString());
+      queryParams.append("maxPrice", priceRange[1].toString());
     }
-    
+
     // Добавляем brand из URL если есть
     if (brand) {
-      queryParams.append('Brand', brand);
+      queryParams.append("Brand", brand);
     }
-    
+
     // Добавляем атрибуты (используем appliedFilters вместо selectedFilters)
     Object.entries(appliedFilters).forEach(([attributeName, values]) => {
-      values.forEach(value => {
+      values.forEach((value) => {
         queryParams.append(attributeName, value);
       });
     });
-    
+
     // If category is "all", fetch all products, otherwise fetch by category
-    const baseUrl = category === 'all' 
-      ? `https://luxstore-backend.vercel.app/products`
-      : `https://luxstore-backend.vercel.app/products/category/${category}`;
-    
+    const baseUrl =
+      category === "all"
+        ? `https://luxstore-backend.vercel.app/products`
+        : `https://luxstore-backend.vercel.app/products/category/${category}`;
+
     const url = `${baseUrl}?${queryParams.toString()}`;
-    
+
     console.log("Fetching products with URL:", url);
     console.log("Sort by:", sortBy);
-    
+
     fetch(url)
       .then((res) => res.json())
       .then((data: ProductsResponse) => {
@@ -236,37 +251,37 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   // Загрузка атрибутов (фильтров) - адаптивных на основе примененных фильтров
   useEffect(() => {
     setLoadingFilters(true);
-    
+
     // Строим query параметры для получения доступных фильтров
     const queryParams = new URLSearchParams();
-    
+
     // Добавляем категорию
-    if (category && category !== 'all') {
-      queryParams.append('categorySlug', category);
+    if (category && category !== "all") {
+      queryParams.append("categorySlug", category);
     } else {
-      queryParams.append('categorySlug', 'all');
+      queryParams.append("categorySlug", "all");
     }
-    
+
     // Добавляем ценовой диапазон
     if (priceRange[0] > 0 || priceRange[1] < 100000) {
-      queryParams.append('minPrice', priceRange[0].toString());
-      queryParams.append('maxPrice', priceRange[1].toString());
+      queryParams.append("minPrice", priceRange[0].toString());
+      queryParams.append("maxPrice", priceRange[1].toString());
     }
-    
+
     // Добавляем brand из URL если есть
     if (brand) {
-      queryParams.append('Brand', brand);
+      queryParams.append("Brand", brand);
     }
-    
+
     // Добавляем примененные фильтры
     Object.entries(appliedFilters).forEach(([attributeName, values]) => {
-      values.forEach(value => {
+      values.forEach((value) => {
         queryParams.append(attributeName, value);
       });
     });
-    
+
     const url = `https://luxstore-backend.vercel.app/attributes/available/filtered?${queryParams.toString()}`;
-    
+
     fetch(url)
       .then((res) => res.json())
       .then((data: AttributeValue[]) => {
@@ -286,7 +301,9 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     ...product,
     brand: getBrandFromProduct(product),
     price: product.base_price || 0,
-    image: product.media?.[0]?.url_original || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop',
+    image:
+      product.media?.[0]?.url_original ||
+      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop",
     rating: 4.5 + Math.random() * 0.5,
     reviews: Math.floor(Math.random() * 200) + 50,
     inStock: !product.is_sold_out,
@@ -297,36 +314,46 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   function getBrandFromProduct(product: Product): string {
     // Сначала пытаемся найти бренд в атрибутах
     const brandAttribute = product.attributes?.find(
-      attr => attr.attribute.name === 'Brand' || attr.attribute.type === 'BRAND'
+      (attr) =>
+        attr.attribute.name === "Brand" || attr.attribute.type === "BRAND"
     );
-    
+
     if (brandAttribute) {
       return brandAttribute.value;
     }
-    
+
     // Если не найден в атрибутах, пытаемся извлечь из названия
-    const brands = ['HERMÈS', 'CARTIER', 'ROLEX', 'CHANEL', 'GUCCI', 'LOUIS VUITTON', 'PATEK PHILIPPE', 'DIOR'];
+    const brands = [
+      "HERMÈS",
+      "CARTIER",
+      "ROLEX",
+      "CHANEL",
+      "GUCCI",
+      "LOUIS VUITTON",
+      "PATEK PHILIPPE",
+      "DIOR",
+    ];
     for (const brand of brands) {
       if (product.name.toUpperCase().includes(brand)) {
         return brand;
       }
     }
-    
+
     // В крайнем случае берем первое слово из названия
-    return product.name.split(' ')[0].toUpperCase();
+    return product.name.split(" ")[0].toUpperCase();
   }
 
   // Функция для извлечения коллекции из атрибутов
   function getCollectionFromProduct(product: Product): string {
     // Ищем атрибут Collection
     const collectionAttribute = product.attributes?.find(
-      attr => attr.attribute.name === 'Collection'
+      (attr) => attr.attribute.name === "Collection"
     );
-    
+
     if (collectionAttribute) {
       return collectionAttribute.value;
     }
-    
+
     return "Luxury Collection";
   }
 
@@ -334,13 +361,13 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     // Локальное состояние для плавного движения слайдера
     const [localPrice, setLocalPrice] = useState(() => tempPriceRef.current);
     const [isInitialized, setIsInitialized] = useState(false);
-    
+
     // Синхронизируем локальное состояние при сбросе фильтров
     useEffect(() => {
       setLocalPrice(tempPriceRef.current);
       setIsInitialized(true);
     }, [priceResetTrigger]);
-    
+
     // Применяем ценовой фильтр автоматически с задержкой
     useEffect(() => {
       // Не применяем на первом рендере
@@ -348,15 +375,15 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
         setIsInitialized(true);
         return;
       }
-      
+
       const timer = setTimeout(() => {
         setPriceRange(localPrice);
         setPage(0);
       }, 300); // Задержка 300мс после последнего изменения
-      
+
       return () => clearTimeout(timer);
     }, [localPrice]);
-    
+
     return (
       <AccordionItem value="price">
         <AccordionTrigger className="text-sm font-medium">
@@ -432,9 +459,9 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       <div className="space-y-6 px-4 lg:px-0 pb-20 lg:pb-0">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Filters</h2>
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             className="h-8 text-xs"
             onClick={clearAllFilters}
           >
@@ -445,37 +472,46 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
 
         <Accordion
           type="multiple"
-          defaultValue={["price", ...attributes.slice(0, 3).map(attr => attr.name.toLowerCase())]}
+          defaultValue={[
+            "price",
+            ...attributes.slice(0, 3).map((attr) => attr.name.toLowerCase()),
+          ]}
           className="w-full"
         >
           <PriceSlider />
 
           {attributes.map((attribute) => (
-            <AccordionItem key={attribute.id} value={attribute.name.toLowerCase()}>
+            <AccordionItem
+              key={attribute.id}
+              value={attribute.name.toLowerCase()}
+            >
               <AccordionTrigger className="text-sm font-medium">
                 <div className="flex">
-                {attribute.name}
-                {selectedFilters[attribute.name]?.length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
-                    {selectedFilters[attribute.name].length}
-                  </Badge>
-                )}
+                  {attribute.name}
+                  {selectedFilters[attribute.name]?.length > 0 && (
+                    <Badge variant="secondary" className="ml-2">
+                      {selectedFilters[attribute.name].length}
+                    </Badge>
+                  )}
                 </div>
               </AccordionTrigger>
               <AccordionContent>
                 <div className="space-y-3 pt-2 max-h-64 overflow-y-auto">
                   {attribute.values.map((value) => {
-                    const isChecked = selectedFilters[attribute.name]?.includes(value) || false;
+                    const isChecked =
+                      selectedFilters[attribute.name]?.includes(value) || false;
                     return (
                       <div
                         key={value}
                         className="flex items-center justify-between"
                       >
                         <div className="flex items-center space-x-2">
-                          <Checkbox 
+                          <Checkbox
                             id={`${attribute.name}-${value}`}
                             checked={isChecked}
-                            onCheckedChange={() => toggleFilter(attribute.name, value)}
+                            onCheckedChange={() =>
+                              toggleFilter(attribute.name, value)
+                            }
                           />
                           <Label
                             htmlFor={`${attribute.name}-${value}`}
@@ -499,7 +535,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Premium Page Header */}
       <div className="border-b bg-gradient-to-b from-muted/30 to-background">
         <div className="container mx-auto px-4 py-12">
@@ -509,14 +545,20 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
               <span>/</span>
               <span>Store</span>
               <span>/</span>
-              <span className="text-foreground font-medium">{categoryName}</span>
+              <span className="text-foreground font-medium">
+                {categoryName}
+              </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
               {categoryName}
             </h1>
             {brandName && (
               <p className="text-lg text-muted-foreground">
-                Showing all <span className="font-semibold text-foreground">{brandName}</span> products
+                Showing all{" "}
+                <span className="font-semibold text-foreground">
+                  {brandName}
+                </span>{" "}
+                products
               </p>
             )}
             <p className="text-muted-foreground mt-2">
@@ -538,13 +580,25 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
               {/* Premium Info Card */}
               <div className="border rounded-lg p-6 bg-card shadow-sm">
                 <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
                   </svg>
                   Authenticity Guarantee
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Every item is carefully authenticated by our expert team. Shop with confidence knowing you're getting 100% genuine luxury products.
+                  We guarantee the authenticity of all products — every piece is
+                  a genuine creation by the brand, delivered with its original
+                  packaging and documentation.{" "}
                 </p>
               </div>
 
@@ -552,24 +606,66 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
               <div className="border rounded-lg p-6 bg-card shadow-sm">
                 <h3 className="font-semibold text-sm mb-4">Need Help?</h3>
                 <div className="space-y-3 text-xs">
-                  <a href="#" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <a
+                    href="mailto:support@luxstore.com"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
                     </svg>
-                    Contact Support
+                    support@luxstore.com
                   </a>
-                  <a href="#" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <a
+                    href="tel:+441412345678"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      />
                     </svg>
-                    FAQ
+                    +44 141 234 5678
                   </a>
-                  <a href="#" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  <button
+                    onClick={() => {
+                      // Здесь можно подключить чат виджет (Intercom, Tawk.to, etc.)
+                      console.log('Opening chat...');
+                    }}
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-full text-left"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
                     </svg>
-                    +1 (555) 123-4567
-                  </a>
+                    Online Chat
+                  </button>
                 </div>
               </div>
             </div>
@@ -585,7 +681,10 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                       Filters
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="w-[300px] sm:w-[350px] overflow-y-auto">
+                  <SheetContent
+                    side="left"
+                    className="w-[300px] sm:w-[350px] overflow-y-auto"
+                  >
                     <SheetHeader>
                       <SheetTitle>Filters</SheetTitle>
                       <SheetDescription>
@@ -608,7 +707,8 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                       "Loading..."
                     ) : (
                       <>
-                        <span className="font-medium">{total}</span> products available
+                        <span className="font-medium">{total}</span> products
+                        available
                       </>
                     )}
                   </p>
@@ -616,17 +716,24 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
-                <Select value={sortBy} onValueChange={(value) => {
-                  setSortBy(value);
-                  setPage(0); // Сбрасываем на первую страницу при изменении сортировки
-                }}>
+                <Select
+                  value={sortBy}
+                  onValueChange={(value) => {
+                    setSortBy(value);
+                    setPage(0); // Сбрасываем на первую страницу при изменении сортировки
+                  }}
+                >
                   <SelectTrigger className="w-full sm:w-[200px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="featured">Featured</SelectItem>
-                    <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                    <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                    <SelectItem value="price-asc">
+                      Price: Low to High
+                    </SelectItem>
+                    <SelectItem value="price-desc">
+                      Price: High to Low
+                    </SelectItem>
                     <SelectItem value="newest">Newest First</SelectItem>
                     <SelectItem value="bestsellers">Best Sellers</SelectItem>
                     <SelectItem value="a-z">Name: A-Z</SelectItem>
@@ -640,46 +747,94 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-6 bg-muted/30 rounded-lg border">
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-background flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <div>
                   <div className="text-xs font-semibold">Authenticated</div>
-                  <div className="text-xs text-muted-foreground">100% Genuine</div>
+                  <div className="text-xs text-muted-foreground">
+                    100% Genuine
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-background flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
                   </svg>
                 </div>
                 <div>
                   <div className="text-xs font-semibold">Secure Payment</div>
-                  <div className="text-xs text-muted-foreground">SSL Encrypted</div>
+                  <div className="text-xs text-muted-foreground">
+                    SSL Encrypted
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-background flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                    />
                   </svg>
                 </div>
                 <div>
                   <div className="text-xs font-semibold">Easy Returns</div>
-                  <div className="text-xs text-muted-foreground">30 Day Policy</div>
+                  <div className="text-xs text-muted-foreground">
+                    30 Day Policy
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-background flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                    />
                   </svg>
                 </div>
                 <div>
                   <div className="text-xs font-semibold">Free Shipping</div>
-                  <div className="text-xs text-muted-foreground">Orders $500+</div>
+                  <div className="text-xs text-muted-foreground">
+                    DHL Express
+                  </div>
                 </div>
               </div>
             </div>
@@ -692,111 +847,127 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                 </div>
               ) : displayProducts.length === 0 ? (
                 <div className="col-span-full text-center py-20">
-                  <p className="text-muted-foreground">No products found in this category</p>
+                  <p className="text-muted-foreground">
+                    No products found in this category
+                  </p>
                 </div>
               ) : (
                 displayProducts.map((product) => {
-                  console.log('Product:', product);
+                  console.log("Product:", product);
                   return (
-                <div
-                  key={product.id}
-                  className="group relative flex flex-col bg-card border rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
-                >
-                  {/* Image Container */}
-                  <div 
-                    className="relative aspect-[4/3] overflow-hidden bg-muted cursor-pointer"
-                    onClick={() => window.location.href = `/product/${product.id}`}
-                  >
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Stock Status */}
-                    {!product.inStock && (
-                      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                        <span className="text-white text-sm font-semibold tracking-wide">SOLD OUT</span>
-                      </div>
-                    )}
+                    <div
+                      key={product.id}
+                      className="group relative flex flex-col bg-card border rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+                    >
+                      {/* Image Container */}
+                      <div
+                        className="relative aspect-square overflow-hidden bg-muted cursor-pointer"
+                        onClick={() =>
+                          (window.location.href = `/product/${product.id}`)
+                        }
+                      >
+                        <Image
+                          src={product.image}
+                          alt={product.name}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
 
-                    {/* Discount Label */}
-                    {product.originalPrice && (
-                      <div className="absolute top-0 right-0 bg-foreground text-background px-3 py-1.5 text-xs font-bold tracking-wider">
-                        -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-                      </div>
-                    )}
-                  </div>
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                  {/* Content */}
-                  <div className="flex flex-col flex-1 p-5">
-                    {/* Brand */}
-                    <div className="mb-3">
-                      <span className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
-                        {product.brand}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="font-bold text-base leading-tight mb-2 min-h-[2.5rem] line-clamp-2">
-                      {product.name}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3 flex-1">
-                      {product.description}
-                    </p>
-
-                    {/* SKU */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="text-xs text-muted-foreground font-medium">SKU:</span>
-                      <code className="text-xs bg-muted/50 px-2 py-1 rounded font-mono">
-                        {product.sku}
-                      </code>
-                    </div>
-
-                    <Separator className="mb-4" />
-
-                    {/* Price & Actions */}
-                    <div className="flex items-end justify-between gap-3">
-                      <div className="flex flex-col">
-                        {product.originalPrice && (
-                          <span className="text-xs text-muted-foreground line-through mb-0.5">
-                            €{product.originalPrice.toLocaleString()}
-                          </span>
+                        {/* Stock Status */}
+                        {!product.inStock && (
+                          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+                            <span className="text-white text-sm font-semibold tracking-wide">
+                              SOLD OUT
+                            </span>
+                          </div>
                         )}
-                        <span className="text-2xl font-bold tracking-tight">
-                          €{product.price.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="font-semibold"
-                          onClick={() => window.location.href = `/product/${product.id}`}
-                        >
-                          Details
-                        </Button>
-                        <Button 
-                          size="icon" 
-                          className="h-8 w-8 shadow-md"
-                          disabled={!product.inStock}
-                        >
-                          <ShoppingCart className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Premium Border Effect */}
-                  <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-primary/20 transition-all duration-300 pointer-events-none" />
-                </div>
-              );
+                        {/* Discount Label */}
+                        {product.originalPrice && (
+                          <div className="absolute top-0 right-0 bg-foreground text-background px-3 py-1.5 text-xs font-bold tracking-wider">
+                            -
+                            {Math.round(
+                              ((product.originalPrice - product.price) /
+                                product.originalPrice) *
+                                100
+                            )}
+                            % OFF
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex flex-col flex-1 p-5">
+                        {/* Brand */}
+                        <div className="mb-3">
+                          <span className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
+                            {product.brand}
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="font-bold text-base leading-tight mb-2 min-h-[2.5rem] line-clamp-2">
+                          {product.name}
+                        </h3>
+
+                        {/* Description */}
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-3 flex-1">
+                          {product.description}
+                        </p>
+
+                        {/* SKU */}
+                        <div className="flex items-center gap-2 mb-4">
+                          <span className="text-xs text-muted-foreground font-medium">
+                            SKU:
+                          </span>
+                          <code className="text-xs bg-muted/50 px-2 py-1 rounded font-mono">
+                            {product.sku}
+                          </code>
+                        </div>
+
+                        <Separator className="mb-4" />
+
+                        {/* Price & Actions */}
+                        <div className="flex items-end justify-between gap-3">
+                          <div className="flex flex-col">
+                            {product.originalPrice && (
+                              <span className="text-xs text-muted-foreground line-through mb-0.5">
+                                €{product.originalPrice.toLocaleString()}
+                              </span>
+                            )}
+                            <span className="text-2xl font-bold tracking-tight">
+                              €{product.price.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="font-semibold"
+                              onClick={() =>
+                                (window.location.href = `/product/${product.id}`)
+                              }
+                            >
+                              Details
+                            </Button>
+                            <Button
+                              size="icon"
+                              className="h-8 w-8 shadow-md"
+                              disabled={!product.inStock}
+                            >
+                              <ShoppingCart className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Premium Border Effect */}
+                      <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-primary/20 transition-all duration-300 pointer-events-none" />
+                    </div>
+                  );
                 })
               )}
             </div>
@@ -832,32 +1003,62 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
             <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center p-6 border rounded-lg bg-card">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  <svg
+                    className="w-6 h-6 text-primary"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
                   </svg>
                 </div>
-                <h3 className="font-semibold mb-2">Authenticity Verified</h3>
+                <h3 className="font-semibold mb-2">100% Authenticity</h3>
                 <p className="text-sm text-muted-foreground">
-                  Each item undergoes rigorous authentication by certified experts
+                  Every item in our collection is original and sourced directly from official brand boutiques and authorized retailers.
                 </p>
               </div>
 
               <div className="text-center p-6 border rounded-lg bg-card">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-6 h-6 text-primary"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <h3 className="font-semibold mb-2">Fast & Secure Delivery</h3>
                 <p className="text-sm text-muted-foreground">
-                  Express shipping with full insurance and tracking included
+                  DHL Express shipping with full insurance and tracking included
                 </p>
               </div>
 
               <div className="text-center p-6 border rounded-lg bg-card">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                  <svg
+                    className="w-6 h-6 text-primary"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
                   </svg>
                 </div>
                 <h3 className="font-semibold mb-2">Concierge Service</h3>
