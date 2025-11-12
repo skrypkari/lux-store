@@ -9,7 +9,7 @@ const slides = [
     id: 1,
     brand: "Cartier",
     subtitle: "Cartier, the jeweller of kings and the king of jewellers.",
-    videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/8dffd83ad2bc7dd47324ad83d29bcce8/iframe?loop=true&autoplay=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F8dffd83ad2bc7dd47324ad83d29bcce8%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
+    videoUrl: "https://customer-gg9877p8mtv4csop.cloudflarestream.com/8dffd83ad2bc7dd47324ad83d29bcce8/iframe?loop=true&autoplay=true&muted=true&poster=https%3A%2F%2Fcustomer-gg9877p8mtv4csop.cloudflarestream.com%2F8dffd83ad2bc7dd47324ad83d29bcce8%2Fthumbnails%2Fthumbnail.jpg%3Ftime%3D%26height%3D600&controls=false",
     duration: 14000, // 14 секунд
   },
   {
