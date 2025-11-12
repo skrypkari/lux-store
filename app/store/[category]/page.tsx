@@ -1,8 +1,10 @@
 "use client";
 
 import { use, useState, useEffect, useRef, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { useCart } from "@/contexts/cart-context";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -104,6 +106,9 @@ interface AttributeValue {
 export default function CategoryPage({ params, searchParams }: PageProps) {
   const { category } = use(params);
   const { brand } = use(searchParams);
+  const router = useRouter();
+  const urlSearchParams = useSearchParams();
+  const { addToCart } = useCart();
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const tempPriceRef = useRef([0, 100000]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -122,6 +127,8 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   const [priceResetTrigger, setPriceResetTrigger] = useState(0);
   const [isPending, startTransition] = useTransition();
   const [sortBy, setSortBy] = useState("featured");
+  const [addingToCart, setAddingToCart] = useState<Record<string, boolean>>({});
+  const [isInitialized, setIsInitialized] = useState(false);
   const pageSize = 12;
 
   const categoryName = category
@@ -135,6 +142,97 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ")
     : null;
+
+  // Инициализация фильтров из URL при первой загрузке
+  useEffect(() => {
+    if (isInitialized) return;
+
+    const filters: Record<string, string[]> = {};
+    
+    // Читаем все параметры из URL
+    urlSearchParams.forEach((value, key) => {
+      if (key === 'sortBy' || key === 'page' || key === 'minPrice' || key === 'maxPrice' || key === 'brand') {
+        return; // Пропускаем служебные параметры
+      }
+      
+      if (!filters[key]) {
+        filters[key] = [];
+      }
+      filters[key].push(value);
+    });
+
+    // Восстанавливаем сортировку
+    const urlSortBy = urlSearchParams.get('sortBy');
+    if (urlSortBy) {
+      setSortBy(urlSortBy);
+    }
+
+    // Восстанавливаем страницу
+    const urlPage = urlSearchParams.get('page');
+    if (urlPage) {
+      setPage(parseInt(urlPage));
+    }
+
+    // Восстанавливаем ценовой диапазон
+    const urlMinPrice = urlSearchParams.get('minPrice');
+    const urlMaxPrice = urlSearchParams.get('maxPrice');
+    if (urlMinPrice || urlMaxPrice) {
+      const min = urlMinPrice ? parseInt(urlMinPrice) : 0;
+      const max = urlMaxPrice ? parseInt(urlMaxPrice) : 100000;
+      setPriceRange([min, max]);
+      tempPriceRef.current = [min, max];
+    }
+
+    // Применяем фильтры
+    if (Object.keys(filters).length > 0) {
+      setSelectedFilters(filters);
+      setAppliedFilters(filters);
+    }
+
+    setIsInitialized(true);
+  }, [urlSearchParams, isInitialized]);
+
+  // Функция для обновления URL
+  const updateURL = (
+    newFilters: Record<string, string[]>,
+    newSortBy: string,
+    newPage: number,
+    newPriceRange: number[]
+  ) => {
+    const params = new URLSearchParams();
+
+    // Добавляем brand если есть
+    if (brand) {
+      params.set('brand', brand);
+    }
+
+    // Добавляем сортировку
+    if (newSortBy && newSortBy !== 'featured') {
+      params.set('sortBy', newSortBy);
+    }
+
+    // Добавляем страницу если не первая
+    if (newPage > 0) {
+      params.set('page', newPage.toString());
+    }
+
+    // Добавляем ценовой диапазон если изменен
+    if (newPriceRange[0] > 0 || newPriceRange[1] < 100000) {
+      params.set('minPrice', newPriceRange[0].toString());
+      params.set('maxPrice', newPriceRange[1].toString());
+    }
+
+    // Добавляем фильтры
+    Object.entries(newFilters).forEach(([key, values]) => {
+      values.forEach((value) => {
+        params.append(key, value);
+      });
+    });
+
+    // Обновляем URL без перезагрузки страницы
+    const newURL = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+    router.push(newURL, { scroll: false });
+  };
 
   // Функция для переключения фильтра
   const toggleFilter = (attributeName: string, value: string) => {
@@ -167,6 +265,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     startTransition(() => {
       setAppliedFilters(newFilters);
       setPage(0);
+      updateURL(newFilters, sortBy, 0, priceRange);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   };
@@ -179,6 +278,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     setPriceRange([0, 100000]);
     setPriceResetTrigger((prev) => prev + 1); // Триггер для сброса PriceSlider
     setPage(0);
+    updateURL({}, sortBy, 0, [0, 100000]);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -357,6 +457,24 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     return "Luxury Collection";
   }
 
+  // Функция для добавления в корзину
+  const handleAddToCart = (product: typeof displayProducts[0]) => {
+    setAddingToCart(prev => ({ ...prev, [product.id]: true }));
+    
+    addToCart({
+      id: parseInt(product.id),
+      name: product.name,
+      brand: product.brand || "Luxury Brand",
+      price: product.price || 0,
+      image: product.image || "",
+      inStock: product.inStock || false
+    });
+
+    setTimeout(() => {
+      setAddingToCart(prev => ({ ...prev, [product.id]: false }));
+    }, 1000);
+  };
+
   const PriceSlider = () => {
     // Локальное состояние для плавного движения слайдера
     const [localPrice, setLocalPrice] = useState(() => tempPriceRef.current);
@@ -379,6 +497,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       const timer = setTimeout(() => {
         setPriceRange(localPrice);
         setPage(0);
+        updateURL(appliedFilters, sortBy, 0, localPrice);
       }, 300); // Задержка 300мс после последнего изменения
 
       return () => clearTimeout(timer);
@@ -474,13 +593,13 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
           type="multiple"
           defaultValue={[
             "price",
-            ...attributes.slice(0, 3).map((attr) => attr.name.toLowerCase()),
+            ...(Array.isArray(attributes) ? attributes.slice(0, 3).map((attr) => attr.name.toLowerCase()) : []),
           ]}
           className="w-full"
         >
           <PriceSlider />
 
-          {attributes.map((attribute) => (
+          {Array.isArray(attributes) && attributes.map((attribute) => (
             <AccordionItem
               key={attribute.id}
               value={attribute.name.toLowerCase()}
@@ -607,7 +726,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                 <h3 className="font-semibold text-sm mb-4">Need Help?</h3>
                 <div className="space-y-3 text-xs">
                   <a
-                    href="mailto:support@luxstore.com"
+                    href="mailto:info@lux-store.eu"
                     className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <svg
@@ -623,10 +742,10 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                         d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                       />
                     </svg>
-                    support@luxstore.com
+                    info@lux-store.eu
                   </a>
                   <a
-                    href="tel:+441412345678"
+                    href="tel:+447700184435"
                     className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <svg
@@ -642,7 +761,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                         d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                       />
                     </svg>
-                    +44 141 234 5678
+                    +44-7700-18-44-35
                   </a>
                   <button
                     onClick={() => {
@@ -720,7 +839,8 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                   value={sortBy}
                   onValueChange={(value) => {
                     setSortBy(value);
-                    setPage(0); // Сбрасываем на первую страницу при изменении сортировки
+                    setPage(0);
+                    updateURL(appliedFilters, value, 0, priceRange);
                   }}
                 >
                   <SelectTrigger className="w-full sm:w-[200px]">
@@ -955,10 +1075,23 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                             </Button>
                             <Button
                               size="icon"
-                              className="h-8 w-8 shadow-md"
+                              className="relative h-8 w-8 shadow-md transition-all duration-300 hover:scale-110"
                               disabled={!product.inStock}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddToCart(product);
+                              }}
                             >
-                              <ShoppingCart className="h-4 w-4" />
+                              {addingToCart[product.id] ? (
+                                <span className="text-xs font-bold animate-bounce">✓</span>
+                              ) : (
+                                <ShoppingCart className="h-4 w-4" />
+                              )}
+                              
+                              {/* Ripple effect */}
+                              {addingToCart[product.id] && (
+                                <span className="absolute inset-0 rounded-md bg-white animate-ping opacity-75" />
+                              )}
                             </Button>
                           </div>
                         </div>
@@ -978,7 +1111,9 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    setPage(Math.max(0, page - 1));
+                    const newPage = Math.max(0, page - 1);
+                    setPage(newPage);
+                    updateURL(appliedFilters, sortBy, newPage, priceRange);
                   }}
                   disabled={page === 0}
                 >
@@ -990,7 +1125,9 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    setPage(page + 1);
+                    const newPage = page + 1;
+                    setPage(newPage);
+                    updateURL(appliedFilters, sortBy, newPage, priceRange);
                   }}
                   disabled={!hasMore}
                 >
