@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, XCircle, Clock, ArrowRight, AlertCircle, Lock } from "lucide-react";
@@ -16,7 +16,7 @@ interface OrderStatusResponse {
   total: number;
 }
 
-export default function PendingPaymentPage() {
+function PendingPaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order_id");
@@ -582,5 +582,22 @@ export default function PendingPaymentPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Suspense wrapper required for useSearchParams()
+export default function PendingPaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-20">
+        <div className="container mx-auto max-w-4xl px-4">
+          <div className="flex items-center justify-center">
+            <Loader2 className="h-12 w-12 animate-spin text-black/20" />
+          </div>
+        </div>
+      </div>
+    }>
+      <PendingPaymentContent />
+    </Suspense>
   );
 }
