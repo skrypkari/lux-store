@@ -86,7 +86,7 @@ export default function OrderDetailsPage() {
 
   const fetchOrder = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/orders/${orderId}`);
+      const response = await fetch(`https://api.lux-store.eu/orders/${orderId}`);
       if (!response.ok) {
         throw new Error("Order not found");
       }

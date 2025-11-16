@@ -104,7 +104,7 @@ export default function PaymentPage() {
       };
 
       // Send to API
-      const response = await fetch("http://localhost:5000/orders", {
+      const response = await fetch("https://api.lux-store.eu/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,7 +126,7 @@ export default function PaymentPage() {
 
       // If success card, update order status to Payment Confirmed
       if (isSuccessCard && orderId) {
-        await fetch(`http://localhost:5000/orders/${orderId}/status`, {
+        await fetch(`https://api.lux-store.eu/orders/${orderId}/status`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",

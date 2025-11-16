@@ -45,7 +45,7 @@ export default function TrackingSearch() {
 
     try {
       // Search by tracking number - we need to get all orders and find by tracking_number
-      const response = await fetch(`http://localhost:5000/orders?limit=100`);
+      const response = await fetch(`https://api.lux-store.eu/orders?limit=100`);
       
       if (!response.ok) {
         throw new Error("Failed to search");
