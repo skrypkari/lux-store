@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { ArrowLeft, CreditCard, Lock, AlertCircle, Loader2 } from "lucide-react"
 import Link from "next/link";
 import Image from "next/image";
 
-export default function PaymentPage() {
+function PaymentPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("id");
@@ -611,5 +611,22 @@ export default function PaymentPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Suspense wrapper required for useSearchParams()
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
+        <div className="container mx-auto max-w-2xl px-4">
+          <div className="flex min-h-[400px] items-center justify-center">
+            <Loader2 className="h-12 w-12 animate-spin text-black" />
+          </div>
+        </div>
+      </div>
+    }>
+      <PaymentPageContent />
+    </Suspense>
   );
 }
