@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Package, Mail, Truck, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/contexts/cart-context";
 
-export default function OrderSuccessPage() {
+function SuccessPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [orderId, setOrderId] = useState("");
@@ -216,5 +216,20 @@ export default function OrderSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+          <p className="font-general-sans text-black/60">Loading...</p>
+        </div>
+      </div>
+    }>
+      <SuccessPageContent />
+    </Suspense>
   );
 }
