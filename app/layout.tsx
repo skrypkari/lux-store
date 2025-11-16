@@ -21,14 +21,14 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/f8235840-ece3-48f1-32f5-f1663b407f00/public",
-        sizes: "32x32",
+        url: "/favicon-180.png",
+        sizes: "180x180",
         type: "image/png",
       },
     ],
     apple: [
       {
-        url: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/808169a6-1490-4769-094b-3c80c8d8e400/public",
+        url: "/favicon-192.png",
       },
     ],
   },

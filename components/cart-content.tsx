@@ -72,7 +72,7 @@ export default function CartContent() {
     const cartItemIds = cartItems.map(item => item.id);
 
     // Fetch products from the API - get more products to have better selection after filtering
-    fetch('https://api.lux-store.eu/products/random?limit=20')
+    fetch('http://localhost:5000/products/random?limit=20')
       .then(res => res.json())
       .then(data => {
         // Filter out items that are already in cart
@@ -613,11 +613,11 @@ export default function CartContent() {
                 <div className="space-y-3">
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Subtotal (excl. VAT)</span>
-                    <span className="font-bold text-black">€{(subtotal / 1.2).toFixed(2)}</span>
+                    <span className="font-bold text-black">€{(subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">VAT (20%)</span>
-                    <span className="font-bold text-black">€{(subtotal - subtotal / 1.2).toFixed(2)}</span>
+                    <span className="font-bold text-black">€{(subtotal - subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Shipping</span>
@@ -629,7 +629,7 @@ export default function CartContent() {
                   {discount > 0 && (
                     <div className="flex justify-between font-general-sans text-base">
                       <span className="text-black/70">Promo Discount</span>
-                      <span className="font-bold text-black">-€{discount.toFixed(2)}</span>
+                      <span className="font-bold text-black">-€{discount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
                     </div>
                   )}
                 </div>
@@ -675,9 +675,6 @@ export default function CartContent() {
                       </Button>
                     </div>
                   )}
-                  <p className="mt-2 font-general-sans text-xs text-black/60">
-                    Try: <span className="font-semibold">LUXURY10</span> or <span className="font-semibold">VIP20</span>
-                  </p>
                 </div>
                 
                 <Separator className="my-4" />
@@ -687,7 +684,7 @@ export default function CartContent() {
                     <span className="font-satoshi text-lg font-bold">Total Amount</span>
                     <div className="text-right">
                       <span className="font-satoshi text-3xl font-bold tracking-tight">
-                        €{total.toFixed(2)}
+                        €{total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
                       </span>
                     </div>
                   </div>

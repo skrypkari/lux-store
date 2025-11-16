@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { ORDER_STATUS_DESCRIPTIONS } from "@/lib/order-statuses";
 
 interface OrderItem {
   id: number;
@@ -63,6 +64,7 @@ interface Order {
   payment_method: string;
   payment_status: string;
   tracking_number?: string;
+  tracking_url?: string;
   courier?: string;
   items: OrderItem[];
   statuses: OrderStatus[];
@@ -79,21 +81,34 @@ export default function OrderDetailsPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (orderId) {
-      fetchOrder();
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    if (!token) {
+      setError("Access denied. Please use the tracking page to view your order.");
+      setLoading(false);
+      return;
     }
-  }, [orderId]);
+    
+    fetchOrder(token);
+  }, []);
 
-  const fetchOrder = async () => {
+  const fetchOrder = async (token: string) => {
     try {
-      const response = await fetch(`https://api.lux-store.eu/orders/${orderId}`);
+      const response = await fetch(`http://localhost:5000/orders/by-token/${token}`);
       if (!response.ok) {
-        throw new Error("Order not found");
+        throw new Error("Order not found or invalid access token");
       }
       const data = await response.json();
+      
+      // Verify that the order ID matches the URL parameter
+      if (data.id !== orderId) {
+        throw new Error("Order ID mismatch");
+      }
+      
       setOrder(data);
-    } catch (err) {
-      setError("Failed to load order details");
+    } catch (err: any) {
+      setError(err.message || "Failed to load order details");
       console.error(err);
     } finally {
       setLoading(false);
@@ -231,12 +246,16 @@ export default function OrderDetailsPage() {
                         <CheckCircle2 className="h-6 w-6 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="mb-1 font-satoshi text-2xl font-bold">
+                        <p className="mb-2 font-satoshi text-2xl font-bold">
                           {currentStatus.status}
                         </p>
+                        <p className="mb-3 font-general-sans text-sm text-black/60">
+                          {ORDER_STATUS_DESCRIPTIONS[currentStatus.status as keyof typeof ORDER_STATUS_DESCRIPTIONS] || 
+                           'Your order is being processed.'}
+                        </p>
                         {currentStatus.notes && (
-                          <p className="font-general-sans text-sm text-black/70">
-                            {currentStatus.notes}
+                          <p className="font-general-sans text-xs text-black/50 italic">
+                            Note: {currentStatus.notes}
                           </p>
                         )}
                       </div>
@@ -277,12 +296,21 @@ export default function OrderDetailsPage() {
                           </span>
                         </div>
                       )}
-                      <Link href={`/track?id=${order.tracking_number}`} target="_blank">
-                        <Button className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700">
-                          <Package className="h-5 w-5" />
-                          Click Here To Track Your Order
-                        </Button>
-                      </Link>
+                      {order.tracking_url ? (
+                        <Link href={order.tracking_url} target="_blank" rel="noopener noreferrer">
+                          <Button className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700">
+                            <Package className="h-5 w-5" />
+                            Click Here To Track Your Order
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Link href={`/track?id=${order.tracking_number}`} target="_blank">
+                          <Button className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700">
+                            <Package className="h-5 w-5" />
+                            Click Here To Track Your Order
+                          </Button>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -324,17 +352,16 @@ export default function OrderDetailsPage() {
                           <p className="mb-1 font-satoshi text-lg font-bold">
                             {status.status}
                           </p>
-                          <p className="mb-1 font-general-sans text-sm text-black/60">
+                          <p className="mb-2 font-general-sans text-sm text-black/60">
                             {formatDate(status.created_at)}
                           </p>
+                          <p className="mb-2 font-general-sans text-sm text-black/70">
+                            {ORDER_STATUS_DESCRIPTIONS[status.status as keyof typeof ORDER_STATUS_DESCRIPTIONS] || 
+                             'Order status updated.'}
+                          </p>
                           {status.notes && (
-                            <p className="flex items-center gap-1 font-general-sans text-sm text-black/60">
-                              {status.notes}
-                            </p>
-                          )}
-                          {status.notes && (
-                            <p className="mt-2 font-general-sans text-sm text-black/70">
-                              {status.notes}
+                            <p className="font-general-sans text-xs text-black/50 italic">
+                              Note: {status.notes}
                             </p>
                           )}
                         </div>
@@ -398,27 +425,27 @@ export default function OrderDetailsPage() {
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Subtotal (excl. VAT)</span>
                     <span className="font-bold">
-                      €{(order.subtotal / 1.2).toFixed(2)}
+                      €{(order.subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
                     </span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">VAT (20%)</span>
                     <span className="font-bold">
-                      €{(order.subtotal - order.subtotal / 1.2).toFixed(2)}
+                      €{(order.subtotal - order.subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
                     </span>
                   </div>
                   {order.discount > 0 && (
                     <div className="flex justify-between font-general-sans text-base">
                       <span className="text-black/70">Discount</span>
                       <span className="font-bold text-red-600">
-                        -€{order.discount.toLocaleString()}
+                        -€{order.discount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Shipping</span>
                     <span className="font-bold text-green-600">
-                      {order.shipping === 0 ? "FREE" : `€${order.shipping}`}
+                      {order.shipping === 0 ? "FREE" : `€${order.shipping.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}`}
                     </span>
                   </div>
                 </div>
@@ -432,7 +459,7 @@ export default function OrderDetailsPage() {
                     </span>
                     <div className="text-right">
                       <span className="font-satoshi text-3xl font-bold tracking-tight">
-                        €{order.total.toFixed(2)}
+                        €{order.total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
                       </span>
                     </div>
                   </div>

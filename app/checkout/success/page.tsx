@@ -11,23 +11,27 @@ function SuccessPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [orderId, setOrderId] = useState("");
+  const [accessToken, setAccessToken] = useState("");
   const { clearCart } = useCart();
 
   useEffect(() => {
-    // Get order ID from URL params
+    // Get order ID and token from URL params
     const id = searchParams.get("orderId");
-    if (id) {
+    const token = searchParams.get("token");
+    
+    if (id && token) {
       setOrderId(id);
+      setAccessToken(token);
       
       // Clear the cart
       clearCart();
     } else {
-      // If no order ID, redirect to home
+      // If no order ID or token, redirect to home
       router.push("/");
     }
   }, [searchParams, router, clearCart]);
 
-  if (!orderId) {
+  if (!orderId || !accessToken) {
     return null;
   }
 
@@ -90,12 +94,17 @@ function SuccessPageContent() {
                 </svg>
               </Button>
             </div>
-            <Link href={`/orders/${orderId}`} className="inline-block">
-              <Button variant="link" className="gap-2 font-semibold">
-                View Order Details
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+            <Button 
+              variant="link" 
+              className="gap-2 font-semibold"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = `/orders/${orderId}?token=${accessToken}`;
+              }}
+            >
+              View Order Details
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Divider */}

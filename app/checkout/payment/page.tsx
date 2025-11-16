@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, CreditCard, Lock, AlertCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -55,9 +56,137 @@ export default function PaymentPage() {
     return cleaned;
   };
 
+  // Detect card type based on card number
+  const getCardType = (cardNumber: string): string => {
+    const cleaned = cardNumber.replace(/\s/g, "");
+    
+    // Visa: starts with 4
+    if (/^4/.test(cleaned)) {
+      return "visa";
+    }
+    
+    // Mastercard: starts with 51-55 or 2221-2720
+    if (/^5[1-5]/.test(cleaned) || /^2(22[1-9]|2[3-9][0-9]|[3-6][0-9]{2}|7[0-1][0-9]|720)/.test(cleaned)) {
+      return "mastercard";
+    }
+    
+    // Amex: starts with 34 or 37
+    if (/^3[47]/.test(cleaned)) {
+      return "amex";
+    }
+    
+    return "generic";
+  };
+
+  // Luhn Algorithm for card validation (Visa, Mastercard, Amex, etc.)
+  const validateCardNumber = (cardNumber: string): boolean => {
+    const cleaned = cardNumber.replace(/\s/g, "");
+    
+    // Check if it contains only digits
+    if (!/^\d+$/.test(cleaned)) {
+      return false;
+    }
+
+    // Check length (13-19 digits for most cards)
+    if (cleaned.length < 13 || cleaned.length > 19) {
+      return false;
+    }
+
+    // Luhn Algorithm
+    let sum = 0;
+    let isEven = false;
+
+    // Loop through values starting from the rightmost digit
+    for (let i = cleaned.length - 1; i >= 0; i--) {
+      let digit = parseInt(cleaned.charAt(i), 10);
+
+      if (isEven) {
+        digit *= 2;
+        if (digit > 9) {
+          digit -= 9;
+        }
+      }
+
+      sum += digit;
+      isEven = !isEven;
+    }
+
+    return sum % 10 === 0;
+  };
+
+  // Validate cardholder name
+  const validateCardholderName = (name: string): boolean => {
+    // Must contain at least 2 characters and only letters and spaces
+    const trimmed = name.trim();
+    if (trimmed.length < 2) {
+      return false;
+    }
+    // Allow letters, spaces, hyphens, and apostrophes
+    return /^[a-zA-Z\s\-']+$/.test(trimmed);
+  };
+
+  // Validate expiry date
+  const validateExpiryDate = (expiryDate: string): boolean => {
+    if (expiryDate.length !== 5) {
+      return false;
+    }
+
+    const [month, year] = expiryDate.split("/");
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt("20" + year, 10);
+
+    // Check valid month
+    if (monthNum < 1 || monthNum > 12) {
+      return false;
+    }
+
+    // Check if card is expired
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    if (yearNum < currentYear) {
+      return false;
+    }
+
+    if (yearNum === currentYear && monthNum < currentMonth) {
+      return false;
+    }
+
+    return true;
+  };
+
+  // Validate CVV
+  const validateCVV = (cvv: string): boolean => {
+    // CVV should be 3 or 4 digits
+    return /^\d{3,4}$/.test(cvv);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Validate all fields
+    if (!validateCardNumber(cardData.cardNumber)) {
+      setError("Invalid card number. Please check and try again.");
+      return;
+    }
+
+    if (!validateCardholderName(cardData.cardName)) {
+      setError("Invalid cardholder name. Must contain at least 2 letters.");
+      return;
+    }
+
+    if (!validateExpiryDate(cardData.expiryDate)) {
+      setError("Invalid or expired date. Please check expiry date.");
+      return;
+    }
+
+    if (!validateCVV(cardData.cvv)) {
+      setError("Invalid CVV. Must be 3 or 4 digits.");
+      return;
+    }
+
     setIsProcessing(true);
 
     // Get checkout data from localStorage
@@ -104,7 +233,7 @@ export default function PaymentPage() {
       };
 
       // Send to API
-      const response = await fetch("https://api.lux-store.eu/orders", {
+      const response = await fetch("http://localhost:5000/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -119,14 +248,15 @@ export default function PaymentPage() {
       const result = await response.json();
       console.log("Order created:", result);
       const orderId = result.id;
+      const accessToken = result.access_token;
 
-      if (!orderId) {
-        throw new Error("Order ID not returned from server");
+      if (!orderId || !accessToken) {
+        throw new Error("Order ID or access token not returned from server");
       }
 
       // If success card, update order status to Payment Confirmed
       if (isSuccessCard && orderId) {
-        await fetch(`https://api.lux-store.eu/orders/${orderId}/status`, {
+        await fetch(`http://localhost:5000/orders/${orderId}/status`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -149,7 +279,7 @@ export default function PaymentPage() {
           localStorage.removeItem("checkoutShipping");
           localStorage.removeItem("checkoutCart");
           localStorage.removeItem("checkoutPaymentMethod");
-          router.push(`/checkout/success?orderId=${orderId}`);
+          router.push(`/checkout/success?orderId=${orderId}&token=${accessToken}`);
         } else {
           // Payment failed
           router.push("/checkout/failed");
@@ -209,10 +339,58 @@ export default function PaymentPage() {
                     })
                   }
                   maxLength={19}
-                  className="h-14 border-black/20 pr-12 font-general-sans text-lg tracking-wide"
+                  className={`h-14 border-black/20 pr-16 font-general-sans text-lg tracking-wide ${
+                    cardData.cardNumber.replace(/\s/g, "").length >= 13 &&
+                    !validateCardNumber(cardData.cardNumber)
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : ""
+                  }`}
                 />
-                <CreditCard className="absolute right-4 top-1/2 h-6 w-6 -translate-y-1/2 text-black/40" />
+                {(() => {
+                  const cardType = getCardType(cardData.cardNumber);
+                  if (cardType === "visa") {
+                    return (
+                      <Image
+                        src="/visal.png"
+                        alt="Visa"
+                        width={40}
+                        height={25}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 object-contain"
+                      />
+                    );
+                  } else if (cardType === "mastercard") {
+                    return (
+                      <Image
+                        src="/mcl.png"
+                        alt="Mastercard"
+                        width={40}
+                        height={25}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 object-contain"
+                      />
+                    );
+                  } else if (cardType === "amex") {
+                    return (
+                      <Image
+                        src="/amex.png"
+                        alt="Amex"
+                        width={40}
+                        height={25}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 object-contain"
+                      />
+                    );
+                  } else {
+                    return (
+                      <CreditCard className="absolute right-4 top-1/2 h-6 w-6 -translate-y-1/2 text-black/40" />
+                    );
+                  }
+                })()}
               </div>
+              {cardData.cardNumber.replace(/\s/g, "").length >= 13 &&
+                !validateCardNumber(cardData.cardNumber) && (
+                  <p className="font-general-sans text-xs text-red-600">
+                    Invalid card number
+                  </p>
+                )}
             </div>
 
             {/* Cardholder Name */}
@@ -232,8 +410,17 @@ export default function PaymentPage() {
                     cardName: e.target.value.toUpperCase(),
                   })
                 }
-                className="h-14 border-black/20 font-general-sans text-lg uppercase"
+                className={`h-14 border-black/20 font-general-sans text-lg uppercase ${
+                  cardData.cardName.length >= 2 && !validateCardholderName(cardData.cardName)
+                    ? "border-red-500 focus-visible:ring-red-500"
+                    : ""
+                }`}
               />
+              {cardData.cardName.length >= 2 && !validateCardholderName(cardData.cardName) && (
+                <p className="font-general-sans text-xs text-red-600">
+                  Name must contain only letters
+                </p>
+              )}
             </div>
 
             {/* Expiry and CVV */}
@@ -255,8 +442,17 @@ export default function PaymentPage() {
                     })
                   }
                   maxLength={5}
-                  className="h-14 border-black/20 font-general-sans text-lg"
+                  className={`h-14 border-black/20 font-general-sans text-lg ${
+                    cardData.expiryDate.length === 5 && !validateExpiryDate(cardData.expiryDate)
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : ""
+                  }`}
                 />
+                {cardData.expiryDate.length === 5 && !validateExpiryDate(cardData.expiryDate) && (
+                  <p className="font-general-sans text-xs text-red-600">
+                    Invalid or expired date
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="cvv" className="font-satoshi font-semibold">
@@ -275,8 +471,17 @@ export default function PaymentPage() {
                     })
                   }
                   maxLength={4}
-                  className="h-14 border-black/20 font-general-sans text-lg"
+                  className={`h-14 border-black/20 font-general-sans text-lg ${
+                    cardData.cvv.length >= 3 && !validateCVV(cardData.cvv)
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : ""
+                  }`}
                 />
+                {cardData.cvv.length >= 3 && !validateCVV(cardData.cvv) && (
+                  <p className="font-general-sans text-xs text-red-600">
+                    CVV must be 3-4 digits
+                  </p>
+                )}
               </div>
             </div>
 
@@ -288,20 +493,6 @@ export default function PaymentPage() {
               </div>
             )}
 
-            {/* Card Brands */}
-            <div className="rounded-xl border border-black/10 bg-black/5 p-4">
-              <p className="mb-3 font-satoshi text-sm font-bold">Accepted Cards</p>
-              <div className="flex flex-wrap gap-2">
-                {["Visa", "Mastercard", "Amex", "Discover"].map((brand) => (
-                  <div
-                    key={brand}
-                    className="rounded-lg border border-black/10 bg-white px-3 py-2 font-general-sans text-sm font-semibold text-black/70"
-                  >
-                    {brand}
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* Terms */}
             <div className="rounded-xl border border-black/10 bg-gradient-to-r from-black/5 to-transparent p-4">
@@ -407,6 +598,17 @@ export default function PaymentPage() {
             <p className="font-satoshi text-sm font-bold">Data Protected</p>
             <p className="font-general-sans text-xs text-black/60">Never stored</p>
           </div>
+        </div>
+
+        {/* Payment Security Badge */}
+        <div className="mt-8 flex justify-center">
+          <Image
+            src="/mpc_logo_2.png"
+            alt="Payment Security"
+            width={600}
+            height={150}
+            className="h-auto max-w-[300px] w-full object-contain"
+          />
         </div>
       </div>
     </div>

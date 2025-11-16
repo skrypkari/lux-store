@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/contexts/cart-context";
 import { Button } from "@/components/ui/button";
@@ -8,76 +8,76 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, CreditCard, Lock, ShoppingBag, Truck, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, CreditCard, Lock, ShoppingBag, Truck, Check, RotateCcw, Shield } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-// Countries list excluding OFAC sanctioned countries
+// Countries list with phone codes, excluding OFAC sanctioned countries (sorted alphabetically)
 const ALLOWED_COUNTRIES = [
-  { code: "US", name: "United States" },
-  { code: "GB", name: "United Kingdom" },
-  { code: "CA", name: "Canada" },
-  { code: "AU", name: "Australia" },
-  { code: "DE", name: "Germany" },
-  { code: "FR", name: "France" },
-  { code: "IT", name: "Italy" },
-  { code: "ES", name: "Spain" },
-  { code: "NL", name: "Netherlands" },
-  { code: "BE", name: "Belgium" },
-  { code: "CH", name: "Switzerland" },
-  { code: "AT", name: "Austria" },
-  { code: "SE", name: "Sweden" },
-  { code: "NO", name: "Norway" },
-  { code: "DK", name: "Denmark" },
-  { code: "FI", name: "Finland" },
-  { code: "IE", name: "Ireland" },
-  { code: "PT", name: "Portugal" },
-  { code: "GR", name: "Greece" },
-  { code: "PL", name: "Poland" },
-  { code: "CZ", name: "Czech Republic" },
-  { code: "HU", name: "Hungary" },
-  { code: "RO", name: "Romania" },
-  { code: "BG", name: "Bulgaria" },
-  { code: "HR", name: "Croatia" },
-  { code: "SI", name: "Slovenia" },
-  { code: "SK", name: "Slovakia" },
-  { code: "EE", name: "Estonia" },
-  { code: "LV", name: "Latvia" },
-  { code: "LT", name: "Lithuania" },
-  { code: "LU", name: "Luxembourg" },
-  { code: "MT", name: "Malta" },
-  { code: "CY", name: "Cyprus" },
-  { code: "IS", name: "Iceland" },
-  { code: "NZ", name: "New Zealand" },
-  { code: "SG", name: "Singapore" },
-  { code: "JP", name: "Japan" },
-  { code: "KR", name: "South Korea" },
-  { code: "HK", name: "Hong Kong" },
-  { code: "TW", name: "Taiwan" },
-  { code: "MY", name: "Malaysia" },
-  { code: "TH", name: "Thailand" },
-  { code: "PH", name: "Philippines" },
-  { code: "ID", name: "Indonesia" },
-  { code: "VN", name: "Vietnam" },
-  { code: "IN", name: "India" },
-  { code: "AE", name: "United Arab Emirates" },
-  { code: "SA", name: "Saudi Arabia" },
-  { code: "QA", name: "Qatar" },
-  { code: "KW", name: "Kuwait" },
-  { code: "OM", name: "Oman" },
-  { code: "BH", name: "Bahrain" },
-  { code: "IL", name: "Israel" },
-  { code: "TR", name: "Turkey" },
-  { code: "ZA", name: "South Africa" },
-  { code: "EG", name: "Egypt" },
-  { code: "MA", name: "Morocco" },
-  { code: "BR", name: "Brazil" },
-  { code: "MX", name: "Mexico" },
-  { code: "AR", name: "Argentina" },
-  { code: "CL", name: "Chile" },
-  { code: "CO", name: "Colombia" },
-  { code: "PE", name: "Peru" },
-  { code: "UY", name: "Uruguay" },
+  { code: "AR", name: "Argentina", phoneCode: "+54" },
+  { code: "AU", name: "Australia", phoneCode: "+61" },
+  { code: "AT", name: "Austria", phoneCode: "+43" },
+  { code: "BH", name: "Bahrain", phoneCode: "+973" },
+  { code: "BE", name: "Belgium", phoneCode: "+32" },
+  { code: "BR", name: "Brazil", phoneCode: "+55" },
+  { code: "BG", name: "Bulgaria", phoneCode: "+359" },
+  { code: "CA", name: "Canada", phoneCode: "+1" },
+  { code: "CL", name: "Chile", phoneCode: "+56" },
+  { code: "CO", name: "Colombia", phoneCode: "+57" },
+  { code: "HR", name: "Croatia", phoneCode: "+385" },
+  { code: "CY", name: "Cyprus", phoneCode: "+357" },
+  { code: "CZ", name: "Czech Republic", phoneCode: "+420" },
+  { code: "DK", name: "Denmark", phoneCode: "+45" },
+  { code: "EG", name: "Egypt", phoneCode: "+20" },
+  { code: "EE", name: "Estonia", phoneCode: "+372" },
+  { code: "FI", name: "Finland", phoneCode: "+358" },
+  { code: "FR", name: "France", phoneCode: "+33" },
+  { code: "DE", name: "Germany", phoneCode: "+49" },
+  { code: "GR", name: "Greece", phoneCode: "+30" },
+  { code: "HK", name: "Hong Kong", phoneCode: "+852" },
+  { code: "HU", name: "Hungary", phoneCode: "+36" },
+  { code: "IS", name: "Iceland", phoneCode: "+354" },
+  { code: "IN", name: "India", phoneCode: "+91" },
+  { code: "ID", name: "Indonesia", phoneCode: "+62" },
+  { code: "IE", name: "Ireland", phoneCode: "+353" },
+  { code: "IL", name: "Israel", phoneCode: "+972" },
+  { code: "IT", name: "Italy", phoneCode: "+39" },
+  { code: "JP", name: "Japan", phoneCode: "+81" },
+  { code: "KR", name: "South Korea", phoneCode: "+82" },
+  { code: "KW", name: "Kuwait", phoneCode: "+965" },
+  { code: "LV", name: "Latvia", phoneCode: "+371" },
+  { code: "LT", name: "Lithuania", phoneCode: "+370" },
+  { code: "LU", name: "Luxembourg", phoneCode: "+352" },
+  { code: "MY", name: "Malaysia", phoneCode: "+60" },
+  { code: "MT", name: "Malta", phoneCode: "+356" },
+  { code: "MX", name: "Mexico", phoneCode: "+52" },
+  { code: "MA", name: "Morocco", phoneCode: "+212" },
+  { code: "NL", name: "Netherlands", phoneCode: "+31" },
+  { code: "NZ", name: "New Zealand", phoneCode: "+64" },
+  { code: "NO", name: "Norway", phoneCode: "+47" },
+  { code: "OM", name: "Oman", phoneCode: "+968" },
+  { code: "PE", name: "Peru", phoneCode: "+51" },
+  { code: "PH", name: "Philippines", phoneCode: "+63" },
+  { code: "PL", name: "Poland", phoneCode: "+48" },
+  { code: "PT", name: "Portugal", phoneCode: "+351" },
+  { code: "QA", name: "Qatar", phoneCode: "+974" },
+  { code: "RO", name: "Romania", phoneCode: "+40" },
+  { code: "SA", name: "Saudi Arabia", phoneCode: "+966" },
+  { code: "SG", name: "Singapore", phoneCode: "+65" },
+  { code: "SK", name: "Slovakia", phoneCode: "+421" },
+  { code: "SI", name: "Slovenia", phoneCode: "+386" },
+  { code: "ZA", name: "South Africa", phoneCode: "+27" },
+  { code: "ES", name: "Spain", phoneCode: "+34" },
+  { code: "SE", name: "Sweden", phoneCode: "+46" },
+  { code: "CH", name: "Switzerland", phoneCode: "+41" },
+  { code: "TW", name: "Taiwan", phoneCode: "+886" },
+  { code: "TH", name: "Thailand", phoneCode: "+66" },
+  { code: "TR", name: "Turkey", phoneCode: "+90" },
+  { code: "AE", name: "United Arab Emirates", phoneCode: "+971" },
+  { code: "GB", name: "United Kingdom", phoneCode: "+44" },
+  { code: "US", name: "United States", phoneCode: "+1" },
+  { code: "UY", name: "Uruguay", phoneCode: "+598" },
+  { code: "VN", name: "Vietnam", phoneCode: "+84" },
 ];
 
 export default function CheckoutPage() {
@@ -85,6 +85,7 @@ export default function CheckoutPage() {
   const { cartItems, cartTotal, clearCart } = useCart();
   const [currentStep, setCurrentStep] = useState(1); // 1: Shipping, 2: Payment, 3: Review
   const [isProcessing, setIsProcessing] = useState(false);
+  const [phoneCode, setPhoneCode] = useState("+1");
 
   // Shipping form data
   const [shippingData, setShippingData] = useState({
@@ -102,6 +103,25 @@ export default function CheckoutPage() {
 
   // Payment data
   const [paymentMethod, setPaymentMethod] = useState("credit_card");
+
+  // Fetch IP and Geo data on mount to pre-select country and phone code
+  useEffect(() => {
+    fetch("https://ipapi.co/json/")
+      .then((res) => res.json())
+      .then((data) => {
+        const countryCode = data.country_code;
+        const country = ALLOWED_COUNTRIES.find((c) => c.code === countryCode);
+        if (country) {
+          setShippingData((prev) => ({ 
+            ...prev, 
+            country: country.name,
+            phone: country.phoneCode + ' '
+          }));
+          setPhoneCode(country.phoneCode);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch geo data:", err));
+  }, []);
 
   const subtotal = cartTotal;
   const shipping = 0; // Free shipping
@@ -133,7 +153,7 @@ export default function CheckoutPage() {
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Save shipping data to localStorage
+    // Save shipping data to localStorage (phone already has + prefix)
     localStorage.setItem("checkoutShipping", JSON.stringify(shippingData));
     localStorage.setItem("checkoutCart", JSON.stringify({
       items: cartItems,
@@ -284,10 +304,16 @@ export default function CheckoutPage() {
                         id="phone"
                         type="tel"
                         required
+                        placeholder="+1 234 567 8900"
                         value={shippingData.phone}
-                        onChange={(e) =>
-                          setShippingData({ ...shippingData, phone: e.target.value })
-                        }
+                        onChange={(e) => {
+                          let value = e.target.value;
+                          // Ensure phone always starts with +
+                          if (!value.startsWith('+')) {
+                            value = '+' + value.replace(/^\+*/, '');
+                          }
+                          setShippingData({ ...shippingData, phone: value });
+                        }}
                         className="h-12 border-black/20 font-general-sans"
                       />
                     </div>
@@ -541,11 +567,11 @@ export default function CheckoutPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Subtotal (excl. VAT)</span>
-                    <span className="font-bold">€{(subtotal / 1.2).toFixed(2)}</span>
+                    <span className="font-bold">€{(subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">VAT (20%)</span>
-                    <span className="font-bold">€{(subtotal - subtotal / 1.2).toFixed(2)}</span>
+                    <span className="font-bold">€{(subtotal - subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Shipping</span>
@@ -560,7 +586,7 @@ export default function CheckoutPage() {
                     <span className="font-satoshi text-lg font-bold">Total</span>
                     <div className="text-right">
                       <span className="font-satoshi text-3xl font-bold tracking-tight">
-                        €{total.toFixed(2)}
+                        €{total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
                       </span>
                     </div>
                   </div>
@@ -586,6 +612,26 @@ export default function CheckoutPage() {
                   <div>
                     <p className="font-satoshi text-sm font-bold">Secure Payment</p>
                     <p className="font-general-sans text-xs text-black/60">256-bit encryption</p>
+                  </div>
+                </div>
+                <Separator />
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-black p-2">
+                    <RotateCcw className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-satoshi text-sm font-bold">30-Day Returns</p>
+                    <p className="font-general-sans text-xs text-black/60">Money back guarantee</p>
+                  </div>
+                </div>
+                <Separator />
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-black p-2">
+                    <Shield className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-satoshi text-sm font-bold">PCI DSS Compliant</p>
+                    <p className="font-general-sans text-xs text-black/60">Certified security</p>
                   </div>
                 </div>
               </div>

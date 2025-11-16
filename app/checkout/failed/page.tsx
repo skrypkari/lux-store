@@ -99,7 +99,7 @@ export default function PaymentFailedPage() {
               onClick={() => router.push("/checkout/payment")}
             >
               <RotateCcw className="h-5 w-5 transition-transform duration-300 group-hover:rotate-180" />
-              Попробовать снова
+              Try Again
             </Button>
 
             <Link href="/store/all">

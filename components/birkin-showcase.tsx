@@ -147,7 +147,7 @@ export default function BirkinShowcase() {
                 <div className="flex items-center gap-4">
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">Price</div>
-                    <div className="text-3xl font-bold">€15,722</div>
+                    <div className="text-3xl font-bold">€14,610</div>
                   </div>
                   <div className="h-12 w-px bg-border" />
                   <div>
