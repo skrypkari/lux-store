@@ -39,7 +39,7 @@ export default function CategoriesSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/categories")
+    fetch("https://api.lux-store.eu/categories")
       .then((res) => res.json())
       .then((data: Category[]) => {
         console.log("Categories data:", data);

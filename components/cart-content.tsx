@@ -72,7 +72,7 @@ export default function CartContent() {
     const cartItemIds = cartItems.map(item => item.id);
 
     // Fetch products from the API - get more products to have better selection after filtering
-    fetch('http://localhost:5000/products/random?limit=20')
+    fetch('https://api.lux-store.eu/products/random?limit=20')
       .then(res => res.json())
       .then(data => {
         // Filter out items that are already in cart
