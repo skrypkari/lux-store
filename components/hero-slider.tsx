@@ -121,7 +121,7 @@ export default function HeroSlider() {
                 asChild
                 className="bg-white text-black hover:bg-white/90 font-semibold px-10 py-7 text-lg shadow-2xl hover:shadow-white/20 hover:scale-105 transition-all duration-300 rounded-full"
               >
-                <a href="/store/all">Explore Collection</a>
+                <a href={`/store/all?brand=${slides[current].brand.toLowerCase()}`}>Explore {slides[current].brand}</a>
               </Button>
             </div>
           </div>
