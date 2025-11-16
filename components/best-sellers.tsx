@@ -11,6 +11,7 @@ interface BestSellerProduct {
   id: string;
   name: string;
   brand: string;
+  slug?: string;
   sku?: string;
   price: number;
   originalPrice?: number;
@@ -26,6 +27,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '768026209',
     name: "Hermès Kelly Sellier 20 Black Epsom Gold Hardware",
     brand: "HERMÈS",
+    slug: "hermes-kelly-sellier-20-black-epsom-gold-hardware",
     sku: "H076099CK89",
     price: 15722,
     originalPrice: undefined,
@@ -38,6 +40,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '768064173',
     name: "Hermès Kelly Sellier 20 Gold Epsom Palladium Hardware",
     brand: "HERMÈS",
+    slug: "hermes-kelly-sellier-20-gold-epsom-palladium-hardware",
     sku: "H076099CK37/02",
     price: 14861,
     originalPrice: undefined,
@@ -50,6 +53,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '768122045',
     name: "Hermès Kelly Sellier 25 Black Shiny Alligator Gold Hardware",
     brand: "HERMÈS",
+    slug: "hermes-kelly-sellier-25-black-shiny-alligator-gold-hardware",
     sku: "H078792CK89",
     price: 33304,
     originalPrice: undefined,
@@ -62,6 +66,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '768122046',
     name: "Hermès \"Quelle Idolle\" Kelly Doll Orange and Rose Sakura Swift Gold Hardware",
     brand: "HERMÈS",
+    slug: "hermes-quelle-idolle-kelly-doll-orange-and-rose-sakura-swift-gold-hardware",
     sku: "H079267CKAA",
     price: 32014,
     originalPrice: undefined,
@@ -74,6 +79,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '768016913',
     name: "Hermès Birkin 25 Black Togo Rose Gold Hardware",
     brand: "HERMÈS",
+    slug: "hermes-birkin-25-black-togo-rose-gold-hardware",
     sku: "H056011CK89/03",
     price: 13966,
     originalPrice: undefined,
@@ -86,6 +92,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '768016992',
     name: "Hermès Birkin 25 Gold Togo Palladium Hardware",
     brand: "HERMÈS",
+    slug: "hermes-birkin-25-gold-togo-palladium-hardware",
     sku: "H056018CK37/01",
     price: 13106,
     originalPrice: undefined,
@@ -98,6 +105,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '768026113',
     name: "Hermès Birkin 30 Craie Togo Gold Hardware",
     brand: "HERMÈS",
+    slug: "hermes-birkin-30-craie-togo-gold-hardware",
     sku: "H056018CK10",
     price: 14825,
     originalPrice: undefined,
@@ -110,6 +118,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '768026143',
     name: "Hermès Birkin 25 Braise Shiny Porosus Crocodile Gold Hardware",
     brand: "HERMÈS",
+    slug: "hermes-birkin-25-braise-shiny-porosus-crocodile-gold-hardware",
     sku: "H075031CC85",
     price: 40706,
     originalPrice: undefined,
@@ -123,6 +132,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '764748979',
     name: "Classic 11.12 Handbag",
     brand: "CHANEL",
+    slug: "classic-11-12-handbag",
     sku: "A01112Y0129594305",
     price: 8240,
     originalPrice: undefined,
@@ -135,6 +145,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '759615190',
     name: "Herbag Zip 31 hobnailed bag",
     brand: "HERMÈS",
+    slug: "herbag-zip-31-hobnailed-bag",
     sku: "H085131CKAA",
     price: 4520,
     originalPrice: undefined,
@@ -147,6 +158,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '761602752',
     name: "Dioriviera Medium Dior Book Tote",
     brand: "DIOR",
+    slug: "dioriviera-medium-dior-book-tote",
     sku: "M1296ZEYD_M086",
     price: 2400,
     originalPrice: undefined,
@@ -159,6 +171,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '752024392',
     name: "Juste un Clou bracelet, classic model, diamonds",
     brand: "CARTIER",
+    slug: "juste-un-clou-bracelet-classic-model-diamonds-752024392",
     sku: "N6709817",
     price: 42000,
     originalPrice: undefined,
@@ -171,6 +184,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '751171684',
     name: "LOVE bracelet, small model, 10 diamonds",
     brand: "CARTIER",
+    slug: "love-bracelet-small-model-10-diamonds-751171684",
     sku: "B6079617",
     price: 8240,
     originalPrice: undefined,
@@ -183,6 +197,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '751171572',
     name: "Clash de Cartier bracelet, flexible, medium model",
     brand: "CARTIER",
+    slug: "clash-de-cartier-bracelet-flexible-medium-model",
     sku: "N6718717",
     price: 7920,
     originalPrice: undefined,
@@ -195,6 +210,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '752641562',
     name: "Juste un Clou torque necklace, small model, diamonds",
     brand: "CARTIER",
+    slug: "juste-un-clou-torque-necklace-small-model-diamonds-752641562",
     sku: "N7424422",
     price: 14720,
     originalPrice: undefined,
@@ -207,6 +223,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '766639252',
     name: "Fil de Camélia Earrings",
     brand: "CHANEL",
+    slug: "fil-de-camelia-earrings",
     sku: "J2672",
     price: 14800,
     originalPrice: undefined,
@@ -219,6 +236,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '754043337',
     name: "C de Cartier Precious Glasses",
     brand: "CARTIER",
+    slug: "c-de-cartier-precious-glasses",
     sku: "EYP00030",
     price: 11280,
     originalPrice: undefined,
@@ -231,6 +249,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '754043437',
     name: "Panthère de Cartier sunglasses",
     brand: "CARTIER",
+    slug: "panthere-de-cartier-sunglasses-754043437",
     sku: "ESW00687",
     price: 960,
     originalPrice: undefined,
@@ -243,6 +262,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '761192655',
     name: "Medium Lady Dior Bag",
     brand: "DIOR",
+    slug: "medium-lady-dior-bag-761192655",
     sku: "M0565ONGE_M59U",
     price: 4720,
     originalPrice: undefined,
@@ -255,6 +275,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '762051373',
     name: "30 Montaigne Bag",
     brand: "DIOR",
+    slug: "30-montaigne-bag-762051373",
     sku: "M9203UMOS_M941",
     price: 2680,
     originalPrice: undefined,
@@ -267,6 +288,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '756394817',
     name: "GMT-Master II",
     brand: "ROLEX",
+    slug: "gmt-master-ii-756394817",
     sku: "126718GRNR/01",
     price: 35680,
     originalPrice: undefined,
@@ -279,6 +301,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '757459485',
     name: "Yacht-Master 42",
     brand: "ROLEX",
+    slug: "yacht-master-42-757459485",
     sku: "226658",
     price: 26800,
     originalPrice: undefined,
@@ -291,6 +314,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '755920973',
     name: "Lady-Datejust",
     brand: "ROLEX",
+    slug: "lady-datejust-755920973",
     sku: "279381RBR/01",
     price: 15000,
     originalPrice: undefined,
@@ -303,6 +327,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '756544656',
     name: "Submariner Date",
     brand: "ROLEX",
+    slug: "submariner-date-756544656",
     sku: "126613LN",
     price: 14080,
     originalPrice: undefined,
@@ -315,6 +340,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '791181355',
     name: "GUCCI 25H watch",
     brand: "GUCCI",
+    slug: "gucci-25h-watch-791181355",
     sku: "673301I16F01108",
     price: 8960,
     originalPrice: undefined,
@@ -327,6 +353,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '791085849',
     name: "Dionysus medium shoulder bag",
     brand: "GUCCI",
+    slug: "dionysus-medium-shoulder-bag",
     sku: "49962392TJN8660",
     price: 2160,
     originalPrice: undefined,
@@ -339,6 +366,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '790971882',
     name: "Gucci Horsebit 1955 crystals small shoulder bag",
     brand: "GUCCI",
+    slug: "gucci-horsebit-1955-crystals-small-shoulder-bag",
     sku: "67580121HRG2687",
     price: 2640,
     originalPrice: undefined,
@@ -351,6 +379,7 @@ const staticProducts: BestSellerProduct[] = [
     id: '790950714',
     name: "GG Marmont large shoulder bag",
     brand: "GUCCI",
+    slug: "gg-marmont-large-shoulder-bag-790950714",
     sku: "850659AAFS11000",
     price: 2320,
     originalPrice: undefined,
@@ -426,7 +455,7 @@ export default function BestSellers() {
                   }} />
                 </div>
                 
-                <Link href={`/products/${product.id}`}>
+                <Link href={`/products/${product.slug}`}>
                   <div className="relative w-full aspect-square overflow-hidden bg-[#f4f4f4]">
                     <Image
                       src={product.image}
@@ -449,7 +478,7 @@ export default function BestSellers() {
                     </p>
                   </div>
 
-                  <Link href={`/products/${product.id}`}>
+                  <Link href={`/products/${product.slug}`}>
                     <h3 className="text-base font-medium text-neutral-900 hover:text-neutral-600 transition-colors min-h-[44px] leading-snug line-clamp-2">
                       {product.name}
                     </h3>
@@ -467,7 +496,7 @@ export default function BestSellers() {
                   </div>
 
                   <div className="flex gap-2 pt-1">
-                    <Link href={`/products/${product.id}`} className="flex-1 relative z-10">
+                    <Link href={`/products/${product.slug}`} className="flex-1 relative z-10">
                       <Button
                         variant="outline"
                         size="sm"

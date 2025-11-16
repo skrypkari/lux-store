@@ -88,7 +88,7 @@ export default function KellyShowcase() {
                   asChild
                   className="w-full py-6 text-base font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
                 >
-                  <Link href="/products/768026216" className="flex items-center justify-center gap-2">
+                  <Link href="/products/hermes-kelly-sellier-20-etoupe-epsom-gold-hardware" className="flex items-center justify-center gap-2">
                     Shop Now
                     <Crown className="w-5 h-5 group-hover:-translate-y-1 transition-transform duration-300" />
                   </Link>

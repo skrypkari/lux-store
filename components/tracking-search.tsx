@@ -3,199 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Package, Truck, CheckCircle2, MapPin, Clock, Phone, Mail, Box, Plane, Home } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-
-// Mock tracking data
-const trackingData: Record<string, any> = {
-  "LUX2024001234": {
-    orderNumber: "LUX2024001234",
-    status: "delivered",
-    estimatedDelivery: "November 5, 2025",
-    actualDelivery: "November 5, 2025, 2:30 PM",
-    courier: "DHL Express",
-    items: [
-      {
-        name: "Santos de Cartier Watch",
-        brand: "Cartier",
-        image: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=200&h=200&fit=crop",
-        quantity: 1,
-        price: 7100
-      }
-    ],
-    timeline: [
-      {
-        status: "Order Placed",
-        date: "November 1, 2025, 10:30 AM",
-        location: "Birmingham, UK",
-        completed: true
-      },
-      {
-        status: "Payment Confirmed",
-        date: "November 1, 2025, 10:35 AM",
-        location: "Birmingham, UK",
-        completed: true
-      },
-      {
-        status: "Processing",
-        date: "November 2, 2025, 9:00 AM",
-        location: "Langkawi, Malaysia",
-        completed: true
-      },
-      {
-        status: "Shipped",
-        date: "November 3, 2025, 4:20 PM",
-        location: "Kuala Lumpur, Malaysia",
-        completed: true
-      },
-      {
-        status: "In Transit",
-        date: "November 4, 2025, 11:00 AM",
-        location: "London, UK",
-        completed: true
-      },
-      {
-        status: "Out for Delivery",
-        date: "November 5, 2025, 8:00 AM",
-        location: "Birmingham, UK",
-        completed: true
-      },
-      {
-        status: "Delivered",
-        date: "November 5, 2025, 2:30 PM",
-        location: "6 Brindley Place, Birmingham",
-        completed: true
-      }
-    ]
-  },
-  "LUX2024005678": {
-    orderNumber: "LUX2024005678",
-    status: "in_transit",
-    estimatedDelivery: "November 10, 2025",
-    courier: "FedEx International",
-    items: [
-      {
-        name: "Lady Dior Bag",
-        brand: "Dior",
-        image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=200&h=200&fit=crop",
-        quantity: 1,
-        price: 5800
-      },
-      {
-        name: "Aviator Sunglasses",
-        brand: "Ray-Ban",
-        image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=200&h=200&fit=crop",
-        quantity: 1,
-        price: 350
-      }
-    ],
-    timeline: [
-      {
-        status: "Order Placed",
-        date: "November 6, 2025, 3:15 PM",
-        location: "Birmingham, UK",
-        completed: true
-      },
-      {
-        status: "Payment Confirmed",
-        date: "November 6, 2025, 3:20 PM",
-        location: "Birmingham, UK",
-        completed: true
-      },
-      {
-        status: "Processing",
-        date: "November 7, 2025, 10:00 AM",
-        location: "Langkawi, Malaysia",
-        completed: true
-      },
-      {
-        status: "Shipped",
-        date: "November 8, 2025, 2:45 PM",
-        location: "Kuala Lumpur, Malaysia",
-        completed: true
-      },
-      {
-        status: "In Transit",
-        date: "November 9, 2025, 6:00 AM",
-        location: "Dubai, UAE",
-        completed: true,
-        current: true
-      },
-      {
-        status: "Out for Delivery",
-        date: "Expected: November 10, 2025",
-        location: "Birmingham, UK",
-        completed: false
-      },
-      {
-        status: "Delivered",
-        date: "Expected: November 10, 2025",
-        location: "Your Address",
-        completed: false
-      }
-    ]
-  },
-  "LUX2024009012": {
-    orderNumber: "LUX2024009012",
-    status: "processing",
-    estimatedDelivery: "November 12, 2025",
-    courier: "UPS Worldwide Express",
-    items: [
-      {
-        name: "Rolex Submariner",
-        brand: "Rolex",
-        image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=200&h=200&fit=crop",
-        quantity: 1,
-        price: 12500
-      }
-    ],
-    timeline: [
-      {
-        status: "Order Placed",
-        date: "November 8, 2025, 11:45 AM",
-        location: "Birmingham, UK",
-        completed: true
-      },
-      {
-        status: "Payment Confirmed",
-        date: "November 8, 2025, 11:50 AM",
-        location: "Birmingham, UK",
-        completed: true
-      },
-      {
-        status: "Processing",
-        date: "November 8, 2025, 2:00 PM",
-        location: "Langkawi, Malaysia",
-        completed: true,
-        current: true
-      },
-      {
-        status: "Shipped",
-        date: "Expected: November 9, 2025",
-        location: "Langkawi, Malaysia",
-        completed: false
-      },
-      {
-        status: "In Transit",
-        date: "Expected: November 10, 2025",
-        location: "International",
-        completed: false
-      },
-      {
-        status: "Out for Delivery",
-        date: "Expected: November 12, 2025",
-        location: "Birmingham, UK",
-        completed: false
-      },
-      {
-        status: "Delivered",
-        date: "Expected: November 12, 2025",
-        location: "Your Address",
-        completed: false
-      }
-    ]
-  }
-};
+import { Search, Package, Truck, CheckCircle2, MapPin, Clock, Phone, Mail, Box } from "lucide-react";
 
 const statusConfig = {
   delivered: {
@@ -235,18 +43,84 @@ export default function TrackingSearch() {
 
     setIsSearching(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Search by tracking number - we need to get all orders and find by tracking_number
+      const response = await fetch(`http://localhost:5000/orders?limit=100`);
+      
+      if (!response.ok) {
+        throw new Error("Failed to search");
+      }
 
-    const result = trackingData[trackingNumber.toUpperCase()];
-    
-    if (result) {
+      const data = await response.json();
+      const order = data.orders.find((o: any) => o.tracking_number === trackingNumber.trim());
+      
+      if (!order) {
+        throw new Error("Tracking number not found");
+      }
+      
+      // Transform API response to match our display format
+      const result = {
+        orderNumber: order.id,
+        status: getCurrentStatusType(order.statuses),
+        estimatedDelivery: formatDate(order.created_at, 30), // +30 days for delivery
+        courier: order.courier || "DHL Express",
+        trackingNumber: order.tracking_number,
+        items: order.items.map((item: any) => ({
+          name: item.product_name,
+          brand: item.brand || "Luxury Brand",
+          image: item.product_image || "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=200&h=200&fit=crop",
+          quantity: item.quantity,
+          price: item.price
+        })),
+        timeline: order.statuses.map((status: any) => ({
+          status: status.status,
+          date: formatDateTime(status.created_at),
+          location: status.location || "Processing",
+          completed: status.is_completed,
+          current: status.is_current
+        })).sort((a: any, b: any) => {
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        })
+      };
+      
       setSearchResult(result);
-    } else {
-      setError("Tracking number not found. Please check and try again.");
+    } catch (err) {
+      console.error("Tracking error:", err);
+      setError("Tracking number not found. Please check the number from your email confirmation.");
+    } finally {
+      setIsSearching(false);
     }
+  };
 
-    setIsSearching(false);
+  const getCurrentStatusType = (statuses: any[]) => {
+    const currentStatus = statuses.find((s: any) => s.is_current);
+    if (!currentStatus) return "processing";
+    
+    const status = currentStatus.status.toLowerCase();
+    if (status.includes("delivered")) return "delivered";
+    if (status.includes("transit") || status.includes("shipping") || status.includes("shipped")) return "in_transit";
+    return "processing";
+  };
+
+  const formatDate = (dateString: string, addDays: number = 0) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + addDays);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  };
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -273,7 +147,7 @@ export default function TrackingSearch() {
                 <div className="min-w-0 flex-1">
                   <h2 className="font-satoshi text-xl font-bold leading-tight text-white sm:text-3xl">Track Your Package</h2>
                   <p className="mt-1.5 font-general-sans text-xs text-white/60 sm:mt-2 sm:text-sm">
-                    Enter your tracking code
+                    Enter your tracking number (if provided via email)
                   </p>
                 </div>
                 <div className="hidden flex-shrink-0 rounded-2xl border border-white/10 bg-white/5 p-3 backdrop-blur-sm sm:p-4 md:block">
@@ -290,11 +164,11 @@ export default function TrackingSearch() {
                     <Search className="h-4 w-4 text-black/40 sm:h-5 sm:w-5" />
                   </div>
                   <Input
-                    placeholder="LUX2024001234"
+                    placeholder="DHL1234567890"
                     value={trackingNumber}
-                    onChange={(e) => setTrackingNumber(e.target.value.toUpperCase())}
+                    onChange={(e) => setTrackingNumber(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="h-12 border-2 border-black/10 bg-white pl-10 pr-3 font-satoshi text-base font-bold uppercase tracking-wider shadow-inner transition-all focus:border-black focus:shadow-lg sm:h-16 sm:pl-12 sm:pr-4 sm:text-xl"
+                    className="h-12 border-2 border-black/10 bg-white pl-10 pr-3 font-mono text-base font-bold tracking-wider shadow-inner transition-all focus:border-black focus:shadow-lg sm:h-16 sm:pl-12 sm:pr-4 sm:text-xl"
                   />
                 </div>
                 <Button
@@ -361,11 +235,16 @@ export default function TrackingSearch() {
                   </div>
                   
                   <div className="text-center sm:text-left">
-                    <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 backdrop-blur-xl sm:mb-3 sm:gap-2 sm:px-4 sm:py-2">
-                      <div className="h-1 w-1 animate-pulse rounded-full bg-white sm:h-1.5 sm:w-1.5" />
-                      <span className="font-general-sans text-[10px] font-bold uppercase tracking-[0.15em] text-white/90 sm:text-xs">
-                        {searchResult.orderNumber}
-                      </span>
+                    <div className="mb-2 flex flex-col gap-1.5 sm:mb-3 sm:gap-2">
+                      <div className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 backdrop-blur-xl sm:gap-2 sm:px-4 sm:py-2">
+                        <div className="h-1 w-1 animate-pulse rounded-full bg-white sm:h-1.5 sm:w-1.5" />
+                        <span className="font-mono text-[10px] font-bold tracking-wider text-white/90 sm:text-xs">
+                          {searchResult.trackingNumber || "No tracking yet"}
+                        </span>
+                      </div>
+                      <p className="font-general-sans text-[9px] text-white/50 sm:text-[10px]">
+                        Order ID: {searchResult.orderNumber}
+                      </p>
                     </div>
                     
                     <h2 className="mb-2 font-satoshi text-3xl font-bold leading-tight text-white sm:mb-3 sm:text-5xl md:text-6xl">
@@ -405,7 +284,7 @@ export default function TrackingSearch() {
                       Total
                     </p>
                     <p className="font-satoshi text-2xl font-bold text-white sm:text-3xl">
-                      ${searchResult.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0).toLocaleString()}
+                      €{searchResult.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -563,7 +442,7 @@ export default function TrackingSearch() {
                               Qty: {item.quantity}
                             </p>
                             <p className="font-satoshi text-base font-bold sm:text-lg">
-                              ${item.price.toLocaleString()}
+                              €{item.price.toLocaleString()}
                             </p>
                           </div>
                         </div>
@@ -594,7 +473,7 @@ export default function TrackingSearch() {
                     
                     <div className="space-y-2.5 sm:space-y-3">
                       <a
-                        href="tel:+445557771234"
+                        href="tel:+447700184435"
                         className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/10 sm:gap-4 sm:rounded-2xl sm:p-4"
                       >
                         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 transition-colors group-hover:bg-white/20 sm:h-11 sm:w-11 sm:rounded-xl">
@@ -605,7 +484,7 @@ export default function TrackingSearch() {
                             Call Direct
                           </p>
                           <p className="font-satoshi text-xs font-bold text-white sm:text-sm">
-                            +44-555-777-1234
+                            +44-7700-18-44-35
                           </p>
                         </div>
                         <svg className="h-3.5 w-3.5 flex-shrink-0 text-white/60 transition-transform group-hover:translate-x-1 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

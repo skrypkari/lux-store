@@ -31,9 +31,8 @@ export default function CartContent() {
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
 
   const subtotal = cartTotal;
-  const vat = subtotal * 0.2; // 20% VAT
   const shipping = cartItems.length > 0 ? 0 : 0; // Free shipping
-  const total = subtotal + vat + shipping - discount;
+  const total = subtotal + shipping - discount; // VAT already included in prices
 
   // Calculate delivery date range (25-35 days from now)
   const getDeliveryDateRange = () => {
@@ -73,7 +72,7 @@ export default function CartContent() {
     const cartItemIds = cartItems.map(item => item.id);
 
     // Fetch products from the API - get more products to have better selection after filtering
-    fetch('https://luxstore-backend.vercel.app/products/random?limit=20')
+    fetch('http://localhost:5000/products/random?limit=20')
       .then(res => res.json())
       .then(data => {
         // Filter out items that are already in cart
@@ -376,11 +375,11 @@ export default function CartContent() {
                         {/* Price */}
                         <div className="text-right">
                           <p className="font-satoshi text-3xl font-bold tracking-tight">
-                            ${(item.price * item.quantity).toLocaleString()}
+                            €{(item.price * item.quantity).toLocaleString()}
                           </p>
                           {item.quantity > 1 && (
                             <p className="font-general-sans text-sm text-black/50">
-                              ${item.price.toLocaleString()} × {item.quantity}
+                              €{item.price.toLocaleString()} × {item.quantity}
                             </p>
                           )}
                         </div>
@@ -436,11 +435,11 @@ export default function CartContent() {
                         </div>
                       )}
                       <p className="font-satoshi text-xl font-bold">
-                        ${(item.price * item.quantity).toLocaleString()}
+                        €{(item.price * item.quantity).toLocaleString()}
                       </p>
                       {item.quantity > 1 && (
                         <p className="font-general-sans text-xs text-black/50">
-                          ${item.price.toLocaleString()} × {item.quantity}
+                          €{item.price.toLocaleString()} × {item.quantity}
                         </p>
                       )}
                     </div>
@@ -613,12 +612,12 @@ export default function CartContent() {
               <div className="space-y-5 p-6">
                 <div className="space-y-3">
                   <div className="flex justify-between font-general-sans text-base">
-                    <span className="text-black/70">Subtotal</span>
-                    <span className="font-bold text-black">${subtotal.toLocaleString()}</span>
+                    <span className="text-black/70">Subtotal (excl. VAT)</span>
+                    <span className="font-bold text-black">€{(subtotal / 1.2).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">VAT (20%)</span>
-                    <span className="font-bold text-black">${vat.toFixed(2)}</span>
+                    <span className="font-bold text-black">€{(subtotal - subtotal / 1.2).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Shipping</span>
@@ -630,7 +629,7 @@ export default function CartContent() {
                   {discount > 0 && (
                     <div className="flex justify-between font-general-sans text-base">
                       <span className="text-black/70">Promo Discount</span>
-                      <span className="font-bold text-black">-${discount.toFixed(2)}</span>
+                      <span className="font-bold text-black">-€{discount.toFixed(2)}</span>
                     </div>
                   )}
                 </div>
@@ -688,21 +687,22 @@ export default function CartContent() {
                     <span className="font-satoshi text-lg font-bold">Total Amount</span>
                     <div className="text-right">
                       <span className="font-satoshi text-3xl font-bold tracking-tight">
-                        ${total.toFixed(2)}
+                        €{total.toFixed(2)}
                       </span>
-                      <p className="font-general-sans text-xs text-black/50">Including VAT</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <Button
-                    size="lg"
-                    className="group relative w-full gap-2 bg-black py-6 text-base font-bold shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-black/90 active:scale-[0.98]"
-                  >
-                    Proceed to Checkout
-                    <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Button>
+                  <Link href="/checkout">
+                    <Button
+                      size="lg"
+                      className="group relative w-full gap-2 bg-black py-6 text-base font-bold shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-black/90 active:scale-[0.98]"
+                    >
+                      Proceed to Checkout
+                      <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                    </Button>
+                  </Link>
 
                   {/* Security Microcopy */}
                   <div className="flex items-center justify-center gap-2 rounded-lg border border-black/10 bg-gradient-to-r from-black/5 to-transparent px-4 py-3">
