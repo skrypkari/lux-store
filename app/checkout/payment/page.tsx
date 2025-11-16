@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,14 +11,13 @@ import Image from "next/image";
 
 export default function PaymentPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("id");
+  
+  const [order, setOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
-  const [geoData, setGeoData] = useState<{
-    ip?: string;
-    country?: string;
-    city?: string;
-    region?: string;
-  }>({});
 
   const [cardData, setCardData] = useState({
     cardNumber: "",
@@ -27,20 +26,29 @@ export default function PaymentPage() {
     cvv: "",
   });
 
-  // Fetch IP and Geo data on mount
-  React.useEffect(() => {
-    fetch("https://ipapi.co/json/")
-      .then((res) => res.json())
-      .then((data) => {
-        setGeoData({
-          ip: data.ip,
-          country: data.country_name,
-          city: data.city,
-          region: data.region,
-        });
+  // Fetch order data on mount
+  useEffect(() => {
+    if (!orderId) {
+      router.push("/checkout");
+      return;
+    }
+
+    // Fetch order by ID
+    fetch(`http://localhost:5000/orders/${orderId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Order not found");
+        return res.json();
       })
-      .catch((err) => console.error("Failed to fetch geo data:", err));
-  }, []);
+      .then((data) => {
+        setOrder(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch order:", err);
+        setError("Order not found");
+        setLoading(false);
+      });
+  }, [orderId, router]);
 
   const formatCardNumber = (value: string) => {
     const cleaned = value.replace(/\s/g, "");
@@ -189,81 +197,22 @@ export default function PaymentPage() {
 
     setIsProcessing(true);
 
-    // Get checkout data from localStorage
-    const shippingData = JSON.parse(localStorage.getItem("checkoutShipping") || "{}");
-    const cartData = JSON.parse(localStorage.getItem("checkoutCart") || "{}");
-    const paymentMethod = localStorage.getItem("checkoutPaymentMethod") || "Credit Card";
-
     // Check if card is the success card (4242 4242 4242 4242)
     const cleanCardNumber = cardData.cardNumber.replace(/\s/g, "");
     const isSuccessCard = cleanCardNumber === "4242424242424242";
 
-    // Create order
+    // Process payment for existing order
     try {
-      const orderData = {
-        customerEmail: shippingData.email,
-        customerFirstName: shippingData.firstName,
-        customerLastName: shippingData.lastName,
-        customerPhone: shippingData.phone,
-        shippingCountry: shippingData.country,
-        shippingState: shippingData.state,
-        shippingCity: shippingData.city,
-        shippingAddress1: shippingData.address1,
-        shippingAddress2: shippingData.address2,
-        shippingPostalCode: shippingData.postalCode,
-        subtotal: cartData.subtotal,
-        discount: 0,
-        shipping: 0,
-        total: cartData.total,
-        paymentMethod: paymentMethod,
-        ipAddress: geoData.ip,
-        geoCountry: geoData.country,
-        geoCity: geoData.city,
-        geoRegion: geoData.region,
-        items: cartData.items.map((item: any) => ({
-          productId: item.id,
-          productName: item.name,
-          productSlug: item.slug,
-          productImage: item.image,
-          brand: item.brand,
-          price: item.price,
-          quantity: item.quantity,
-          options: item.options,
-        })),
-      };
-
-      // Send to API
-      const response = await fetch("https://api.lux-store.eu/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create order");
-      }
-
-      const result = await response.json();
-      console.log("Order created:", result);
-      const orderId = result.id;
-      const accessToken = result.access_token;
-
-      if (!orderId || !accessToken) {
-        throw new Error("Order ID or access token not returned from server");
-      }
-
       // If success card, update order status to Payment Confirmed
-      if (isSuccessCard && orderId) {
-        await fetch(`https://api.lux-store.eu/orders/${orderId}/status`, {
+      if (isSuccessCard) {
+        await fetch(`http://localhost:5000/orders/${order.id}/status`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             status: "Payment Confirmed",
-            location: shippingData.city + ", " + shippingData.country,
+            location: order.shipping_city + ", " + order.shipping_country,
           }),
         });
       }
@@ -278,35 +227,83 @@ export default function PaymentPage() {
           // Success! Clear cart and redirect to success page
           localStorage.removeItem("checkoutShipping");
           localStorage.removeItem("checkoutCart");
-          localStorage.removeItem("checkoutPaymentMethod");
-          router.push(`/checkout/success?orderId=${orderId}&token=${accessToken}`);
+          router.push(`/checkout/success?orderId=${order.id}&token=${order.access_token}`);
         } else {
           // Payment failed
           router.push("/checkout/failed");
         }
       }, delay);
     } catch (error) {
-      console.error("Failed to create order:", error);
+      console.error("Failed to process payment:", error);
       setIsProcessing(false);
       setError("Failed to process payment. Please try again.");
     }
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
+        <div className="container mx-auto max-w-2xl px-4">
+          <div className="flex min-h-[400px] items-center justify-center">
+            <div className="text-center">
+              <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-black" />
+              <p className="font-general-sans text-black/60">Loading payment details...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !order) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
+        <div className="container mx-auto max-w-2xl px-4">
+          <div className="text-center">
+            <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-600" />
+            <h1 className="mb-4 font-satoshi text-3xl font-bold">Order Not Found</h1>
+            <p className="mb-8 font-general-sans text-black/60">{error || "Unable to load order details"}</p>
+            <Button onClick={() => router.push("/checkout")}>Return to Checkout</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If payment method is plisio (crypto), user should be on crypto-select page
+  if (order.payment_method === "plisio") {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
+        <div className="container mx-auto max-w-2xl px-4">
+          <div className="text-center">
+            <p className="mb-4 font-general-sans text-black/60">Redirecting to cryptocurrency selection...</p>
+            <Loader2 className="mx-auto h-8 w-8 animate-spin text-black" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
       <div className="container mx-auto max-w-2xl px-4">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="mb-4 flex justify-center">
-            <div className="rounded-full bg-black p-4">
-              <CreditCard className="h-8 w-8 text-white" />
+        {/* Card Payment Form - Show when payment method is creditcard */}
+        {order.payment_method === "creditcard" && (
+          <>
+            {/* Header */}
+            <div className="mb-8 text-center">
+              <div className="mb-4 flex justify-center">
+                <div className="rounded-full bg-black p-4 shadow-2xl">
+                  <CreditCard className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <h1 className="mb-2 font-satoshi text-4xl font-bold">Payment Details</h1>
+              <p className="font-general-sans text-black/60">
+                Order #{order.id} - €{order.total.toFixed(2)}
+              </p>
             </div>
-          </div>
-          <h1 className="mb-2 font-satoshi text-4xl font-bold">Payment Details</h1>
-          <p className="font-general-sans text-black/60">
-            Enter your card information to complete purchase
-          </p>
-        </div>
 
         {/* Security Badge */}
         <div className="mb-8 flex items-center justify-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-50 px-6 py-4">
@@ -610,6 +607,8 @@ export default function PaymentPage() {
             className="h-auto max-w-[300px] w-full object-contain"
           />
         </div>
+          </>
+        )}
       </div>
     </div>
   );

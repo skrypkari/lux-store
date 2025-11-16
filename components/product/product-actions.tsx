@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
-import { ShoppingBag, Heart, Share2 } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import QuantitySelector from "./quantity-selector";
 
 interface ProductActionsProps {
@@ -20,33 +20,30 @@ interface ProductActionsProps {
 }
 
 export default function ProductActions({ inStock, product, disabled }: ProductActionsProps) {
-  const { addToCart } = useCart();
+  const { addToCart, cartItems, getMaxQuantity } = useCart();
   const [quantity, setQuantity] = useState(1);
 
+  // Check current quantity in cart
+  const cartItem = cartItems.find((i) => {
+    if (i.id !== product.id) return false;
+    const iOptionsStr = JSON.stringify(i.options || {});
+    const itemOptionsStr = JSON.stringify(product.options || {});
+    return iOptionsStr === itemOptionsStr;
+  });
+
+  const currentQuantityInCart = cartItem?.quantity || 0;
+  const maxQuantity = getMaxQuantity(product.price);
+  const isMaxReached = currentQuantityInCart >= maxQuantity;
+
   const handleAddToCart = () => {
+    if (isMaxReached) return;
     addToCart({ ...product, inStock });
   };
 
   const handleBuyNow = () => {
+    if (isMaxReached) return;
     addToCart({ ...product, inStock });
     window.location.href = "/cart";
-  };
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: product.name,
-          text: `Check out this ${product.brand} product!`,
-          url: window.location.href,
-        });
-      } catch (err) {
-        console.log("Error sharing:", err);
-      }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link copied to clipboard!");
-    }
   };
 
   return (
@@ -58,19 +55,33 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
         onQuantityChange={setQuantity}
       />
 
+      {/* Max Quantity Info */}
+      {currentQuantityInCart > 0 && (
+        <div className="rounded-lg border border-black/20 bg-black/5 p-3 text-sm">
+          <p className="font-medium text-black">
+            {currentQuantityInCart} of {maxQuantity} in cart
+          </p>
+          {isMaxReached && (
+            <p className="mt-1 text-xs text-black/70">
+              Maximum quantity reached for this price range
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Action Buttons */}
       <div className="space-y-3">
         <Button
           size="lg"
           className="w-full text-base font-semibold"
-          disabled={!inStock || disabled}
+          disabled={!inStock || disabled || isMaxReached}
           onClick={handleAddToCart}
         >
           <ShoppingBag className="mr-2 h-5 w-5" />
-          {inStock ? "Add to Cart" : "Out of Stock"}
+          {!inStock ? "Out of Stock" : isMaxReached ? "Max Quantity Reached" : "Add to Cart"}
         </Button>
 
-        {inStock && (
+        {inStock && !isMaxReached && (
           <Button
             size="lg"
             variant="outline"
@@ -81,17 +92,6 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
             Buy Now
           </Button>
         )}
-
-        <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" size="lg" disabled={!inStock}>
-            <Heart className="mr-2 h-5 w-5" />
-            Save
-          </Button>
-          <Button variant="outline" size="lg" onClick={handleShare}>
-            <Share2 className="mr-2 h-5 w-5" />
-            Share
-          </Button>
-        </div>
       </div>
 
       {disabled && (

@@ -24,7 +24,7 @@ export default function StoreDropdown() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    fetch("https://api.lux-store.eu/categories")
+    fetch("http://localhost:5000/categories")
       .then((res) => res.json())
       .then((data) => {
         console.log("Received data:", data);

@@ -21,6 +21,7 @@ interface CartContextType {
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
   cartTotal: number;
+  getMaxQuantity: (price: number) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -45,6 +46,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // Get max quantity allowed based on price
+  const getMaxQuantity = (price: number): number => {
+    if (price < 1000) return 5;
+    if (price < 5000) return 3;
+    if (price < 50000) return 2;
+    return 1; // 50k and above
+  };
+
   const addToCart = (item: Omit<CartItem, "quantity">) => {
     setCartItems((prev) => {
       // Check if item with same id AND same options exists
@@ -57,14 +66,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return iOptionsStr === itemOptionsStr;
       });
       
+      const maxQty = getMaxQuantity(item.price);
+      
       if (existing) {
         return prev.map((i) => {
           const iOptionsStr = JSON.stringify(i.options || {});
           const itemOptionsStr = JSON.stringify(item.options || {});
           
-          return i.id === item.id && iOptionsStr === itemOptionsStr
-            ? { ...i, quantity: i.quantity + 1 }
-            : i;
+          if (i.id === item.id && iOptionsStr === itemOptionsStr) {
+            // Don't exceed max quantity
+            const newQuantity = Math.min(i.quantity + 1, maxQty);
+            return { ...i, quantity: newQuantity };
+          }
+          return i;
         });
       }
       return [...prev, { ...item, quantity: 1 }];
@@ -81,7 +95,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
     setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+      prev.map((item) => {
+        if (item.id === id) {
+          const maxQty = getMaxQuantity(item.price);
+          const newQuantity = Math.min(quantity, maxQty);
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      })
     );
   };
 
@@ -93,7 +114,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cartCount, cartItems, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal }}>
+    <CartContext.Provider value={{ cartCount, cartItems, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, getMaxQuantity }}>
       {children}
     </CartContext.Provider>
   );

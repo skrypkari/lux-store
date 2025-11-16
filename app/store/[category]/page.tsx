@@ -110,8 +110,8 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
   const { addToCart } = useCart();
-  const [priceRange, setPriceRange] = useState([0, 100000]);
-  const tempPriceRef = useRef([0, 100000]);
+  const [priceRange, setPriceRange] = useState([0, 400000]);
+  const tempPriceRef = useRef([0, 400000]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
@@ -244,7 +244,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     const urlMaxPrice = urlSearchParams.get('maxPrice');
     if (urlMinPrice || urlMaxPrice) {
       const min = urlMinPrice ? parseInt(urlMinPrice) : 0;
-      const max = urlMaxPrice ? parseInt(urlMaxPrice) : 100000;
+      const max = urlMaxPrice ? parseInt(urlMaxPrice) : 400000;
       setPriceRange([min, max]);
       tempPriceRef.current = [min, max];
     }
@@ -283,7 +283,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     }
 
     // Добавляем ценовой диапазон если изменен
-    if (newPriceRange[0] > 0 || newPriceRange[1] < 100000) {
+    if (newPriceRange[0] > 0 || newPriceRange[1] < 400000) {
       params.set('minPrice', newPriceRange[0].toString());
       params.set('maxPrice', newPriceRange[1].toString());
     }
@@ -340,11 +340,11 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   const clearAllFilters = () => {
     setSelectedFilters({});
     setAppliedFilters({});
-    tempPriceRef.current = [0, 100000];
-    setPriceRange([0, 100000]);
+    tempPriceRef.current = [0, 400000];
+    setPriceRange([0, 400000]);
     setPriceResetTrigger((prev) => prev + 1); // Триггер для сброса PriceSlider
     setPage(0);
-    updateURL({}, sortBy, 0, [0, 100000]);
+    updateURL({}, sortBy, 0, [0, 400000]);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -368,7 +368,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     }
 
     // Добавляем ценовой диапазон
-    if (priceRange[0] > 0 || priceRange[1] < 100000) {
+    if (priceRange[0] > 0 || priceRange[1] < 400000) {
       queryParams.append("minPrice", priceRange[0].toString());
       queryParams.append("maxPrice", priceRange[1].toString());
     }
@@ -388,8 +388,8 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     // If category is "all", fetch all products, otherwise fetch by category
     const baseUrl =
       category === "all"
-        ? `https://api.lux-store.eu/products`
-        : `https://api.lux-store.eu/products/category/${category}`;
+        ? `http://localhost:5000/products`
+        : `http://localhost:5000/products/category/${category}`;
 
     const url = `${baseUrl}?${queryParams.toString()}`;
 
@@ -429,7 +429,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     }
 
     // Добавляем ценовой диапазон
-    if (priceRange[0] > 0 || priceRange[1] < 100000) {
+    if (priceRange[0] > 0 || priceRange[1] < 400000) {
       queryParams.append("minPrice", priceRange[0].toString());
       queryParams.append("maxPrice", priceRange[1].toString());
     }
@@ -446,7 +446,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       });
     });
 
-    const url = `https://api.lux-store.eu/attributes/available/filtered?${queryParams.toString()}`;
+    const url = `http://localhost:5000/attributes/available/filtered?${queryParams.toString()}`;
 
     fetch(url)
       .then((res) => res.json())
@@ -582,7 +582,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                 setLocalPrice(value);
                 tempPriceRef.current = value;
               }}
-              max={100000}
+              max={400000}
               step={1000}
               className="w-full"
             />

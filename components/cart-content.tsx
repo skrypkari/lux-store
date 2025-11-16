@@ -24,7 +24,7 @@ interface RelatedProduct {
 }
 
 export default function CartContent() {
-  const { cartItems, cartTotal, removeFromCart, updateQuantity } = useCart();
+  const { cartItems, cartTotal, removeFromCart, updateQuantity, getMaxQuantity } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [promoApplied, setPromoApplied] = useState(false);
@@ -61,30 +61,42 @@ export default function CartContent() {
     }
   };
 
-  // Fetch related products based on cart items
   useEffect(() => {
     if (cartItems.length === 0) {
       setRelatedProducts([]);
       return;
     }
 
-    // Get unique cart item IDs to exclude from recommendations
     const cartItemIds = cartItems.map(item => item.id);
 
-    // Fetch products from the API - get more products to have better selection after filtering
-    fetch('https://api.lux-store.eu/products/random?limit=20')
-      .then(res => res.json())
-      .then(data => {
-        // Filter out items that are already in cart
-        const filtered = data.products
-          .filter((product: RelatedProduct) => !cartItemIds.includes(product.id))
-          .slice(0, 4); // Take only 4 products for display
-        setRelatedProducts(filtered);
-      })
-      .catch(err => {
+    const fetchProducts = async (attempt = 1, maxAttempts = 5) => {
+      try {
+        const res = await fetch('http://localhost:5000/products/random?limit=20');
+        const data = await res.json();
+        
+        if (data && Array.isArray(data.products) && data.products.length > 0) {
+          const filtered = data.products
+            .filter((product: RelatedProduct) => !cartItemIds.includes(product.id))
+            .slice(0, 4); 
+          setRelatedProducts(filtered);
+        } else if (attempt < maxAttempts) {
+          console.log(`Attempt ${attempt} failed, retrying...`);
+          setTimeout(() => fetchProducts(attempt + 1, maxAttempts), 500);
+        } else {
+          console.warn('Failed to fetch products after', maxAttempts, 'attempts');
+          setRelatedProducts([]);
+        }
+      } catch (err) {
         console.error('Failed to fetch related products:', err);
-        setRelatedProducts([]);
-      });
+        if (attempt < maxAttempts) {
+          setTimeout(() => fetchProducts(attempt + 1, maxAttempts), 500);
+        } else {
+          setRelatedProducts([]);
+        }
+      }
+    };
+
+    fetchProducts();
   }, [cartItems]);
 
   if (cartItems.length === 0) {
@@ -365,11 +377,16 @@ export default function CartContent() {
                               size="icon"
                               className="h-10 w-10 rounded-xl border-black/20 transition-all hover:scale-110 hover:border-black hover:bg-black hover:text-white"
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              disabled={!item.inStock}
+                              disabled={!item.inStock || item.quantity >= getMaxQuantity(item.price)}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
                           </div>
+                          {item.quantity >= getMaxQuantity(item.price) && (
+                            <p className="mt-1 font-general-sans text-xs text-black/60">
+                              Max quantity for this price
+                            </p>
+                          )}
                         </div>
 
                         {/* Price */}
@@ -464,33 +481,40 @@ export default function CartContent() {
                   </div>
 
                   {/* Mobile Quantity Controls */}
-                  <div className="flex items-center justify-between gap-4 rounded-lg border border-black/10 bg-black/5 p-3">
-                    <span className="font-general-sans text-sm font-medium text-black/60">
-                      Quantity
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 rounded-lg border-black/20 bg-white hover:border-black hover:bg-black hover:text-white"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        disabled={!item.inStock}
-                      >
-                        <Minus className="h-3.5 w-3.5" />
-                      </Button>
-                      <div className="flex h-8 w-12 items-center justify-center rounded-lg border-2 border-black/20 bg-white font-satoshi text-base font-bold">
-                        {item.quantity}
+                  <div className="rounded-lg border border-black/10 bg-black/5 p-3">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="font-general-sans text-sm font-medium text-black/60">
+                        Quantity
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-lg border-black/20 bg-white hover:border-black hover:bg-black hover:text-white"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          disabled={!item.inStock}
+                        >
+                          <Minus className="h-3.5 w-3.5" />
+                        </Button>
+                        <div className="flex h-8 w-12 items-center justify-center rounded-lg border-2 border-black/20 bg-white font-satoshi text-base font-bold">
+                          {item.quantity}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-lg border-black/20 bg-white hover:border-black hover:bg-black hover:text-white"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          disabled={!item.inStock || item.quantity >= getMaxQuantity(item.price)}
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 rounded-lg border-black/20 bg-white hover:border-black hover:bg-black hover:text-white"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        disabled={!item.inStock}
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                      </Button>
                     </div>
+                    {item.quantity >= getMaxQuantity(item.price) && (
+                      <p className="mt-2 font-general-sans text-xs text-black/60">
+                        Maximum quantity reached for this price range
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

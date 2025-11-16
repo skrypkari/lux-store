@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
 import { ArrowLeft, ArrowRight, CreditCard, Lock, ShoppingBag, Truck, Check, RotateCcw, Shield } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -83,7 +84,8 @@ const ALLOWED_COUNTRIES = [
 export default function CheckoutPage() {
   const router = useRouter();
   const { cartItems, cartTotal, clearCart } = useCart();
-  const [currentStep, setCurrentStep] = useState(1); // 1: Shipping, 2: Payment, 3: Review
+  const { toast } = useToast();
+  const [currentStep, setCurrentStep] = useState(1); // 1: Shipping, 2: Payment
   const [isProcessing, setIsProcessing] = useState(false);
   const [phoneCode, setPhoneCode] = useState("+1");
 
@@ -164,11 +166,111 @@ export default function CheckoutPage() {
   };
 
   const handlePaymentSubmit = async () => {
-    if (paymentMethod === "credit_card") {
-      // Save payment method
-      localStorage.setItem("checkoutPaymentMethod", paymentMethod);
-      // Redirect to credit card payment page
-      router.push("/checkout/payment");
+    try {
+      setIsProcessing(true);
+      const shippingData = JSON.parse(localStorage.getItem("checkoutShipping") || "{}");
+      const cartData = JSON.parse(localStorage.getItem("checkoutCart") || "{}");
+
+      // Fetch geo data for IP tracking
+      let geoData = { ip: "", country: "", city: "", region: "" };
+      try {
+        const geoRes = await fetch("https://ipapi.co/json/");
+        const geoJson = await geoRes.json();
+        geoData = {
+          ip: geoJson.ip,
+          country: geoJson.country_name,
+          city: geoJson.city,
+          region: geoJson.region,
+        };
+      } catch (err) {
+        console.error("Failed to fetch geo data:", err);
+      }
+
+      // Determine payment method gateway
+      let gateway = "creditcard";
+      if (paymentMethod === "cryptocurrency") {
+        gateway = "plisio";
+      } else if (paymentMethod === "open_banking") {
+        gateway = "Open Banking";
+      }
+
+      const orderData = {
+        customerEmail: shippingData.email,
+        customerFirstName: shippingData.firstName,
+        customerLastName: shippingData.lastName,
+        customerPhone: shippingData.phone,
+        shippingCountry: shippingData.country,
+        shippingState: shippingData.state,
+        shippingCity: shippingData.city,
+        shippingAddress1: shippingData.address1,
+        shippingAddress2: shippingData.address2,
+        shippingPostalCode: shippingData.postalCode,
+        subtotal: cartData.subtotal,
+        discount: 0,
+        shipping: 0,
+        total: cartData.total,
+        paymentMethod: gateway,
+        ipAddress: geoData.ip,
+        geoCountry: geoData.country,
+        geoCity: geoData.city,
+        geoRegion: geoData.region,
+        items: cartData.items.map((item: any) => ({
+          productId: item.id,
+          productName: item.name,
+          productSlug: item.slug,
+          productImage: item.image,
+          brand: item.brand,
+          price: item.price,
+          quantity: item.quantity,
+          options: item.options,
+        })),
+      };
+
+      const response = await fetch("http://localhost:5000/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create order");
+      }
+
+      const result = await response.json();
+      const orderId = result.id;
+
+      // Redirect based on payment method
+      if (paymentMethod === "credit_card") {
+        // Redirect to payment page with orderId
+        router.push(`/checkout/payment?id=${orderId}`);
+      } else if (paymentMethod === "cryptocurrency") {
+        // Redirect to crypto selection to choose currency
+        router.push(`/checkout/crypto-select?orderId=${orderId}`);
+      } else if (paymentMethod === "open_banking") {
+        // Create CoinToPay payment and redirect to payment URL
+        const paymentResponse = await fetch(`http://localhost:5000/orders/${orderId}/cointopay-payment`, {
+          method: "POST",
+        });
+
+        if (!paymentResponse.ok) {
+          throw new Error("Failed to create CoinToPay payment");
+        }
+
+        const paymentData = await paymentResponse.json();
+        
+        // Redirect to CoinToPay payment page
+        window.location.href = paymentData.paymentUrl;
+      }
+    } catch (error) {
+      console.error("Failed to create order:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to process order. Please try again.",
+      });
+      setIsProcessing(false);
     }
   };
 
@@ -490,6 +592,72 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                       <CreditCard className="h-8 w-8 text-black/40" />
+                    </div>
+                  </div>
+
+                  {/* Cryptocurrency Option */}
+                  <div
+                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                      paymentMethod === "cryptocurrency"
+                        ? "border-black bg-black/5"
+                        : "border-black/20 hover:border-black/40"
+                    }`}
+                    onClick={() => setPaymentMethod("cryptocurrency")}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                          paymentMethod === "cryptocurrency"
+                            ? "border-black bg-black"
+                            : "border-black/40"
+                        }`}
+                      >
+                        {paymentMethod === "cryptocurrency" && (
+                          <div className="h-3 w-3 rounded-full bg-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-satoshi font-bold">Cryptocurrency</p>
+                        <p className="font-general-sans text-sm text-black/60">
+                          Bitcoin, Ethereum, USDT and more
+                        </p>
+                      </div>
+                      <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Open Banking & SEPA Transfer Option */}
+                  <div
+                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                      paymentMethod === "open_banking"
+                        ? "border-black bg-black/5"
+                        : "border-black/20 hover:border-black/40"
+                    }`}
+                    onClick={() => setPaymentMethod("open_banking")}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                          paymentMethod === "open_banking"
+                            ? "border-black bg-black"
+                            : "border-black/40"
+                        }`}
+                      >
+                        {paymentMethod === "open_banking" && (
+                          <div className="h-3 w-3 rounded-full bg-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-satoshi font-bold">Open Banking & SEPA Transfer</p>
+                        <p className="font-general-sans text-sm text-black/60">
+                          Direct bank transfer - Secure & Fast
+                        </p>
+                      </div>
+                      <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                      </svg>
                     </div>
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { CartProvider } from "@/contexts/cart-context";
+import { Toaster } from "@/components/ui/toaster";
 
 const generalSans = localFont({
   src: "../public/fonts/GeneralSans-Variable.ttf",
@@ -83,6 +84,7 @@ export default function RootLayout({
       >
         <CartProvider>
           {children}
+          <Toaster />
         </CartProvider>
       </body>
     </html>
