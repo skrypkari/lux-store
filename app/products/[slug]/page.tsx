@@ -163,7 +163,6 @@ export default async function ProductPage({ params }: PageProps) {
 
   return (
     <>
-      {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -182,13 +181,43 @@ export default async function ProductPage({ params }: PageProps) {
               "url": `https://lux-store.eu/products/${productData.slug_without_id}`,
               "priceCurrency": "EUR",
               "price": product.price,
-              "availability": product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-              "itemCondition": "https://schema.org/NewCondition"
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": product.rating.toFixed(1),
-              "reviewCount": product.reviews
+              "availability": "https://schema.org/InStock",
+              "itemCondition": "https://schema.org/NewCondition",
+              "shippingDetails": {
+                "@type": "OfferShippingDetails",
+                "shippingRate": {
+                  "@type": "MonetaryAmount",
+                  "value": "0",
+                  "currency": "EUR"
+                },
+                "shippingDestination": {
+                  "@type": "DefinedRegion",
+                  "addressCountry": ["US", "GB", "DE", "FR", "IT", "ES", "CA", "AU", "NL", "BE", "AT", "CH", "SE", "NO", "DK", "FI", "PL", "CZ", "PT", "IE", "GR", "JP", "KR", "SG", "HK", "AE", "SA"]
+                },
+                "deliveryTime": {
+                  "@type": "ShippingDeliveryTime",
+                  "handlingTime": {
+                    "@type": "QuantitativeValue",
+                    "minValue": 1,
+                    "maxValue": 3,
+                    "unitCode": "DAY"
+                  },
+                  "transitTime": {
+                    "@type": "QuantitativeValue",
+                    "minValue": 21,
+                    "maxValue": 35,
+                    "unitCode": "DAY"
+                  }
+                }
+              },
+              "hasMerchantReturnPolicy": {
+                "@type": "MerchantReturnPolicy",
+                "applicableCountry": ["US", "GB", "DE", "FR", "IT", "ES", "CA", "AU", "NL", "BE", "AT", "CH", "SE", "NO", "DK", "FI", "PL", "CZ", "PT", "IE", "GR", "JP", "KR", "SG", "HK", "AE", "SA"],
+                "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+                "merchantReturnDays": 30,
+                "returnMethod": "https://schema.org/ReturnByMail",
+                "returnFees": "https://schema.org/FreeReturn"
+              }
             }
           })
         }}
@@ -315,7 +344,6 @@ export default async function ProductPage({ params }: PageProps) {
             {/* SKU & Quick Info */}
             <div className="flex flex-wrap items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">SKU:</span>
                 <code className="bg-muted px-3 py-1 rounded font-mono font-semibold">
                   {product.sku}
                 </code>
