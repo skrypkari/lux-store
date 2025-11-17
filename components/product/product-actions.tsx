@@ -33,16 +33,24 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
 
   const currentQuantityInCart = cartItem?.quantity || 0;
   const maxQuantity = getMaxQuantity(product.price);
-  const isMaxReached = currentQuantityInCart >= maxQuantity;
+  const remainingSpace = maxQuantity - currentQuantityInCart;
+  const isMaxReached = remainingSpace <= 0;
 
   const handleAddToCart = () => {
-    if (isMaxReached) return;
-    addToCart({ ...product, inStock });
+    const remainingSpace = maxQuantity - currentQuantityInCart;
+    if (remainingSpace <= 0) return;
+    
+    // Add selected quantity, but don't exceed max
+    const quantityToAdd = Math.min(quantity, remainingSpace);
+    addToCart({ ...product, inStock }, quantityToAdd);
   };
 
   const handleBuyNow = () => {
-    if (isMaxReached) return;
-    addToCart({ ...product, inStock });
+    const remainingSpace = maxQuantity - currentQuantityInCart;
+    if (remainingSpace <= 0) return;
+    
+    const quantityToAdd = Math.min(quantity, remainingSpace);
+    addToCart({ ...product, inStock }, quantityToAdd);
     window.location.href = "/cart";
   };
 
@@ -53,6 +61,7 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
         inStock={inStock} 
         quantity={quantity}
         onQuantityChange={setQuantity}
+        maxAvailable={remainingSpace > 0 ? remainingSpace : 0}
       />
 
       {/* Max Quantity Info */}

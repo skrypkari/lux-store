@@ -7,9 +7,10 @@ interface QuantitySelectorProps {
   inStock: boolean;
   quantity: number;
   onQuantityChange: (quantity: number) => void;
+  maxAvailable?: number;
 }
 
-export default function QuantitySelector({ inStock, quantity, onQuantityChange }: QuantitySelectorProps) {
+export default function QuantitySelector({ inStock, quantity, onQuantityChange, maxAvailable }: QuantitySelectorProps) {
 
   // Calculate delivery estimate (21-35 days from now)
   const today = new Date();
@@ -49,12 +50,17 @@ export default function QuantitySelector({ inStock, quantity, onQuantityChange }
             variant="outline"
             size="icon"
             onClick={() => onQuantityChange(quantity + 1)}
-            disabled={!inStock}
+            disabled={!inStock || (maxAvailable !== undefined && quantity >= maxAvailable)}
             className="h-11 w-11"
           >
             +
           </Button>
         </div>
+        {maxAvailable !== undefined && maxAvailable < 10 && (
+          <p className="text-xs text-muted-foreground mt-2">
+            Maximum {maxAvailable} available
+          </p>
+        )}
       </div>
 
       {/* Delivery Estimate */}

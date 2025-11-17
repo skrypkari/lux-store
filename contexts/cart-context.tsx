@@ -16,7 +16,7 @@ export interface CartItem {
 interface CartContextType {
   cartCount: number;
   cartItems: CartItem[];
-  addToCart: (item: Omit<CartItem, "quantity">) => void;
+  addToCart: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
   removeFromCart: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
@@ -54,7 +54,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return 1; // 50k and above
   };
 
-  const addToCart = (item: Omit<CartItem, "quantity">) => {
+  const addToCart = (item: Omit<CartItem, "quantity">, quantity: number = 1) => {
     setCartItems((prev) => {
       // Check if item with same id AND same options exists
       const existing = prev.find((i) => {
@@ -75,13 +75,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
           
           if (i.id === item.id && iOptionsStr === itemOptionsStr) {
             // Don't exceed max quantity
-            const newQuantity = Math.min(i.quantity + 1, maxQty);
+            const newQuantity = Math.min(i.quantity + quantity, maxQty);
             return { ...i, quantity: newQuantity };
           }
           return i;
         });
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity: Math.min(quantity, maxQty) }];
     });
   };
 
