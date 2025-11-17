@@ -89,7 +89,7 @@ const productSitemapContent = `import { MetadataRoute } from 'next';
 // Функция для получения всех товаров
 async function getProducts() {
   try {
-    const response = await fetch('http://localhost:5000/products', {
+    const response = await fetch('https://www.api.lux-store.eu/products', {
       cache: 'no-store',
     });
     

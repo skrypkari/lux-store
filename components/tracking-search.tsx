@@ -60,7 +60,7 @@ export default function TrackingSearch() {
 
     try {
       // Call the new track endpoint
-      const response = await fetch(`http://localhost:5000/orders/track`, {
+      const response = await fetch(`https://www.api.lux-store.eu/orders/track`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

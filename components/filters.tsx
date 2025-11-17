@@ -107,7 +107,7 @@ export function Filters({ className }: FiltersProps) {
           </AccordionTrigger>
           <AccordionContent className="pb-6">
             <div className="space-y-4 pt-2">
-              {['Hermès', 'Cartier', 'Rolex', 'Chanel', 'Gucci', 'Dior', 'Louis Vuitton', 'Tiffany & Co.'].map((brand) => (
+              {['Hermès', 'Cartier', 'Rolex', 'Chanel', 'Gucci', 'Dior'].map((brand) => (
                 <div key={brand} className="flex items-center space-x-3 group">
                   <Checkbox id={`brand-${brand}`} className="data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600" />
                   <Label

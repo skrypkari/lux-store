@@ -35,7 +35,7 @@ function CryptoPaymentContent() {
       router.push("/");
       return;
     }
-    fetch(`http://localhost:5000/plisio/invoice/${txnId}`)
+    fetch(`https://www.api.lux-store.eu/plisio/invoice/${txnId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch payment data");
         return res.json();

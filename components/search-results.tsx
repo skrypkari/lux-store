@@ -89,7 +89,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
       }
     }
 
-    fetch(`http://localhost:5000/products?${params.toString()}`)
+    fetch(`https://www.api.lux-store.eu/products?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         let filteredProducts = data.products || [];

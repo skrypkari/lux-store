@@ -39,7 +39,7 @@ export default function SearchBar() {
 
   // Load categories for quick links
   useEffect(() => {
-    fetch('http://localhost:5000/categories')
+    fetch('https://www.api.lux-store.eu/categories')
       .then(res => res.json())
       .then(data => {
         // Get top 4 categories for quick links
@@ -105,7 +105,7 @@ export default function SearchBar() {
         search: query,
       });
 
-      fetch(`http://localhost:5000/products?${searchParams.toString()}`)
+      fetch(`https://www.api.lux-store.eu/products?${searchParams.toString()}`)
         .then(res => res.json())
         .then(data => {
           setResults(data.products || []);
@@ -130,7 +130,7 @@ export default function SearchBar() {
     setResults([]);
   };
 
-  const trendingSearches = ["Hermès", "Chanel", "Louis Vuitton", "Cartier"];
+  const trendingSearches = ["Hermès", "Chanel", "Rolex", "Cartier"];
 
   return (
     <>

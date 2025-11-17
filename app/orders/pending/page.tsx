@@ -36,7 +36,7 @@ function PendingPaymentContent() {
     // Function to check payment status
     const checkPaymentStatus = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/orders/${orderId}/cointopay-status`);
+        const response = await fetch(`https://www.api.lux-store.eu/orders/${orderId}/cointopay-status`);
         
         if (!response.ok) {
           throw new Error("Failed to check payment status");
