@@ -130,7 +130,7 @@ export default function SearchBar() {
     setResults([]);
   };
 
-  const trendingSearches = ["Hermès", "Chanel", "Rolex", "Cartier"];
+  const trendingSearches = ["Hermès", "Chanel", "Rolex", "Cartier", "Hermès Birkin", "Hermès Kelly"];
 
   return (
     <>

@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   DropdownMenu,
@@ -52,11 +51,11 @@ export default function StoreDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-[250px] p-2">
-        <Link href="/store/all" className="block">
+        <a href="/store/all" className="block">
           <DropdownMenuItem className="cursor-pointer font-medium">
             VIEW ALL
           </DropdownMenuItem>
-        </Link>
+        </a>
         
         {loading ? (
           <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
@@ -78,14 +77,14 @@ export default function StoreDropdown() {
               </DropdownMenuTrigger>
               {category.children.length > 0 && (
                 <DropdownMenuContent side="right" sideOffset={0} alignOffset={-8} align="start" className="w-[200px] p-2">
-                  <Link 
+                  <a 
                     href={`/store/${category.slug_without_id}`} 
                     className="block"
                   >
                     <DropdownMenuItem className="cursor-pointer font-medium">
                       View All
                     </DropdownMenuItem>
-                  </Link>
+                  </a>
                   {category.children.map((subcategory) => {
                     // Проверяем, есть ли у этого бренда модели (для Hermès в категории Bags)
                     const isHermes = subcategory.name.toLowerCase().includes('herm') && 
@@ -105,38 +104,38 @@ export default function StoreDropdown() {
                             </DropdownMenuItem>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="right" sideOffset={0} alignOffset={-8} align="start" className="w-[200px] p-2">
-                            <Link 
+                            <a 
                               href={`/store/${category.slug_without_id}?brand=${subcategory.slug_without_id}`} 
                               className="block"
                             >
                               <DropdownMenuItem className="cursor-pointer font-medium">
                                 View All
                               </DropdownMenuItem>
-                            </Link>
-                            <Link 
+                            </a>
+                            <a 
                               href="/store/hermes-birkin" 
                               className="block"
                             >
                               <DropdownMenuItem className="cursor-pointer">
                                 HERMÈS BIRKIN
                               </DropdownMenuItem>
-                            </Link>
-                            <Link 
+                            </a>
+                            <a 
                               href="/store/hermes-kelly" 
                               className="block"
                             >
                               <DropdownMenuItem className="cursor-pointer">
                                 HERMÈS KELLY
                               </DropdownMenuItem>
-                            </Link>
-                            <Link 
+                            </a>
+                            <a 
                               href="/store/hermes-constance" 
                               className="block"
                             >
                               <DropdownMenuItem className="cursor-pointer">
                                 HERMÈS CONSTANCE
                               </DropdownMenuItem>
-                            </Link>
+                            </a>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       );
@@ -144,7 +143,7 @@ export default function StoreDropdown() {
                     
                     // Обычный бренд без моделей
                     return (
-                      <Link 
+                      <a 
                         key={subcategory.id}
                         href={`/store/${category.slug_without_id}?brand=${subcategory.slug_without_id}`} 
                         className="block"
@@ -152,7 +151,7 @@ export default function StoreDropdown() {
                         <DropdownMenuItem className="cursor-pointer">
                           {subcategory.name.toUpperCase()}
                         </DropdownMenuItem>
-                      </Link>
+                      </a>
                     );
                   })}
                 </DropdownMenuContent>

@@ -104,7 +104,7 @@ interface AttributeValue {
   values: string[];
 }
 
-export default function CategoryPage({ params, searchParams }: PageProps) {
+function CategoryPageContent({ params, searchParams }: PageProps) {
   const { category } = use(params);
   const { brand } = use(searchParams);
   const router = useRouter();
@@ -256,7 +256,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
     }
 
     setIsInitialized(true);
-  }, [urlSearchParams, isInitialized]);
+  }, []);
 
   // Функция для обновления URL
   const updateURL = (
@@ -1105,10 +1105,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                         </p>
 
                         {/* SKU */}
-                        <div className="flex items-center gap-2 mb-4">
-                          <span className="text-xs text-muted-foreground font-medium">
-                            SKU:
-                          </span>
+                        <div className="flex items-center mb-4">
                           <code className="text-xs bg-muted/50 px-2 py-1 rounded font-mono">
                             {product.sku}
                           </code>
@@ -1770,4 +1767,9 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
       <Footer />
     </div>
   );
+}
+
+// Suspense wrapper required for useSearchParams()
+export default function CategoryPage({ params, searchParams }: PageProps) {
+  return <CategoryPageContent params={params} searchParams={searchParams} />;
 }
