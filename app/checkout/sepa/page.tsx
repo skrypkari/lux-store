@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,7 +75,7 @@ async function compressImage(file: File): Promise<File> {
   });
 }
 
-export default function SepaPaymentPage() {
+function SepaPaymentContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get("order_id");
@@ -376,5 +376,17 @@ export default function SepaPaymentPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function SepaPaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-16 text-center">
+        <p>Loading...</p>
+      </div>
+    }>
+      <SepaPaymentContent />
+    </Suspense>
   );
 }
