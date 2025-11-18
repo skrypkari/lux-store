@@ -11,7 +11,9 @@ type PaymentStatus = "pending" | "paid" | "overpaid" | "underpaid" | "expired" |
 interface OrderStatusResponse {
   id: number;
   order_number: string;
+  access_token: string; // For secure redirect to order details
   payment_status: string;
+  status: string; // OrderStatusType (awaiting_payment, payment_confirmed, etc.)
   gateway_payment_id: string | null;
   total: number;
 }
@@ -19,7 +21,8 @@ interface OrderStatusResponse {
 function PendingPaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const orderId = searchParams.get("order_id");
+  // Support both order_id and order_number parameters
+  const orderId = searchParams.get("order_id") || searchParams.get("order_number");
   const gatewayPaymentId = searchParams.get("gateway_payment_id");
 
   const [status, setStatus] = useState<PaymentStatus>("pending");
@@ -30,27 +33,35 @@ function PendingPaymentContent() {
   useEffect(() => {
     if (!orderId) {
       setError("Order ID not found");
+      console.error("❌ No order_id or order_number in URL");
       return;
     }
 
     // Function to check payment status
     const checkPaymentStatus = async () => {
       try {
-        const response = await fetch(`https://www.api.lux-store.eu/orders/${orderId}/cointopay-status`);
+        console.log('🔍 Checking payment status for order:', orderId);
+        const url = `https://api.lux-store.eu/orders/${orderId}/cointopay-status`;
+        console.log('📡 Fetching:', url);
+        
+        const response = await fetch(url);
+        console.log('📥 Response status:', response.status, response.statusText);
         
         if (!response.ok) {
-          throw new Error("Failed to check payment status");
+          throw new Error(`Failed to check payment status: ${response.status}`);
         }
 
         const data: OrderStatusResponse = await response.json();
+        console.log('✅ Received data:', data);
         setOrderData(data);
 
-        // Map payment_status to our status type
-        if (data.payment_status === "paid") {
+        // Map payment_status OR order status to our status type
+        // For SEPA & Open Banking: when status becomes "Payment Confirmed", show as paid
+        if (data.payment_status === "paid" || data.status === "Payment Confirmed") {
           setStatus("paid");
-          // Redirect to success page after 2 seconds
+          // Redirect to order details page with token after 2 seconds
           setTimeout(() => {
-            router.push(`/orders/success?order_number=${data.order_number}`);
+            router.push(`/orders/${data.order_number}?token=${data.access_token}`);
           }, 2000);
         } else if (data.payment_status === "pending") {
           setStatus("pending");
@@ -64,77 +75,79 @@ function PendingPaymentContent() {
 
         setCheckCount((prev) => prev + 1);
       } catch (err) {
-        console.error("Error checking payment status:", err);
+        console.error("❌ Error checking payment status:", err);
+        console.error("Error details:", {
+          message: err instanceof Error ? err.message : 'Unknown error',
+          orderId,
+        });
         setError("Failed to check payment status");
         setStatus("error");
       }
     };
 
-    // Check immediately
+    // Check immediately  
     checkPaymentStatus();
 
-    // Then check every 10 minutes (600000 ms)
-    // Frontend читает из БД, CRON обновляет статус каждые 10 минут
-    const interval = setInterval(checkPaymentStatus, 600000);
+    const interval = setInterval(checkPaymentStatus, 150000);
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, [orderId, router]);
 
   // Render error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-rose-50 py-20">
-        <div className="container mx-auto max-w-3xl px-4">
-          <div className="relative overflow-hidden rounded-3xl border border-red-200 bg-white p-8 shadow-2xl sm:p-12">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-transparent" />
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-rose-50 py-20">
+  //       <div className="container mx-auto max-w-3xl px-4">
+  //         <div className="relative overflow-hidden rounded-3xl border border-red-200 bg-white p-8 shadow-2xl sm:p-12">
+  //           <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-transparent" />
             
-            <div className="relative z-10 text-center">
-              <div className="mb-8 flex justify-center">
-                <div className="relative">
-                  <div className="absolute inset-0 animate-pulse rounded-full bg-red-400 opacity-20" />
-                  <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-xl">
-                    <XCircle className="h-14 w-14 text-white" strokeWidth={2.5} />
-                  </div>
-                </div>
-              </div>
+  //           <div className="relative z-10 text-center">
+  //             <div className="mb-8 flex justify-center">
+  //               <div className="relative">
+  //                 <div className="absolute inset-0 animate-pulse rounded-full bg-red-400 opacity-20" />
+  //                 <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-xl">
+  //                   <XCircle className="h-14 w-14 text-white" strokeWidth={2.5} />
+  //                 </div>
+  //               </div>
+  //             </div>
 
-              <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight">
-                <span className="bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
-                  Unable to Process
-                </span>
-              </h1>
-              <p className="mb-8 font-general-sans text-lg text-black/60">
-                {error}
-              </p>
+  //             <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight">
+  //               <span className="bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+  //                 Unable to Process
+  //               </span>
+  //             </h1>
+  //             <p className="mb-8 font-general-sans text-lg text-black/60">
+  //               {error}
+  //             </p>
 
-              <div className="mb-8 rounded-2xl border border-red-100 bg-gradient-to-br from-red-50 to-white p-6">
-                <h3 className="mb-3 font-satoshi text-lg font-bold">Need Assistance?</h3>
-                <p className="font-general-sans text-sm text-black/70">
-                  Our support team is available 24/7 to help resolve any issues. Please don't hesitate to reach out.
-                </p>
-              </div>
+  //             <div className="mb-8 rounded-2xl border border-red-100 bg-gradient-to-br from-red-50 to-white p-6">
+  //               <h3 className="mb-3 font-satoshi text-lg font-bold">Need Assistance?</h3>
+  //               <p className="font-general-sans text-sm text-black/70">
+  //                 Our support team is available 24/7 to help resolve any issues. Please don't hesitate to reach out.
+  //               </p>
+  //             </div>
 
-              <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-                <Link href="/contact">
-                  <Button size="lg" className="gap-2 bg-gradient-to-r from-red-600 to-rose-600 px-8 font-satoshi font-semibold hover:from-red-700 hover:to-rose-700">
-                    Contact Support
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link href="/store/all">
-                  <Button variant="outline" size="lg" className="gap-2 border-2 font-satoshi font-semibold">
-                    Continue Shopping
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  //             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
+  //               <Link href="/contact">
+  //                 <Button size="lg" className="gap-2 bg-gradient-to-r from-red-600 to-rose-600 px-8 font-satoshi font-semibold hover:from-red-700 hover:to-rose-700">
+  //                   Contact Support
+  //                   <ArrowRight className="h-5 w-5" />
+  //                 </Button>
+  //               </Link>
+  //               <Link href="/store/all">
+  //                 <Button variant="outline" size="lg" className="gap-2 border-2 font-satoshi font-semibold">
+  //                   Continue Shopping
+  //                   <ArrowRight className="h-5 w-5" />
+  //                 </Button>
+  //               </Link>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Render paid state
   if (status === "paid") {
@@ -192,7 +205,7 @@ function PendingPaymentContent() {
               <div className="flex items-center justify-center gap-3 text-emerald-600">
                 <Loader2 className="h-5 w-5 animate-spin" />
                 <p className="font-satoshi text-sm font-semibold">
-                  Redirecting to your order details...
+                  Opening your order details...
                 </p>
               </div>
             </div>
@@ -462,7 +475,7 @@ function PendingPaymentContent() {
                 <div className="flex-1">
                   <p className="font-satoshi text-sm font-bold">Monitoring Transfer Status</p>
                   <p className="mt-0.5 font-general-sans text-xs text-black/60">
-                    Checking status every 10 minutes • {checkCount} {checkCount === 1 ? "check" : "checks"} completed
+                    Checking status every second • {checkCount} {checkCount === 1 ? "check" : "checks"} completed
                   </p>
                 </div>
               </div>
@@ -513,7 +526,7 @@ function PendingPaymentContent() {
                     1
                   </div>
                   <p className="font-general-sans text-sm text-black/70">
-                    Your bank transfer has been initiated through Open Banking or SEPA
+                    Your bank transfer has been initiated
                   </p>
                 </div>
                 <div className="flex gap-3">

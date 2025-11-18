@@ -83,7 +83,7 @@ const ALLOWED_COUNTRIES = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cartItems, cartTotal, clearCart } = useCart();
+  const { cartItems, cartTotal, clearCart, promoCode, promoDiscount, clearPromo } = useCart();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1); // 1: Shipping, 2: Payment
   const [isProcessing, setIsProcessing] = useState(false);
@@ -127,7 +127,7 @@ export default function CheckoutPage() {
 
   const subtotal = cartTotal;
   const shipping = 0; // Free shipping
-  const total = subtotal;
+  const total = subtotal - promoDiscount;
 
   if (cartItems.length === 0) {
     return (
@@ -192,6 +192,12 @@ export default function CheckoutPage() {
         gateway = "plisio";
       } else if (paymentMethod === "open_banking") {
         gateway = "Open Banking";
+      } else if (paymentMethod === "sepa") {
+        gateway = "SEPA Instant Transfer";
+      } else if (paymentMethod === "ach_wire") {
+        gateway = "ACH or Wire";
+      } else if (paymentMethod === "faster_payments") {
+        gateway = "Faster Payments";
       }
 
       const orderData = {
@@ -206,7 +212,8 @@ export default function CheckoutPage() {
         shippingAddress2: shippingData.address2,
         shippingPostalCode: shippingData.postalCode,
         subtotal: cartData.subtotal,
-        discount: 0,
+        discount: promoDiscount,
+        promoCode: promoCode || null,
         shipping: 0,
         total: cartData.total,
         paymentMethod: gateway,
@@ -226,7 +233,7 @@ export default function CheckoutPage() {
         })),
       };
 
-      const response = await fetch("https://www.api.lux-store.eu/orders", {
+      const response = await fetch("https://api.lux-store.eu/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -241,6 +248,10 @@ export default function CheckoutPage() {
       const result = await response.json();
       const orderId = result.id;
 
+      // Clear cart and promo code after successful order creation
+      clearCart();
+      clearPromo();
+
       // Redirect based on payment method
       if (paymentMethod === "credit_card") {
         // Redirect to payment page with orderId
@@ -250,7 +261,7 @@ export default function CheckoutPage() {
         router.push(`/checkout/crypto-select?orderId=${orderId}`);
       } else if (paymentMethod === "open_banking") {
         // Create CoinToPay payment and redirect to payment URL
-        const paymentResponse = await fetch(`https://www.api.lux-store.eu/orders/${orderId}/cointopay-payment`, {
+        const paymentResponse = await fetch(`https://api.lux-store.eu/orders/${orderId}/cointopay-payment`, {
           method: "POST",
         });
 
@@ -262,6 +273,15 @@ export default function CheckoutPage() {
         
         // Redirect to CoinToPay payment page
         window.location.href = paymentData.paymentUrl;
+      } else if (paymentMethod === "sepa") {
+        // Redirect to SEPA payment page
+        router.push(`/checkout/sepa?order_id=${orderId}`);
+      } else if (paymentMethod === "ach_wire") {
+        // Redirect to ACH payment page
+        router.push(`/checkout/ach?order_id=${orderId}`);
+      } else if (paymentMethod === "faster_payments") {
+        // Redirect to FP payment page
+        router.push(`/checkout/fp?order_id=${orderId}`);
       }
     } catch (error) {
       console.error("Failed to create order:", error);
@@ -628,7 +648,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Open Banking & SEPA Transfer Option */}
+                  {/* Open Banking Option */}
                   <div
                     className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
                       paymentMethod === "open_banking"
@@ -650,13 +670,112 @@ export default function CheckoutPage() {
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="font-satoshi font-bold">Open Banking & SEPA Transfer</p>
+                        <p className="font-satoshi font-bold">Open Banking</p>
                         <p className="font-general-sans text-sm text-black/60">
-                          Direct bank transfer - Secure & Fast
+                          Pay directly from your bank account
                         </p>
                       </div>
                       <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* SEPA Instant Transfer Option */}
+                  <div
+                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                      paymentMethod === "sepa"
+                        ? "border-black bg-black/5"
+                        : "border-black/20 hover:border-black/40"
+                    }`}
+                    onClick={() => setPaymentMethod("sepa")}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                          paymentMethod === "sepa"
+                            ? "border-black bg-black"
+                            : "border-black/40"
+                        }`}
+                      >
+                        {paymentMethod === "sepa" && (
+                          <div className="h-3 w-3 rounded-full bg-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-satoshi font-bold">SEPA Instant Transfer</p>
+                        <p className="font-general-sans text-sm text-black/60">
+                          Direct bank transfer - EU banks
+                        </p>
+                      </div>
+                      <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* ACH or Wire Transfer Option */}
+                  <div
+                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                      paymentMethod === "ach_wire"
+                        ? "border-black bg-black/5"
+                        : "border-black/20 hover:border-black/40"
+                    }`}
+                    onClick={() => setPaymentMethod("ach_wire")}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                          paymentMethod === "ach_wire"
+                            ? "border-black bg-black"
+                            : "border-black/40"
+                        }`}
+                      >
+                        {paymentMethod === "ach_wire" && (
+                          <div className="h-3 w-3 rounded-full bg-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-satoshi font-bold">ACH or Wire Transfer</p>
+                        <p className="font-general-sans text-sm text-black/60">
+                          Direct bank transfer - US banks (USD)
+                        </p>
+                      </div>
+                      <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Faster Payments Option */}
+                  <div
+                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                      paymentMethod === "faster_payments"
+                        ? "border-black bg-black/5"
+                        : "border-black/20 hover:border-black/40"
+                    }`}
+                    onClick={() => setPaymentMethod("faster_payments")}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                          paymentMethod === "faster_payments"
+                            ? "border-black bg-black"
+                            : "border-black/40"
+                        }`}
+                      >
+                        {paymentMethod === "faster_payments" && (
+                          <div className="h-3 w-3 rounded-full bg-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-satoshi font-bold">Faster Payments</p>
+                        <p className="font-general-sans text-sm text-black/60">
+                          Direct bank transfer - UK banks (GBP)
+                        </p>
+                      </div>
+                      <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                     </div>
                   </div>
@@ -741,6 +860,15 @@ export default function CheckoutPage() {
                     <span className="text-black/70">VAT (20%)</span>
                     <span className="font-bold">€{(subtotal - subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
                   </div>
+                  {promoDiscount > 0 && (
+                    <div className="flex justify-between font-general-sans text-base">
+                      <span className="text-black/70">
+                        Promo Discount
+                        {promoCode && <span className="ml-1 text-xs">({promoCode})</span>}
+                      </span>
+                      <span className="font-bold text-green-600">-€{promoDiscount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Shipping</span>
                     <span className="font-bold text-green-600">FREE</span>

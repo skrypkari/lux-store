@@ -22,12 +22,19 @@ interface CartContextType {
   clearCart: () => void;
   cartTotal: number;
   getMaxQuantity: (price: number) => number;
+  promoCode: string;
+  promoDiscount: number;
+  setPromoCode: (code: string) => void;
+  setPromoDiscount: (discount: number) => void;
+  clearPromo: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [promoCode, setPromoCode] = useState<string>("");
+  const [promoDiscount, setPromoDiscount] = useState<number>(0);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -39,12 +46,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
         console.error("Failed to parse cart:", e);
       }
     }
+    
+    // Load promo code from localStorage
+    const savedPromo = localStorage.getItem("promoCode");
+    const savedDiscount = localStorage.getItem("promoDiscount");
+    if (savedPromo) setPromoCode(savedPromo);
+    if (savedDiscount) setPromoDiscount(parseFloat(savedDiscount));
   }, []);
 
   // Save to localStorage whenever cart changes
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
+
+  // Save promo code to localStorage
+  useEffect(() => {
+    if (promoCode) {
+      localStorage.setItem("promoCode", promoCode);
+      localStorage.setItem("promoDiscount", promoDiscount.toString());
+    } else {
+      localStorage.removeItem("promoCode");
+      localStorage.removeItem("promoDiscount");
+    }
+  }, [promoCode, promoDiscount]);
 
   // Get max quantity allowed based on price
   const getMaxQuantity = (price: number): number => {
@@ -110,11 +134,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCartItems([]);
   };
 
+  const clearPromo = () => {
+    setPromoCode("");
+    setPromoDiscount(0);
+  };
+
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cartCount, cartItems, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, getMaxQuantity }}>
+    <CartContext.Provider value={{ 
+      cartCount, 
+      cartItems, 
+      addToCart, 
+      removeFromCart, 
+      updateQuantity, 
+      clearCart, 
+      cartTotal, 
+      getMaxQuantity,
+      promoCode,
+      promoDiscount,
+      setPromoCode,
+      setPromoDiscount,
+      clearPromo
+    }}>
       {children}
     </CartContext.Provider>
   );

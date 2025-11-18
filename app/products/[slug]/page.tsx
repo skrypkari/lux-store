@@ -16,7 +16,7 @@ interface PageProps {
 }
 
 async function getProductBySlug(slug: string) {
-  const res = await fetch(`https://www.api.lux-store.eu/products/slug/${slug}`, {
+  const res = await fetch(`https://api.lux-store.eu/products/slug/${slug}`, {
     cache: 'no-store', // Always fetch fresh data
   });
   
@@ -34,6 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const productData = await getProductBySlug(slug);
     const price = productData.base_price || 0;
+    console.log('Product Price:', price);
     const brand = productData.attributes?.find((attr: any) => attr.attribute.name === 'Brand')?.value || 'Luxury Brand';
     
     return {
@@ -344,6 +345,7 @@ export default async function ProductPage({ params }: PageProps) {
             {/* SKU & Quick Info */}
             <div className="flex flex-wrap items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">SKU:</span>
                 <code className="bg-muted px-3 py-1 rounded font-mono font-semibold">
                   {product.sku}
                 </code>
@@ -363,7 +365,7 @@ export default async function ProductPage({ params }: PageProps) {
             {/* Price */}
             <div>
               <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-4xl font-bold tracking-tight">
+                <span itemProp="price" id="price" className="text-4xl font-bold tracking-tight">
                   €{product.price.toLocaleString()}
                 </span>
                 <Badge variant="secondary" className="text-xs">
@@ -371,7 +373,7 @@ export default async function ProductPage({ params }: PageProps) {
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground mb-2">
-                Price incl. VAT (20%) €{product.priceVAT.toLocaleString()}
+                VAT incl. (20%) €{product.priceVAT.toLocaleString()}
               </p>
             </div>
 

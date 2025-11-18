@@ -388,8 +388,8 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     // If category is "all", fetch all products, otherwise fetch by category
     const baseUrl =
       category === "all"
-        ? `https://www.api.lux-store.eu/products`
-        : `https://www.api.lux-store.eu/products/category/${category}`;
+        ? `https://api.lux-store.eu/products`
+        : `https://api.lux-store.eu/products/category/${category}`;
 
     const url = `${baseUrl}?${queryParams.toString()}`;
 
@@ -446,7 +446,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       });
     });
 
-    const url = `https://www.api.lux-store.eu/attributes/available/filtered?${queryParams.toString()}`;
+    const url = `https://api.lux-store.eu/attributes/available/filtered?${queryParams.toString()}`;
 
     fetch(url)
       .then((res) => res.json())

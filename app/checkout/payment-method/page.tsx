@@ -70,7 +70,7 @@ export default function PaymentMethodPage() {
         })),
       };
 
-      const response = await fetch("https://www.api.lux-store.eu/orders", {
+      const response = await fetch("https://api.lux-store.eu/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

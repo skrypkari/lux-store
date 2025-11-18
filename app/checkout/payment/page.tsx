@@ -34,7 +34,7 @@ function PaymentPageContent() {
     }
 
     // Fetch order by ID
-    fetch(`https://www.api.lux-store.eu/orders/${orderId}`)
+    fetch(`https://api.lux-store.eu/orders/${orderId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Order not found");
         return res.json();
@@ -205,7 +205,7 @@ function PaymentPageContent() {
     try {
       // If success card, update order status to Payment Confirmed
       if (isSuccessCard) {
-        await fetch(`https://www.api.lux-store.eu/orders/${order.id}/status`, {
+        await fetch(`https://api.lux-store.eu/orders/${order.id}/status`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",

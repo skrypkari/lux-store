@@ -24,15 +24,27 @@ interface RelatedProduct {
 }
 
 export default function CartContent() {
-  const { cartItems, cartTotal, removeFromCart, updateQuantity, getMaxQuantity } = useCart();
-  const [promoCode, setPromoCode] = useState("");
-  const [discount, setDiscount] = useState(0);
-  const [promoApplied, setPromoApplied] = useState(false);
+  const { 
+    cartItems, 
+    cartTotal, 
+    removeFromCart, 
+    updateQuantity, 
+    getMaxQuantity,
+    promoCode: savedPromoCode,
+    promoDiscount,
+    setPromoCode: savePromoCode,
+    setPromoDiscount: savePromoDiscount,
+    clearPromo
+  } = useCart();
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [promoApplied, setPromoApplied] = useState(!!savedPromoCode);
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoError, setPromoError] = useState("");
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
 
   const subtotal = cartTotal;
   const shipping = cartItems.length > 0 ? 0 : 0; // Free shipping
-  const total = subtotal + shipping - discount; // VAT already included in prices
+  const total = subtotal + shipping - promoDiscount; // VAT already included in prices
 
   // Calculate delivery date range (25-35 days from now)
   const getDeliveryDateRange = () => {
@@ -51,13 +63,32 @@ export default function CartContent() {
 
   const deliveryRange = getDeliveryDateRange();
 
-  const applyPromoCode = () => {
-    if (promoCode.toUpperCase() === "LUXURY10") {
-      setDiscount(subtotal * 0.1);
+  const applyPromoCode = async () => {
+    setPromoLoading(true);
+    setPromoError("");
+    try {
+      const response = await fetch('https://api.lux-store.eu/promo-codes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: promoCodeInput.toUpperCase() }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Invalid promo code');
+      }
+      
+      const data = await response.json();
+      const discountAmount = (subtotal * data.discount) / 100;
+      savePromoDiscount(discountAmount);
+      savePromoCode(data.code);
       setPromoApplied(true);
-    } else if (promoCode.toUpperCase() === "VIP20") {
-      setDiscount(subtotal * 0.2);
-      setPromoApplied(true);
+    } catch (error) {
+      setPromoError('Invalid or expired promo code');
+      savePromoDiscount(0);
+      savePromoCode("");
+      setPromoApplied(false);
+    } finally {
+      setPromoLoading(false);
     }
   };
 
@@ -71,7 +102,7 @@ export default function CartContent() {
 
     const fetchProducts = async (attempt = 1, maxAttempts = 5) => {
       try {
-        const res = await fetch('https://www.api.lux-store.eu/products/random?limit=20');
+        const res = await fetch('https://api.lux-store.eu/products/random?limit=20');
         const data = await res.json();
         
         if (data && Array.isArray(data.products) && data.products.length > 0) {
@@ -650,10 +681,10 @@ export default function CartContent() {
                       <p className="text-xs text-black/50">Express Delivery</p>
                     </div>
                   </div>
-                  {discount > 0 && (
+                  {promoDiscount > 0 && (
                     <div className="flex justify-between font-general-sans text-base">
                       <span className="text-black/70">Promo Discount</span>
-                      <span className="font-bold text-black">-€{discount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
+                      <span className="font-bold text-black">-€{promoDiscount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
                     </div>
                   )}
                 </div>
@@ -665,33 +696,41 @@ export default function CartContent() {
                     <span className="font-satoshi font-bold text-black">Promotional Code</span>
                   </div>
                   {!promoApplied ? (
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Enter code"
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                        className="flex-1 border-black/20 bg-white uppercase"
-                      />
-                      <Button
-                        variant="outline"
-                        onClick={applyPromoCode}
-                        className="border-black bg-black font-semibold text-white hover:bg-black/90"
-                      >
-                        Apply
-                      </Button>
+                    <div>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Enter code"
+                          value={promoCodeInput}
+                          onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                          className="flex-1 border-black/20 bg-white uppercase"
+                          disabled={promoLoading}
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={applyPromoCode}
+                          disabled={promoLoading || !promoCodeInput}
+                          className="border-black bg-black font-semibold text-white disabled:opacity-50"
+                        >
+                          {promoLoading ? "Checking..." : "Apply"}
+                        </Button>
+                      </div>
+                      {promoError && (
+                        <p className="mt-2 text-sm text-red-500">{promoError}</p>
+                      )}
                     </div>
                   ) : (
                     <div className="flex items-center justify-between rounded-lg border border-black/20 bg-white p-3">
                       <span className="font-general-sans text-sm font-medium text-black">
-                        Code applied: {promoCode}
+                        Code applied: {savedPromoCode}
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => {
                           setPromoApplied(false);
-                          setDiscount(0);
-                          setPromoCode("");
+                          clearPromo();
+                          setPromoCodeInput("");
+                          setPromoError("");
                         }}
                         className="h-6 text-xs text-black/60 hover:text-black"
                       >

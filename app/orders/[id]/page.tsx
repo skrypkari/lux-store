@@ -95,7 +95,7 @@ export default function OrderDetailsPage() {
 
   const fetchOrder = async (token: string) => {
     try {
-      const response = await fetch(`https://www.api.lux-store.eu/orders/by-token/${token}`);
+      const response = await fetch(`https://api.lux-store.eu/orders/by-token/${token}`);
       if (!response.ok) {
         throw new Error("Order not found or invalid access token");
       }

@@ -10,16 +10,16 @@ function CryptoPaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [paymentData, setPaymentData] = useState<any>(null);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<{ [key: string]: boolean }>({});
   const [timeLeft, setTimeLeft] = useState(0);
   const [status, setStatus] = useState<string>("pending");
 
-  // Редирект на страницу успеха после подтверждения оплаты
+  // Редирект на страницу заказа после подтверждения оплаты
   useEffect(() => {
     if (paymentData && paymentData.status === "completed") {
       const timeout = setTimeout(() => {
         if (paymentData.orderId && paymentData.accessToken) {
-          router.push(`/checkout/success?orderId=${encodeURIComponent(paymentData.orderId)}&token=${encodeURIComponent(paymentData.accessToken)}`);
+          router.push(`/orders/${paymentData.orderId}?token=${paymentData.accessToken}`);
         } else {
           router.push("/checkout/success");
         }
@@ -35,7 +35,7 @@ function CryptoPaymentContent() {
       router.push("/");
       return;
     }
-    fetch(`https://www.api.lux-store.eu/plisio/invoice/${txnId}`)
+    fetch(`https://api.lux-store.eu/plisio/invoice/${txnId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch payment data");
         return res.json();
@@ -96,10 +96,12 @@ function CryptoPaymentContent() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopied({ ...copied, [field]: true });
+    setTimeout(() => {
+      setCopied({ ...copied, [field]: false });
+    }, 2000);
   };
 
   if (!paymentData) {
@@ -127,6 +129,23 @@ function CryptoPaymentContent() {
           <p className="font-general-sans text-lg text-black/60">
             Send exact amount to the address below
           </p>
+        </div>
+
+        {/* Network Info */}
+        <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
+          <div className="flex items-center gap-2">
+            <div className="rounded-full bg-blue-500 p-2">
+              <Bitcoin className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <p className="font-satoshi text-sm font-bold text-blue-900">
+                Network: {paymentData.currency?.toUpperCase()} Blockchain
+              </p>
+              <p className="font-general-sans text-xs text-blue-700">
+                Make sure to send from the correct network
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Timer */}
@@ -185,9 +204,9 @@ function CryptoPaymentContent() {
                 size="sm"
                 variant="outline"
                 className="w-full gap-2"
-                onClick={() => copyToClipboard(paymentData.wallet_hash)}
+                onClick={() => copyToClipboard(paymentData.wallet_hash, "address")}
               >
-                {copied ? (
+                {copied.address ? (
                   <>
                     <Check className="h-4 w-4" />
                     Copied!
@@ -209,6 +228,24 @@ function CryptoPaymentContent() {
               <p className="mb-1 font-mono text-3xl font-bold text-black">
                 {paymentData.invoice_total_sum} {paymentData.currency}
               </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full gap-2 mt-3"
+                onClick={() => copyToClipboard(paymentData.invoice_total_sum, "amount")}
+              >
+                {copied.amount ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    Amount Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    Copy Amount
+                  </>
+                )}
+              </Button>
               <div className="mt-4 space-y-1 border-t border-black/10 pt-4 text-sm">
                 <div className="flex justify-between">
                   <span className="text-black/60">Invoice Amount:</span>
@@ -226,29 +263,51 @@ function CryptoPaymentContent() {
               <p className="mb-2 font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
                 Payment Status
               </p>
-              <p className="text-2xl font-bold text-black">
-                {status === "completed"
-                  ? "✓ Confirmed"
-                  : status === "processing"
-                  ? "Processing..."
-                  : "Awaiting Payment"}
-              </p>
-              {status === "processing" && paymentData.confirmations !== undefined && (
-                <div className="mt-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-black/60">Confirmations:</span>
-                    <span className="font-bold text-black">
-                      {paymentData.confirmations} / {paymentData.expected_confirmations || 1}
-                    </span>
+              
+              {status === "completed" ? (
+                <div className="flex items-center gap-2">
+                  <div className="rounded-full bg-green-500 p-1">
+                    <Check className="h-5 w-5 text-white" />
                   </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/10">
-                    <div 
-                      className="h-full bg-black transition-all duration-500"
-                      style={{ 
-                        width: `${Math.min(100, (paymentData.confirmations / (paymentData.expected_confirmations || 1)) * 100)}%` 
-                      }}
-                    />
+                  <p className="text-2xl font-bold text-green-600">Payment Confirmed</p>
+                </div>
+              ) : status === "pending" || status === "pending internal" ? (
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <p className="text-xl font-bold text-blue-600">Payment Detected!</p>
                   </div>
+                  <p className="text-sm text-black/60 mb-3">
+                    Waiting for blockchain confirmations...
+                  </p>
+                  {paymentData.confirmations !== undefined && (
+                    <div className="mt-3">
+                      <div className="flex items-center justify-between text-sm mb-2">
+                        <span className="text-black/60">Confirmations:</span>
+                        <span className="font-bold text-black">
+                          {paymentData.confirmations} / {paymentData.expected_confirmations || 1}
+                        </span>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-black/10">
+                        <div 
+                          className="h-full bg-blue-600 transition-all duration-500"
+                          style={{ 
+                            width: `${Math.min(100, (paymentData.confirmations / (paymentData.expected_confirmations || 1)) * 100)}%` 
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
+                    <p className="text-2xl font-bold text-black">Awaiting Payment</p>
+                  </div>
+                  <p className="text-sm text-black/60">
+                    Send crypto to the address above
+                  </p>
                 </div>
               )}
             </div>

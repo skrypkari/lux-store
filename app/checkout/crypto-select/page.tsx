@@ -44,7 +44,7 @@ function CryptoSelectionContent() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://www.api.lux-store.eu/plisio/create-invoice", {
+      const response = await fetch("https://api.lux-store.eu/plisio/create-invoice", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

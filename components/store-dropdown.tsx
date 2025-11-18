@@ -23,7 +23,7 @@ export default function StoreDropdown() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    fetch("https://www.api.lux-store.eu/categories")
+    fetch("https://api.lux-store.eu/categories")
       .then((res) => res.json())
       .then((data) => {
         console.log("Received data:", data);
