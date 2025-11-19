@@ -23,8 +23,9 @@ async function getProductBySlug(slug: string) {
   if (!res.ok) {
     throw new Error('Product not found');
   }
-  
-  return res.json();
+  const productData = await res.json();
+  console.log(productData);
+  return productData;
 }
 
 // Generate metadata for SEO
@@ -258,6 +259,7 @@ export default async function ProductPage({ params }: PageProps) {
           })
         }}
       />
+      
 
       <div className="min-h-screen bg-background">
         <Header />
@@ -455,7 +457,7 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
             <div 
               className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: productData.description_html || product.description }}
+              dangerouslySetInnerHTML={{ __html: productData.seo?.jsonld?.description || productData.description_html || product.description }}
             />
             
           </div>

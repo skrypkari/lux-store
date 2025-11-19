@@ -487,7 +487,7 @@ function PendingPaymentContent() {
                 <div className="flex-1">
                   <p className="font-satoshi text-sm font-bold">Monitoring Transfer Status</p>
                   <p className="mt-0.5 font-general-sans text-xs text-black/60">
-                    Checking status every second • {checkCount} {checkCount === 1 ? "check" : "checks"} completed
+                    Checking status...
                   </p>
                 </div>
               </div>

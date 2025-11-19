@@ -94,10 +94,7 @@ export default function RootLayout({
             gtag('config', 'G-EFT733S3K6');
           `}
         </Script>
-        <Script
-          src="https://code.jivosite.com/widget/6iCt2ayMiM"
-          strategy="afterInteractive"
-        />
+        <script src="//code.jivosite.com/widget/6iCt2ayMiM" async></script>
       </head>
       <body
         className={`${generalSans.variable} ${satoshi.variable} antialiased`}

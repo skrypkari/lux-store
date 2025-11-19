@@ -54,19 +54,19 @@ export default function MobileMenu() {
             <div className="border-t pt-2 space-y-1">
               <p className="font-semibold text-sm mb-2">BRANDS</p>
               <Button variant="ghost" asChild className="justify-start w-full pl-0">
-                <Link href="/brands/cartier">CARTIER</Link>
+                <Link href="/store/all?brand=Cartier">CARTIER</Link>
               </Button>
               <Button variant="ghost" asChild className="justify-start w-full pl-0">
-                <Link href="/brands/hermes">HERMÈS</Link>
+                <Link href="/store/all?brand=Hermès">HERMÈS</Link>
               </Button>
               <Button variant="ghost" asChild className="justify-start w-full pl-0">
-                <Link href="/brands/dior">DIOR</Link>
+                <Link href="/store/all?brand=Dior">DIOR</Link>
               </Button>
               <Button variant="ghost" asChild className="justify-start w-full pl-0">
-                <Link href="/brands/chanel">CHANEL</Link>
+                <Link href="/store/all?brand=Chanel">CHANEL</Link>
               </Button>
               <Button variant="ghost" asChild className="justify-start w-full pl-0">
-                <Link href="/brands/gucci">GUCCI</Link>
+                <Link href="/store/all?brand=Gucci">GUCCI</Link>
               </Button>
             </div>
 

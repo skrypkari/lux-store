@@ -89,7 +89,7 @@ function CryptoPaymentContent() {
 
   // Редирект на страницу заказа после подтверждения оплаты
   useEffect(() => {
-    if (paymentData && paymentData.status === "completed") {
+    if (paymentData && (paymentData.status === "completed" || paymentData.status === "paid")) {
       const timeout = setTimeout(() => {
         if (paymentData.orderId && paymentData.accessToken) {
           router.push(`/orders/${paymentData.orderId}?token=${paymentData.accessToken}`);
@@ -138,7 +138,7 @@ function CryptoPaymentContent() {
   useEffect(() => {
     if (!paymentData) return;
     // Не опрашивать, если завершён
-    if (["completed", "expired", "cancelled", "error"].includes(paymentData.status)) return;
+    if (["completed", "paid", "expired", "cancelled", "error"].includes(paymentData.status)) return;
     const interval = setInterval(() => {
       fetchPaymentData();
     }, 10000); // 10 секунд
@@ -337,7 +337,7 @@ function CryptoPaymentContent() {
                 Payment Status
               </p>
               
-              {status === "completed" ? (
+              {status === "completed" || status === "paid" ? (
                 <div className="flex items-center gap-2">
                   <div className="rounded-full bg-green-500 p-1">
                     <Check className="h-5 w-5 text-white" />
@@ -346,31 +346,13 @@ function CryptoPaymentContent() {
                 </div>
               ) : status === "pending" || status === "pending internal" ? (
                 <div>
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center gap-3 mb-2">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                     <p className="text-xl font-bold text-blue-600">Payment Detected!</p>
                   </div>
-                  <p className="text-sm text-black/60 mb-3">
-                    Waiting for blockchain confirmations...
+                  <p className="text-sm text-black/60">
+                    Waiting for confirmations...
                   </p>
-                  {paymentData.confirmations !== undefined && (
-                    <div className="mt-3">
-                      <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-black/60">Confirmations:</span>
-                        <span className="font-bold text-black">
-                          {paymentData.confirmations} / {paymentData.expected_confirmations || 1}
-                        </span>
-                      </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-black/10">
-                        <div 
-                          className="h-full bg-blue-600 transition-all duration-500"
-                          style={{ 
-                            width: `${Math.min(100, (paymentData.confirmations / (paymentData.expected_confirmations || 1)) * 100)}%` 
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div>
