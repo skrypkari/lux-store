@@ -6,6 +6,69 @@ import { Button } from "@/components/ui/button";
 import { Copy, Check, ExternalLink, Clock, Bitcoin } from "lucide-react";
 import Image from "next/image";
 
+// Маппинг технических кодов на пользовательские названия
+const CRYPTO_NAMES: { [key: string]: string } = {
+  'ETH': 'ETH',
+  'ETH_BASE': 'ETH (Base)',
+  'BTC': 'BTC',
+  'LTC': 'LTC',
+  'DASH': 'DASH',
+  'TZEC': 'ZEC',
+  'DOGE': 'DOGE',
+  'BCH': 'BCH',
+  'XMR': 'XMR',
+  'USDT': 'USDT (ERC-20)',
+  'USDC': 'USDC (ERC-20)',
+  'USDC_BASE': 'USDC (Base)',
+  'SHIB': 'SHIB',
+  'APE': 'APE',
+  'BTT_TRX': 'BTT (TRC-20)',
+  'USDT_TRX': 'USDT (TRC-20)',
+  'TRX': 'TRX',
+  'BNB': 'BNB',
+  'BUSD': 'BUSD (BEP-20)',
+  'USDT_BSC': 'USDT (BEP-20)',
+  'USDС_BSC': 'USDC (BEP-20)',
+  'LB': 'LB (BEP-20)',
+  'ETC': 'ETC',
+  'TON': 'TON',
+  'USDT_TON': 'USDT (TON)',
+  'SOL': 'SOL',
+  'USDT_SOL': 'USDT (SPL)',
+  'USDC_SOL': 'USDC (SPL)',
+};
+
+const NETWORK_NAMES: { [key: string]: string } = {
+  'ETH': 'Ethereum',
+  'ETH_BASE': 'Base Network',
+  'BTC': 'Bitcoin',
+  'LTC': 'Litecoin',
+  'DASH': 'Dash',
+  'TZEC': 'Zcash',
+  'DOGE': 'Dogecoin',
+  'BCH': 'Bitcoin Cash',
+  'XMR': 'Monero',
+  'USDT': 'Ethereum (ERC-20)',
+  'USDC': 'Ethereum (ERC-20)',
+  'USDC_BASE': 'Base Network',
+  'SHIB': 'Ethereum (ERC-20)',
+  'APE': 'Ethereum (ERC-20)',
+  'BTT_TRX': 'Tron (TRC-20)',
+  'USDT_TRX': 'Tron (TRC-20)',
+  'TRX': 'Tron',
+  'BNB': 'BSC',
+  'BUSD': 'BSC (BEP-20)',
+  'USDT_BSC': 'BSC (BEP-20)',
+  'USDС_BSC': 'BSC (BEP-20)',
+  'LB': 'BSC (BEP-20)',
+  'ETC': 'Ethereum Classic',
+  'TON': 'TON Network',
+  'USDT_TON': 'TON Network',
+  'SOL': 'Solana',
+  'USDT_SOL': 'Solana (SPL)',
+  'USDC_SOL': 'Solana (SPL)',
+};
+
 function CryptoPaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -13,6 +76,16 @@ function CryptoPaymentContent() {
   const [copied, setCopied] = useState<{ [key: string]: boolean }>({});
   const [timeLeft, setTimeLeft] = useState(0);
   const [status, setStatus] = useState<string>("pending");
+
+  // Функция для получения читаемого названия валюты
+  const getCryptoName = (code: string) => {
+    return CRYPTO_NAMES[code] || code;
+  };
+
+  // Функция для получения названия сети
+  const getNetworkName = (code: string) => {
+    return NETWORK_NAMES[code] || code;
+  };
 
   // Редирект на страницу заказа после подтверждения оплаты
   useEffect(() => {
@@ -139,7 +212,7 @@ function CryptoPaymentContent() {
             </div>
             <div>
               <p className="font-satoshi text-sm font-bold text-blue-900">
-                Network: {paymentData.currency?.toUpperCase()} Blockchain
+                Network: {getNetworkName(paymentData.currency)}
               </p>
               <p className="font-general-sans text-xs text-blue-700">
                 Make sure to send from the correct network
@@ -226,7 +299,7 @@ function CryptoPaymentContent() {
                 Amount to Send
               </p>
               <p className="mb-1 font-mono text-3xl font-bold text-black">
-                {paymentData.invoice_total_sum} {paymentData.currency}
+                {paymentData.invoice_total_sum} {getCryptoName(paymentData.currency)}
               </p>
               <Button
                 size="sm"
@@ -249,11 +322,11 @@ function CryptoPaymentContent() {
               <div className="mt-4 space-y-1 border-t border-black/10 pt-4 text-sm">
                 <div className="flex justify-between">
                   <span className="text-black/60">Invoice Amount:</span>
-                  <span className="font-semibold">{paymentData.invoice_sum} {paymentData.currency}</span>
+                  <span className="font-semibold">{paymentData.invoice_sum} {getCryptoName(paymentData.currency)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-black/60">Service Fee:</span>
-                  <span className="font-semibold">{paymentData.invoice_commission} {paymentData.currency}</span>
+                  <span className="font-semibold">{paymentData.invoice_commission} {getCryptoName(paymentData.currency)}</span>
                 </div>
               </div>
             </div>
@@ -320,7 +393,7 @@ function CryptoPaymentContent() {
           <div className="space-y-3 font-general-sans text-sm text-black/70">
             <div className="flex gap-3">
               <span className="font-bold text-black">1.</span>
-              <p>Send <strong>exactly {paymentData.invoice_total_sum} {paymentData.currency}</strong> to the address above</p>
+              <p>Send <strong>exactly {paymentData.invoice_total_sum} {getCryptoName(paymentData.currency)}</strong> to the address above</p>
             </div>
             <div className="flex gap-3">
               <span className="font-bold text-black">2.</span>

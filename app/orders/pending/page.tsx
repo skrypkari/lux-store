@@ -56,8 +56,20 @@ function PendingPaymentContent() {
         setOrderData(data);
 
         // Map payment_status OR order status to our status type
-        // For SEPA & Open Banking: when status becomes "Payment Confirmed", show as paid
-        if (data.payment_status === "paid" || data.status === "Payment Confirmed") {
+        // For SEPA & Open Banking: when status becomes "Payment Confirmed" or any status after it
+        if (
+          data.payment_status === "paid" || 
+          data.status === "Payment Confirmed" ||
+          data.status === "Under Review" ||
+          data.status === "Processing" ||
+          data.status === "Quality Check" ||
+          data.status === "Packaging" ||
+          data.status === "Ready to Ship" ||
+          data.status === "Shipped" ||
+          data.status === "In Transit" ||
+          data.status === "Out for Delivery" ||
+          data.status === "Delivered"
+        ) {
           setStatus("paid");
           // Redirect to order details page with token after 2 seconds
           setTimeout(() => {
@@ -503,11 +515,11 @@ function PendingPaymentContent() {
               
               <div className="group rounded-xl border border-black/10 bg-white/50 p-6 backdrop-blur-sm transition-all hover:border-black/20 hover:shadow-lg">
                 <div className="mb-3 inline-flex rounded-full bg-black/5 p-3 transition-colors group-hover:bg-black/10">
-                  <AlertCircle className="h-5 w-5 text-black/70" />
+                  <CheckCircle2 className="h-5 w-5 text-black/70" />
                 </div>
-                <p className="mb-1 font-satoshi text-sm font-bold">Keep This Open</p>
+                <p className="mb-1 font-satoshi text-sm font-bold">Safe to Close</p>
                 <p className="font-general-sans text-xs text-black/60">
-                  Don't close the window
+                  You can close this window
                 </p>
               </div>
             </div>

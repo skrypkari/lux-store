@@ -1,12 +1,55 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 export default function ChatButton() {
+  const [isJivoReady, setIsJivoReady] = useState(false);
+
+  useEffect(() => {
+    // Проверяем загрузку Jivo API
+    const checkJivo = () => {
+      if (typeof window !== 'undefined' && (window as any).jivo_api) {
+        setIsJivoReady(true);
+        console.log('✅ Jivo API loaded');
+      }
+    };
+
+    // Проверяем сразу
+    checkJivo();
+
+    // Проверяем периодически в течение 5 секунд
+    const interval = setInterval(checkJivo, 500);
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      if (!isJivoReady) {
+        console.log('⚠️ Jivo API not loaded after 5 seconds');
+      }
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [isJivoReady]);
+
   const handleClick = () => {
-    console.log('Opening chat...');
-    // Здесь можно добавить логику открытия чата
-    // Например, открыть виджет чата или перенаправить на страницу чата
+    console.log('🖱️ Opening Jivo chat...');
+    
+    if (typeof window !== 'undefined') {
+      const jivo = (window as any).jivo_api;
+      
+      if (jivo) {
+        try {
+          jivo.open();
+          console.log('✅ Jivo chat opened');
+        } catch (error) {
+          console.error('❌ Error opening Jivo:', error);
+        }
+      } else {
+        console.log('⚠️ Jivo API not available yet');
+      }
+    }
   };
 
   return (

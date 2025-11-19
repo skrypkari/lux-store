@@ -64,6 +64,7 @@ export default function PaymentMethodPage() {
           productSlug: item.slug,
           productImage: item.image,
           brand: item.brand,
+          sku: item.sku,
           price: item.price,
           quantity: item.quantity,
           options: item.options,

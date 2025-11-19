@@ -13,8 +13,19 @@ import { ArrowLeft, ArrowRight, CreditCard, Lock, ShoppingBag, Truck, Check, Rot
 import Image from "next/image";
 import Link from "next/link";
 
+// SEPA Countries - for Open Banking and SEPA payment methods
+const SEPA_COUNTRIES = [
+  "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic",
+  "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary",
+  "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands",
+  "Poland", "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden",
+  "Iceland", "Liechtenstein", "Norway", "Switzerland", "Monaco", "San Marino",
+  "Andorra", "Vatican City", "Holy See"
+];
+
 // Countries list with phone codes, excluding OFAC sanctioned countries (sorted alphabetically)
 const ALLOWED_COUNTRIES = [
+  { code: "AD", name: "Andorra", phoneCode: "+376" },
   { code: "AR", name: "Argentina", phoneCode: "+54" },
   { code: "AU", name: "Australia", phoneCode: "+61" },
   { code: "AT", name: "Austria", phoneCode: "+43" },
@@ -47,10 +58,12 @@ const ALLOWED_COUNTRIES = [
   { code: "KR", name: "South Korea", phoneCode: "+82" },
   { code: "KW", name: "Kuwait", phoneCode: "+965" },
   { code: "LV", name: "Latvia", phoneCode: "+371" },
+  { code: "LI", name: "Liechtenstein", phoneCode: "+423" },
   { code: "LT", name: "Lithuania", phoneCode: "+370" },
   { code: "LU", name: "Luxembourg", phoneCode: "+352" },
   { code: "MY", name: "Malaysia", phoneCode: "+60" },
   { code: "MT", name: "Malta", phoneCode: "+356" },
+  { code: "MC", name: "Monaco", phoneCode: "+377" },
   { code: "MX", name: "Mexico", phoneCode: "+52" },
   { code: "MA", name: "Morocco", phoneCode: "+212" },
   { code: "NL", name: "Netherlands", phoneCode: "+31" },
@@ -63,6 +76,7 @@ const ALLOWED_COUNTRIES = [
   { code: "PT", name: "Portugal", phoneCode: "+351" },
   { code: "QA", name: "Qatar", phoneCode: "+974" },
   { code: "RO", name: "Romania", phoneCode: "+40" },
+  { code: "SM", name: "San Marino", phoneCode: "+378" },
   { code: "SA", name: "Saudi Arabia", phoneCode: "+966" },
   { code: "SG", name: "Singapore", phoneCode: "+65" },
   { code: "SK", name: "Slovakia", phoneCode: "+421" },
@@ -78,6 +92,7 @@ const ALLOWED_COUNTRIES = [
   { code: "GB", name: "United Kingdom", phoneCode: "+44" },
   { code: "US", name: "United States", phoneCode: "+1" },
   { code: "UY", name: "Uruguay", phoneCode: "+598" },
+  { code: "VA", name: "Vatican City", phoneCode: "+379" },
   { code: "VN", name: "Vietnam", phoneCode: "+84" },
 ];
 
@@ -124,6 +139,11 @@ export default function CheckoutPage() {
       })
       .catch((err) => console.error("Failed to fetch geo data:", err));
   }, []);
+
+  // Helper functions to check payment method availability based on country
+  const isSepaCountry = () => SEPA_COUNTRIES.includes(shippingData.country);
+  const isUSA = () => shippingData.country === "United States";
+  const isUK = () => shippingData.country === "United Kingdom";
 
   const subtotal = cartTotal;
   const shipping = 0; // Free shipping
@@ -227,6 +247,7 @@ export default function CheckoutPage() {
           productSlug: item.slug,
           productImage: item.image,
           brand: item.brand,
+          sku: item.sku,
           price: item.price,
           quantity: item.quantity,
           options: item.options,
@@ -271,8 +292,9 @@ export default function CheckoutPage() {
 
         const paymentData = await paymentResponse.json();
         
-        // Redirect to CoinToPay payment page
-        window.location.href = paymentData.paymentUrl;
+        // Redirect to CoinToPay payment page with alternative=false parameter
+        const paymentUrl = paymentData.paymentUrl + '&alternative=false';
+        window.location.href = paymentUrl;
       } else if (paymentMethod === "sepa") {
         // Redirect to SEPA payment page
         router.push(`/checkout/sepa?order_id=${orderId}`);
@@ -648,81 +670,86 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Open Banking Option */}
-                  <div
-                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                      paymentMethod === "open_banking"
-                        ? "border-black bg-black/5"
-                        : "border-black/20 hover:border-black/40"
-                    }`}
-                    onClick={() => setPaymentMethod("open_banking")}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                          paymentMethod === "open_banking"
-                            ? "border-black bg-black"
-                            : "border-black/40"
-                        }`}
-                      >
-                        {paymentMethod === "open_banking" && (
-                          <div className="h-3 w-3 rounded-full bg-white" />
-                        )}
+                  {/* Open Banking Option - Only for SEPA countries */}
+                  {isSepaCountry() && (
+                    <div
+                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                        paymentMethod === "open_banking"
+                          ? "border-black bg-black/5"
+                          : "border-black/20 hover:border-black/40"
+                      }`}
+                      onClick={() => setPaymentMethod("open_banking")}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                            paymentMethod === "open_banking"
+                              ? "border-black bg-black"
+                              : "border-black/40"
+                          }`}
+                        >
+                          {paymentMethod === "open_banking" && (
+                            <div className="h-3 w-3 rounded-full bg-white" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-satoshi font-bold">Open Banking or SEPA</p>
+                          <p className="font-general-sans text-sm text-black/60">
+                            Pay directly from your bank account
+                          </p>
+                        </div>
+                        <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                        </svg>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-satoshi font-bold">Open Banking</p>
-                        <p className="font-general-sans text-sm text-black/60">
-                          Pay directly from your bank account
-                        </p>
-                      </div>
-                      <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-                      </svg>
                     </div>
-                  </div>
+                  )}
 
-                  {/* SEPA Instant Transfer Option */}
-                  <div
-                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                      paymentMethod === "sepa"
-                        ? "border-black bg-black/5"
-                        : "border-black/20 hover:border-black/40"
-                    }`}
-                    onClick={() => setPaymentMethod("sepa")}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                          paymentMethod === "sepa"
-                            ? "border-black bg-black"
-                            : "border-black/40"
-                        }`}
-                      >
-                        {paymentMethod === "sepa" && (
-                          <div className="h-3 w-3 rounded-full bg-white" />
-                        )}
+                  {/* SEPA Instant Transfer Option - Only for SEPA countries */}
+                  {isSepaCountry() && (
+                    <div
+                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                        paymentMethod === "sepa"
+                          ? "border-black bg-black/5"
+                          : "border-black/20 hover:border-black/40"
+                      }`}
+                      onClick={() => setPaymentMethod("sepa")}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                            paymentMethod === "sepa"
+                              ? "border-black bg-black"
+                              : "border-black/40"
+                          }`}
+                        >
+                          {paymentMethod === "sepa" && (
+                            <div className="h-3 w-3 rounded-full bg-white" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-satoshi font-bold">SEPA Instant Transfer</p>
+                          <p className="font-general-sans text-sm text-black/60">
+                            Direct bank transfer - EU banks
+                          </p>
+                        </div>
+                        <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-satoshi font-bold">SEPA Instant Transfer</p>
-                        <p className="font-general-sans text-sm text-black/60">
-                          Direct bank transfer - EU banks
-                        </p>
-                      </div>
-                      <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
                     </div>
-                  </div>
+                  )}
 
-                  {/* ACH or Wire Transfer Option */}
-                  <div
-                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                      paymentMethod === "ach_wire"
-                        ? "border-black bg-black/5"
-                        : "border-black/20 hover:border-black/40"
-                    }`}
-                    onClick={() => setPaymentMethod("ach_wire")}
-                  >
+                  {/* ACH or Wire Transfer Option - Only for USA */}
+                  {isUSA() && (
+                    <div
+                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                        paymentMethod === "ach_wire"
+                          ? "border-black bg-black/5"
+                          : "border-black/20 hover:border-black/40"
+                      }`}
+                      onClick={() => setPaymentMethod("ach_wire")}
+                    >
                     <div className="flex items-center gap-4">
                       <div
                         className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
@@ -745,17 +772,19 @@ export default function CheckoutPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                     </div>
-                  </div>
+                    </div>
+                  )}
 
-                  {/* Faster Payments Option */}
-                  <div
-                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                      paymentMethod === "faster_payments"
-                        ? "border-black bg-black/5"
-                        : "border-black/20 hover:border-black/40"
-                    }`}
-                    onClick={() => setPaymentMethod("faster_payments")}
-                  >
+                  {/* Faster Payments Option - Only for UK */}
+                  {isUK() && (
+                    <div
+                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                        paymentMethod === "faster_payments"
+                          ? "border-black bg-black/5"
+                          : "border-black/20 hover:border-black/40"
+                      }`}
+                      onClick={() => setPaymentMethod("faster_payments")}
+                    >
                     <div className="flex items-center gap-4">
                       <div
                         className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
@@ -778,7 +807,8 @@ export default function CheckoutPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                     </div>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Security Notice */}

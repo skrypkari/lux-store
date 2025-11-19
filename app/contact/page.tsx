@@ -3,8 +3,9 @@ import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { MapPin, Clock, Phone, Mail, Send, MessageCircle } from "lucide-react";
+import { MapPin, Clock, Phone, Mail, Send } from "lucide-react";
 import ContactForm from "@/components/contact-form";
+import JivoChatButton from "@/components/jivo-chat-button";
 
 export default async function ContactPage() {
   return (
@@ -184,19 +185,7 @@ export default async function ContactPage() {
                   </a>
 
                   {/* Online Chat */}
-                  <button className="group cursor-pointer flex w-full items-center gap-4 rounded-xl border border-black/10 bg-black/5 p-4 transition-all duration-300 hover:scale-[1.02] hover:border-black hover:bg-black">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-black transition-colors group-hover:bg-white">
-                      <MessageCircle className="h-6 w-6 text-white transition-colors group-hover:text-black" />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-satoshi text-xs font-bold text-black/50 transition-colors group-hover:text-white/70">
-                        Live Chat
-                      </p>
-                      <p className="font-satoshi text-base font-bold transition-colors group-hover:text-white">
-                        Start Conversation
-                      </p>
-                    </div>
-                  </button>
+                  <JivoChatButton />
                 </div>
               </div>
             </div>

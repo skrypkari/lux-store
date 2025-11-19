@@ -30,6 +30,7 @@ interface OrderItem {
   product_slug?: string;
   product_image?: string;
   brand?: string;
+  sku?: string;
   price: number;
   quantity: number;
   options?: any;
@@ -399,6 +400,11 @@ export default function OrderDetailsPage() {
                             {item.brand}
                           </p>
                         )}
+                        {item.sku && (
+                          <p className="mb-2 font-mono text-xs text-black/50">
+                            SKU: {item.sku}
+                          </p>
+                        )}
                         <div className="flex items-center justify-between">
                           <p className="font-general-sans text-sm text-black/60">
                             Quantity: {item.quantity}
@@ -470,6 +476,45 @@ export default function OrderDetailsPage() {
                     <Calendar className="h-4 w-4" />
                     Ordered on {formatDate(order.created_at)}
                   </p>
+                </div>
+              </div>
+
+              {/* Estimated Delivery Time */}
+              <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
+                <h3 className="mb-4 font-satoshi text-lg font-bold">
+                  Estimated Delivery
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Clock className="mt-0.5 h-5 w-5 text-black/40" />
+                    <div className="flex-1">
+                      <p className="font-general-sans text-xs text-black/60">
+                        Expected arrival
+                      </p>
+                      <p className="font-general-sans text-sm font-semibold">
+                        {(() => {
+                          const orderDate = new Date(order.created_at);
+                          const minDate = new Date(orderDate);
+                          minDate.setDate(minDate.getDate() + 25);
+                          const maxDate = new Date(orderDate);
+                          maxDate.setDate(maxDate.getDate() + 35);
+                          
+                          const formatDateRange = (date: Date) => {
+                            return date.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric"
+                            });
+                          };
+                          
+                          return `${formatDateRange(minDate)} - ${formatDateRange(maxDate)}`;
+                        })()}
+                      </p>
+                      <p className="mt-1 font-general-sans text-xs text-black/50">
+                        Delivery time may vary depending on customs clearance and your location.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

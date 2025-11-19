@@ -831,8 +831,19 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                   </a>
                   <button
                     onClick={() => {
-                      // Здесь можно подключить чат виджет (Intercom, Tawk.to, etc.)
-                      console.log('Opening chat...');
+                      if (typeof window !== 'undefined') {
+                        const jivo = (window as any).jivo_api;
+                        if (jivo) {
+                          try {
+                            jivo.open();
+                            console.log('✅ Jivo chat opened');
+                          } catch (error) {
+                            console.error('❌ Error opening Jivo:', error);
+                          }
+                        } else {
+                          console.log('⚠️ Jivo API not available yet');
+                        }
+                      }
                     }}
                     className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-full text-left"
                   >
