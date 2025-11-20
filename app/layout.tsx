@@ -81,19 +81,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Analytics */}
-        <Script
+        <script
+          async
           src="https://www.googletagmanager.com/gtag/js?id=G-EFT733S3K6"
-          strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-EFT733S3K6');
-          `}
-        </Script>
+
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-EFT733S3K6');
+            `
+          }}
+        />
+
         <script src="//code.jivosite.com/widget/6iCt2ayMiM" async></script>
       </head>
       <body

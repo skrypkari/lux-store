@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ArrowLeft, ArrowRight, CreditCard, Lock, ShoppingBag, Truck, Check, RotateCcw, Shield } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getGAClientId } from "@/lib/ga-client-id";
 
 // SEPA Countries - for Open Banking and SEPA payment methods
 const SEPA_COUNTRIES = [
@@ -221,21 +222,6 @@ export default function CheckoutPage() {
       } else if (paymentMethod === "faster_payments") {
         gateway = "Faster Payments";
       }
-
-      // Get GA client_id from _ga cookie
-      const getGAClientId = () => {
-        const cookies = document.cookie.split(';');
-        for (const cookie of cookies) {
-          const [name, value] = cookie.trim().split('=');
-          if (name === '_ga') {
-            const parts = value.split('.');
-            if (parts.length >= 4) {
-              return `${parts[2]}.${parts[3]}`;
-            }
-          }
-        }
-        return null;
-      };
 
       const orderData = {
         customerEmail: shippingData.email,
