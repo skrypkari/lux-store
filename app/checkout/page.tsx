@@ -299,8 +299,12 @@ export default function CheckoutPage() {
         // Redirect to crypto selection to choose currency
         router.push(`/checkout/crypto-select?orderId=${orderId}`);
       } else if (paymentMethod === "ampay_open_banking") {
-        // Redirect to AmPay Open Banking page
-        router.push(`/checkout/open-banking?order=${orderId}`);
+        // Create AmPay payment and redirect
+        const paymentResponse = await fetch(`https://api.lux-store.eu/orders/${orderId}/ampay-payment`, {
+          method: "POST",
+        });
+        const paymentData = await paymentResponse.json();
+        window.location.href = paymentData.redirect_url;
       } else if (paymentMethod === "open_banking") {
         // Redirect to CoinToPay Open Banking page
         const paymentResponse = await fetch(`https://api.lux-store.eu/orders/${orderId}/cointopay-payment`, {
@@ -709,7 +713,7 @@ export default function CheckoutPage() {
                         <div className="flex-1">
                           <p className="font-satoshi font-bold">Open Banking</p>
                           <p className="font-general-sans text-sm text-black/60">
-                            Instant bank transfer via AmPay
+                            Instant bank transfer.
                           </p>
                         </div>
                         <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
