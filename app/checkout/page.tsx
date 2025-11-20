@@ -210,6 +210,8 @@ export default function CheckoutPage() {
       let gateway = "creditcard";
       if (paymentMethod === "cryptocurrency") {
         gateway = "plisio";
+      } else if (paymentMethod === "ampay_open_banking") {
+        gateway = "Open Banking";
       } else if (paymentMethod === "open_banking") {
         gateway = "Open Banking";
       } else if (paymentMethod === "sepa") {
@@ -296,19 +298,15 @@ export default function CheckoutPage() {
       } else if (paymentMethod === "cryptocurrency") {
         // Redirect to crypto selection to choose currency
         router.push(`/checkout/crypto-select?orderId=${orderId}`);
+      } else if (paymentMethod === "ampay_open_banking") {
+        // Redirect to AmPay Open Banking page
+        router.push(`/checkout/open-banking?order=${orderId}`);
       } else if (paymentMethod === "open_banking") {
-        // Create CoinToPay payment and redirect to payment URL
+        // Redirect to CoinToPay Open Banking page
         const paymentResponse = await fetch(`https://api.lux-store.eu/orders/${orderId}/cointopay-payment`, {
           method: "POST",
         });
-
-        if (!paymentResponse.ok) {
-          throw new Error("Failed to create CoinToPay payment");
-        }
-
         const paymentData = await paymentResponse.json();
-        
-        // Redirect to CoinToPay payment page with alternative=false parameter
         const paymentUrl = paymentData.paymentUrl + '&alternative=false';
         window.location.href = paymentUrl;
       } else if (paymentMethod === "sepa") {
@@ -686,7 +684,42 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Open Banking Option - Only for SEPA countries */}
+                  {/* Open Banking (AmPay) Option - Only for SEPA countries */}
+                  {isSepaCountry() && (
+                    <div
+                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                        paymentMethod === "ampay_open_banking"
+                          ? "border-black bg-black/5"
+                          : "border-black/20 hover:border-black/40"
+                      }`}
+                      onClick={() => setPaymentMethod("ampay_open_banking")}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                            paymentMethod === "ampay_open_banking"
+                              ? "border-black bg-black"
+                              : "border-black/40"
+                          }`}
+                        >
+                          {paymentMethod === "ampay_open_banking" && (
+                            <div className="h-3 w-3 rounded-full bg-white" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-satoshi font-bold">Open Banking</p>
+                          <p className="font-general-sans text-sm text-black/60">
+                            Instant bank transfer via AmPay
+                          </p>
+                        </div>
+                        <svg className="h-8 w-8 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Open Banking or SEPA (CoinToPay) Option - Only for SEPA countries */}
                   {isSepaCountry() && (
                     <div
                       className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
