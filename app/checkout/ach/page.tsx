@@ -179,30 +179,39 @@ function AchPaymentContent() {
     }
 
     setError("");
+    setUploading(true);
 
-    // Compress if it's an image
-    if (file.type.startsWith("image/")) {
-      try {
-        const compressed = await compressImage(file);
-        setSelectedFile(compressed);
-      } catch (err) {
-        console.error("Compression error:", err);
-        setSelectedFile(file);
+    try {
+      let fileToUpload = file;
+
+      // Compress if it's an image
+      if (file.type.startsWith("image/")) {
+        try {
+          fileToUpload = await compressImage(file);
+        } catch (err) {
+          console.error("Compression error:", err);
+          setError("Failed to compress image");
+          setUploading(false);
+          return;
+        }
       }
-    } else {
-      setSelectedFile(file);
+
+      setSelectedFile(fileToUpload);
+
+      // Automatically upload the file
+      await uploadFile(fileToUpload);
+    } catch (err) {
+      setError("Failed to process file");
+      setUploading(false);
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile || !orderId) return;
-
-    setUploading(true);
-    setError("");
+  const uploadFile = async (file: File) => {
+    if (!orderId) return;
 
     try {
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append("file", file);
 
       const response = await fetch(`https://api.lux-store.eu/ach/upload-proof/${orderId}`, {
         method: "POST",
@@ -219,6 +228,7 @@ function AchPaymentContent() {
       }, 1500);
     } catch (err) {
       setError("Failed to upload payment proof. Please try again.");
+      setSelectedFile(null);
     } finally {
       setUploading(false);
     }
@@ -377,37 +387,12 @@ function AchPaymentContent() {
               />
 
               {selectedFile ? (
-                <div className="space-y-4">
-                  <FileText className="h-12 w-12 text-green-500 mx-auto" />
-                  <p className="font-medium">{selectedFile.name}</p>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                  <p className="font-medium">Uploading {selectedFile.name}...</p>
                   <p className="text-sm text-gray-500">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                   </p>
-                  <div className="flex gap-4 justify-center">
-                    <Button
-                      onClick={() => fileInputRef.current?.click()}
-                      variant="outline"
-                    >
-                      Choose Different File
-                    </Button>
-                    <Button
-                      onClick={handleUpload}
-                      disabled={uploading}
-                      className="bg-black text-white hover:bg-gray-800"
-                    >
-                      {uploading ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Upload Proof
-                        </>
-                      )}
-                    </Button>
-                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">

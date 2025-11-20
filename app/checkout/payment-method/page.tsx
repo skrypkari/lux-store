@@ -38,6 +38,21 @@ export default function PaymentMethodPage() {
       const cartData = JSON.parse(localStorage.getItem("checkoutCart") || "{}");
       const geoData = JSON.parse(localStorage.getItem("geoData") || "{}");
 
+      // Get GA client_id from _ga cookie
+      const getGAClientId = () => {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+          const [name, value] = cookie.trim().split('=');
+          if (name === '_ga') {
+            const parts = value.split('.');
+            if (parts.length >= 4) {
+              return `${parts[2]}.${parts[3]}`;
+            }
+          }
+        }
+        return null;
+      };
+
       const orderData = {
         customerEmail: shippingData.email,
         customerFirstName: shippingData.firstName,
@@ -54,6 +69,7 @@ export default function PaymentMethodPage() {
         shipping: 0,
         total: cartData.total,
         paymentMethod: "Cryptocurrency",
+        gaClientId: getGAClientId(),
         ipAddress: geoData.ip,
         geoCountry: geoData.country,
         geoCity: geoData.city,

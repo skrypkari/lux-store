@@ -141,30 +141,39 @@ function SepaPaymentContent() {
       return;
     }
 
-    // Compress image files
-    if (file.type.startsWith("image/")) {
-      try {
-        const compressed = await compressImage(file);
-        setSelectedFile(compressed);
-        setError("");
-      } catch (err) {
-        setError("Failed to compress image");
+    setError("");
+    setUploading(true);
+
+    try {
+      let fileToUpload = file;
+
+      // Compress image files
+      if (file.type.startsWith("image/")) {
+        try {
+          fileToUpload = await compressImage(file);
+        } catch (err) {
+          setError("Failed to compress image");
+          setUploading(false);
+          return;
+        }
       }
-    } else {
-      setSelectedFile(file);
-      setError("");
+
+      setSelectedFile(fileToUpload);
+
+      // Automatically upload the file
+      await uploadFile(fileToUpload);
+    } catch (err) {
+      setError("Failed to process file");
+      setUploading(false);
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile || !orderId) return;
-
-    setUploading(true);
-    setError("");
+  const uploadFile = async (file: File) => {
+    if (!orderId) return;
 
     try {
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append("file", file);
 
       const response = await fetch(
         `https://api.lux-store.eu/sepa/upload-proof/${orderId}`,
@@ -184,10 +193,13 @@ function SepaPaymentContent() {
       }, 2000);
     } catch (err) {
       setError("Failed to upload payment proof. Please try again.");
+      setSelectedFile(null);
     } finally {
       setUploading(false);
     }
   };
+
+
 
   if (loading) {
     return (
@@ -331,21 +343,12 @@ function SepaPaymentContent() {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center justify-center gap-4">
-                  <FileText className="h-8 w-8 text-green-500" />
-                  <div className="text-left">
-                    <p className="font-medium">{selectedFile.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedFile(null)}
-                  >
-                    Remove
-                  </Button>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                  <p className="font-medium">Uploading {selectedFile.name}...</p>
+                  <p className="text-sm text-gray-500">
+                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
                 </div>
               )}
             </div>
@@ -363,15 +366,6 @@ function SepaPaymentContent() {
                 </p>
               </div>
             )}
-
-            <Button
-              className="w-full"
-              size="lg"
-              disabled={!selectedFile || uploading || uploadSuccess}
-              onClick={handleUpload}
-            >
-              {uploading ? "Uploading..." : uploadSuccess ? "Success!" : "Upload & Continue"}
-            </Button>
           </div>
         </CardContent>
       </Card>
