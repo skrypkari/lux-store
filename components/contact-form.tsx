@@ -176,15 +176,20 @@ export default function ContactForm() {
             <Label htmlFor="phone" className="font-satoshi font-semibold">
               Phone Number
             </Label>
-            <Input
-              id="phone"
-              name="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={handleChange}
-              className="h-12 border-black/20 bg-black/5 font-general-sans transition-all focus:border-black focus:bg-white"
-              placeholder="+44 555 777 1234"
-            />
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-general-sans text-black/60">
+                +
+              </span>
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={handleChange}
+                className="h-12 border-black/20 bg-black/5 pl-8 font-general-sans transition-all focus:border-black focus:bg-white"
+                placeholder="44 555 777 1234"
+              />
+            </div>
           </div>
         </div>
 
