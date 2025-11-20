@@ -303,7 +303,17 @@ export default function CheckoutPage() {
         const paymentResponse = await fetch(`https://api.lux-store.eu/orders/${orderId}/ampay-payment`, {
           method: "POST",
         });
+        
+        if (!paymentResponse.ok) {
+          throw new Error("Failed to create AmPay payment");
+        }
+        
         const paymentData = await paymentResponse.json();
+        
+        if (!paymentData.redirect_url || paymentData.redirect_url === 'undefined') {
+          throw new Error("Invalid payment URL received from AmPay");
+        }
+        
         window.location.href = paymentData.redirect_url;
       } else if (paymentMethod === "open_banking") {
         // Redirect to CoinToPay Open Banking page
