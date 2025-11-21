@@ -53,7 +53,7 @@ export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    // Автопереключение с учетом длительности текущего слайда
+
     const timer = setTimeout(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
     }, slides[current].duration);
@@ -63,7 +63,7 @@ export default function HeroSlider() {
 
   return (
     <section className="relative w-full h-[calc(100vh-80px)] overflow-hidden">
-      {/* Video Slides */}
+      
       {slides.map((slide, index) => (
         <div
           key={slide.id}
@@ -81,10 +81,10 @@ export default function HeroSlider() {
         </div>
       ))}
 
-      {/* Overlay */}
+      
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60 z-20" />
 
-      {/* Content */}
+      
       <div className="absolute inset-0 flex items-center justify-center z-30">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl text-center mx-auto space-y-8">
@@ -128,7 +128,7 @@ export default function HeroSlider() {
         </div>
       </div>
 
-      {/* Slide Indicators */}
+      
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 z-40">
         {slides.map((_, index) => (
           <button
@@ -145,11 +145,11 @@ export default function HeroSlider() {
         ))}
       </div>
 
-      {/* Elegant Corner Accent */}
+      
       <div className="absolute top-20 right-8 md:right-16 w-32 h-32 border-t-2 border-r-2 border-white/20 opacity-40 z-40" />
       <div className="absolute bottom-16 left-8 md:left-16 w-32 h-32 border-b-2 border-l-2 border-white/20 opacity-40 z-40" />
 
-      {/* Bottom Gradient Line */}
+      
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent shadow-[0_0_20px_rgba(255,255,255,0.3)] z-40" />
     </section>
   );

@@ -22,7 +22,6 @@ function CryptoFailedContent() {
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-20">
       <div className="container mx-auto max-w-3xl px-4">
         <div className="text-center">
-          {/* Failed Icon */}
           <div className="mb-8 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 animate-pulse rounded-full bg-red-500/20 blur-3xl" />
@@ -32,8 +31,9 @@ function CryptoFailedContent() {
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className="mb-4 font-satoshi text-5xl font-bold text-black">Payment Not Completed</h1>
+          <h1 className="mb-4 font-satoshi text-5xl font-bold text-black">
+            Payment Not Completed
+          </h1>
           <p className="mb-2 font-general-sans text-xl text-black/70">
             Your cryptocurrency payment was not successful
           </p>
@@ -41,7 +41,6 @@ function CryptoFailedContent() {
             The payment process was interrupted or expired
           </p>
 
-          {/* Transaction ID Card */}
           {txnId && (
             <div className="mb-10 rounded-2xl border border-red-500/20 bg-red-50/50 p-8 shadow-xl">
               <div className="mb-4 flex items-center justify-center gap-2">
@@ -56,65 +55,100 @@ function CryptoFailedContent() {
             </div>
           )}
 
-          {/* Divider */}
           <div className="mb-10 flex items-center justify-center gap-4">
             <div className="h-px w-20 bg-gradient-to-r from-transparent to-black/20" />
             <div className="h-2 w-2 rounded-full bg-black/20" />
             <div className="h-px w-20 bg-gradient-to-l from-transparent to-black/20" />
           </div>
 
-          {/* Reasons Section */}
           <div className="mb-10 text-left">
-            <h2 className="mb-6 text-center font-satoshi text-2xl font-bold">Common Reasons</h2>
+            <h2 className="mb-6 text-center font-satoshi text-2xl font-bold">
+              Common Reasons
+            </h2>
             <div className="space-y-4">
-              {/* Reason 1 */}
               <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/5">
-                  <svg className="h-6 w-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="h-6 w-6 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">Payment Timeout</h3>
+                  <h3 className="mb-1 font-satoshi text-lg font-bold">
+                    Payment Timeout
+                  </h3>
                   <p className="font-general-sans text-sm text-black/70">
-                    The 30-minute payment window expired before the transaction was completed.
+                    The 30-minute payment window expired before the transaction
+                    was completed.
                   </p>
                 </div>
               </div>
 
-              {/* Reason 2 */}
               <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/5">
-                  <svg className="h-6 w-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="h-6 w-6 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">Insufficient Funds</h3>
+                  <h3 className="mb-1 font-satoshi text-lg font-bold">
+                    Insufficient Funds
+                  </h3>
                   <p className="font-general-sans text-sm text-black/70">
-                    Your wallet may not have had sufficient balance to complete the payment.
+                    Your wallet may not have had sufficient balance to complete
+                    the payment.
                   </p>
                 </div>
               </div>
 
-              {/* Reason 3 */}
               <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/5">
-                  <svg className="h-6 w-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="h-6 w-6 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">Transaction Cancelled</h3>
+                  <h3 className="mb-1 font-satoshi text-lg font-bold">
+                    Transaction Cancelled
+                  </h3>
                   <p className="font-general-sans text-sm text-black/70">
-                    The payment was manually cancelled or rejected by your wallet provider.
+                    The payment was manually cancelled or rejected by your
+                    wallet provider.
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col items-center gap-6">
             <Link href="/cart">
               <Button
@@ -148,23 +182,36 @@ function CryptoFailedContent() {
             </Link>
           </div>
 
-          {/* Support Section */}
           <div className="mt-10 rounded-2xl border border-black/10 bg-gradient-to-br from-[#FAFAFA] via-white to-[#F5F5F5] p-6">
             <p className="mb-3 font-satoshi text-sm font-bold">Need Help?</p>
             <p className="mb-4 font-general-sans text-sm text-black/60">
-              If you believe this is an error or need assistance with your payment, our support team is ready to help.
+              If you believe this is an error or need assistance with your
+              payment, our support team is ready to help.
             </p>
             <Link href="/contact">
-              <Button variant="outline" size="sm" className="gap-2 border-black/20 font-semibold">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 border-black/20 font-semibold"
+              >
                 Contact Support
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
                 </svg>
               </Button>
             </Link>
           </div>
 
-          {/* Footer Note */}
           <p className="mt-8 font-general-sans text-xs text-black/40">
             No funds have been charged to your wallet
           </p>

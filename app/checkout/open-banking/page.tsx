@@ -3,13 +3,20 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Loader2, Building2, Shield, Lock, CheckCircle2, Sparkles } from "lucide-react";
+import {
+  Loader2,
+  Building2,
+  Shield,
+  Lock,
+  CheckCircle2,
+  Sparkles,
+} from "lucide-react";
 
 function OpenBankingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get("order");
-  
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,7 +26,6 @@ function OpenBankingContent() {
       return;
     }
 
-    // Automatically initiate payment when page loads
     handlePayment();
   }, [orderId]);
 
@@ -33,30 +39,31 @@ function OpenBankingContent() {
     setError(null);
 
     try {
-      // Create AmPay payment
-      const response = await fetch(`https://api.lux-store.eu/orders/${orderId}/ampay-payment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `http://localhost:5000/orders/${orderId}/ampay-payment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create payment');
+        throw new Error(errorData.message || "Failed to create payment");
       }
 
       const data = await response.json();
 
       if (data.redirect_url) {
-        // Redirect to AmPay payment page
         window.location.href = data.redirect_url;
       } else {
-        throw new Error('No redirect URL received');
+        throw new Error("No redirect URL received");
       }
     } catch (err: any) {
-      console.error('Payment error:', err);
-      setError(err.message || 'Failed to process payment');
+      console.error("Payment error:", err);
+      setError(err.message || "Failed to process payment");
       setIsProcessing(false);
     }
   };
@@ -65,25 +72,24 @@ function OpenBankingContent() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black px-4 py-16">
         <div className="container mx-auto max-w-2xl">
-          {/* Elegant Error Card */}
           <div className="overflow-hidden rounded-3xl border border-red-900/20 bg-gradient-to-br from-red-950/40 via-zinc-900/90 to-black shadow-2xl backdrop-blur-sm">
             <div className="p-12 text-center">
-              {/* Error Icon */}
               <div className="mb-8 flex justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 animate-pulse rounded-full bg-red-500/20 blur-xl"></div>
                   <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-red-500/30 bg-gradient-to-br from-red-950/80 to-red-900/60 shadow-lg">
-                    <Shield className="h-10 w-10 text-red-400" strokeWidth={1.5} />
+                    <Shield
+                      className="h-10 w-10 text-red-400"
+                      strokeWidth={1.5}
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Title */}
               <h2 className="mb-4 font-editorial text-4xl font-light tracking-tight text-white">
                 Payment Processing Error
               </h2>
 
-              {/* Error Message */}
               <div className="mb-8 space-y-3">
                 <div className="mx-auto h-px w-16 bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
                 <p className="font-satoshi text-lg font-light text-red-200/90">
@@ -91,7 +97,6 @@ function OpenBankingContent() {
                 </p>
               </div>
 
-              {/* Action Button */}
               <Button
                 onClick={() => router.push(`/orders/pending?order=${orderId}`)}
                 className="group relative overflow-hidden border border-white/10 bg-white/5 px-8 py-6 font-satoshi text-base font-medium text-white shadow-xl transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:shadow-2xl"
@@ -109,45 +114,44 @@ function OpenBankingContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black px-4 py-16">
       <div className="container mx-auto max-w-3xl">
-        {/* Premium Payment Card */}
         <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900/90 via-black/95 to-zinc-900/90 shadow-2xl backdrop-blur-sm">
           <div className="relative p-12">
-            {/* Subtle Background Effect */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent_50%)]"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.02),transparent_50%)]"></div>
 
             <div className="relative text-center">
-              {/* Premium Loading Icon */}
               <div className="mb-8 flex justify-center">
                 <div className="relative">
-                  {/* Outer glow */}
                   <div className="absolute inset-0 animate-ping rounded-full bg-white/10 blur-xl"></div>
-                  {/* Middle ring */}
+
                   <div className="absolute inset-0 animate-pulse rounded-full bg-gradient-to-br from-white/20 to-transparent blur-md"></div>
-                  {/* Icon container */}
+
                   <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-white/20 bg-gradient-to-br from-zinc-800/80 to-zinc-900/90 shadow-2xl backdrop-blur-sm">
-                    <Building2 className="h-12 w-12 text-white" strokeWidth={1.5} />
+                    <Building2
+                      className="h-12 w-12 text-white"
+                      strokeWidth={1.5}
+                    />
                     <Sparkles className="absolute -right-1 -top-1 h-5 w-5 animate-pulse text-white/80" />
                   </div>
                 </div>
               </div>
 
-              {/* Title */}
               <h2 className="mb-3 font-editorial text-5xl font-light tracking-tight text-white">
                 Open Banking Payment
               </h2>
 
-              {/* Subtitle */}
               <p className="mb-8 font-satoshi text-sm font-light uppercase tracking-[0.2em] text-white/50">
                 Secure Bank Transfer
               </p>
 
-              {/* Status Message */}
               <div className="mb-10 space-y-4">
                 <div className="mx-auto h-px w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                
+
                 <div className="flex items-center justify-center gap-3">
-                  <Loader2 className="h-5 w-5 animate-spin text-white/70" strokeWidth={2} />
+                  <Loader2
+                    className="h-5 w-5 animate-spin text-white/70"
+                    strokeWidth={2}
+                  />
                   <p className="font-satoshi text-lg font-light text-white/90">
                     Redirecting to secure payment gateway
                   </p>
@@ -158,7 +162,6 @@ function OpenBankingContent() {
                 </p>
               </div>
 
-              {/* Security Features - Premium Style */}
               <div className="mb-10 rounded-2xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-sm">
                 <div className="mb-6 flex items-center justify-center gap-2 text-white/90">
                   <Lock className="h-5 w-5" strokeWidth={1.5} />
@@ -166,11 +169,14 @@ function OpenBankingContent() {
                     Protected Transaction
                   </span>
                 </div>
-                
+
                 <div className="grid gap-5 text-left md:grid-cols-3">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-400" strokeWidth={2} />
+                      <CheckCircle2
+                        className="h-4 w-4 flex-shrink-0 text-emerald-400"
+                        strokeWidth={2}
+                      />
                       <p className="font-satoshi text-sm font-medium text-white/90">
                         Bank Security
                       </p>
@@ -182,7 +188,10 @@ function OpenBankingContent() {
 
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-400" strokeWidth={2} />
+                      <CheckCircle2
+                        className="h-4 w-4 flex-shrink-0 text-emerald-400"
+                        strokeWidth={2}
+                      />
                       <p className="font-satoshi text-sm font-medium text-white/90">
                         Direct Transfer
                       </p>
@@ -194,7 +203,10 @@ function OpenBankingContent() {
 
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-400" strokeWidth={2} />
+                      <CheckCircle2
+                        className="h-4 w-4 flex-shrink-0 text-emerald-400"
+                        strokeWidth={2}
+                      />
                       <p className="font-satoshi text-sm font-medium text-white/90">
                         Instant Status
                       </p>
@@ -206,7 +218,6 @@ function OpenBankingContent() {
                 </div>
               </div>
 
-              {/* Order Info */}
               {orderId && (
                 <div className="space-y-2">
                   <div className="mx-auto h-px w-16 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
@@ -222,7 +233,6 @@ function OpenBankingContent() {
           </div>
         </div>
 
-        {/* Subtle footer text */}
         <p className="mt-8 text-center font-general-sans text-xs text-white/20">
           You will be securely redirected to complete your payment
         </p>
@@ -233,11 +243,13 @@ function OpenBankingContent() {
 
 export default function OpenBankingPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black via-zinc-900 to-black">
-        <Loader2 className="h-8 w-8 animate-spin text-white/50" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black via-zinc-900 to-black">
+          <Loader2 className="h-8 w-8 animate-spin text-white/50" />
+        </div>
+      }
+    >
       <OpenBankingContent />
     </Suspense>
   );

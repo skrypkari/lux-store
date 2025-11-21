@@ -44,7 +44,7 @@ function CryptoSelectionContent() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://api.lux-store.eu/plisio/create-invoice", {
+      const response = await fetch("http://localhost:5000/plisio/create-invoice", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +58,7 @@ function CryptoSelectionContent() {
       const data = await response.json();
 
       if (data.success) {
-        // Redirect to payment page with txn_id
+
         router.push(`/checkout/crypto-payment?txn_id=${data.data.txn_id}`);
       } else {
         toast({
@@ -84,7 +84,7 @@ function CryptoSelectionContent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
       <div className="container mx-auto max-w-5xl px-4">
-        {/* Back Button */}
+        
         <Button
           variant="ghost"
           onClick={() => router.back()}
@@ -94,7 +94,7 @@ function CryptoSelectionContent() {
           Back
         </Button>
 
-        {/* Header */}
+        
         <div className="mb-10 text-center">
           <div className="mb-4 flex justify-center">
             <div className="rounded-full bg-gradient-to-br from-orange-500 to-yellow-500 p-4 shadow-2xl">
@@ -110,7 +110,7 @@ function CryptoSelectionContent() {
           </p>
         </div>
 
-        {/* Crypto Grid */}
+        
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CRYPTOCURRENCIES.map((crypto) => (
             <button
@@ -123,7 +123,7 @@ function CryptoSelectionContent() {
                   : "border-black/10 bg-white hover:border-black/30 hover:shadow-lg"
               } ${loading && selectedCrypto !== crypto.id ? "opacity-50" : ""}`}
             >
-              {/* Stablecoin Badge */}
+              
               {crypto.stablecoin && (
                 <div className="absolute right-3 top-3 rounded-full bg-green-100 px-2 py-1">
                   <span className="text-[10px] font-bold uppercase tracking-wide text-green-700">
@@ -132,7 +132,7 @@ function CryptoSelectionContent() {
                 </div>
               )}
 
-              {/* Icon */}
+              
               <div
                 className={`mb-4 inline-flex h-16 w-16 items-center justify-center rounded-xl text-3xl font-bold transition-all ${
                   selectedCrypto === crypto.id
@@ -143,7 +143,7 @@ function CryptoSelectionContent() {
                 {crypto.icon}
               </div>
 
-              {/* Name */}
+              
               <h3
                 className={`mb-1 font-satoshi text-xl font-bold ${
                   selectedCrypto === crypto.id ? "text-white" : "text-black"
@@ -152,7 +152,7 @@ function CryptoSelectionContent() {
                 {crypto.name}
               </h3>
 
-              {/* Code */}
+              
               <p
                 className={`font-mono text-sm font-semibold ${
                   selectedCrypto === crypto.id ? "text-white/70" : "text-black/60"
@@ -161,7 +161,7 @@ function CryptoSelectionContent() {
                 {crypto.id}
               </p>
 
-              {/* Loading Spinner */}
+              
               {loading && selectedCrypto === crypto.id && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                   <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -171,7 +171,7 @@ function CryptoSelectionContent() {
           ))}
         </div>
 
-        {/* Info Card */}
+        
         <div className="mt-10 rounded-2xl border border-black/10 bg-gradient-to-br from-[#FAFAFA] via-white to-[#F5F5F5] p-6">
           <h3 className="mb-3 font-satoshi text-lg font-bold">Payment Information</h3>
           <div className="space-y-2 font-general-sans text-sm text-black/70">

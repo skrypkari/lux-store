@@ -28,7 +28,7 @@ export default function ProductInteractive({
 }: ProductInteractiveProps) {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
 
-  // Check if all required options are selected
+
   const hasRequiredOptions = options && options.length > 0;
   const allRequiredSelected = !hasRequiredOptions || options.every(
     opt => !opt.required || selectedOptions[opt.optionId]
@@ -36,7 +36,7 @@ export default function ProductInteractive({
 
   return (
     <>
-      {/* Product Options */}
+      
       {hasRequiredOptions && (
         <>
           <ProductOptions
@@ -48,7 +48,7 @@ export default function ProductInteractive({
         </>
       )}
 
-      {/* Quantity & Actions */}
+      
       <ProductActions
         inStock={inStock}
         product={{

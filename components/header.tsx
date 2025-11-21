@@ -11,9 +11,9 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
-        {/* Top bar */}
+        
         <div className="flex h-20 items-center justify-between">
-          {/* Logo */}
+          
           <Link href="/" className="flex items-center">
             <Image
               src="/logo.png"
@@ -38,7 +38,7 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            {/* Track Button */}
+            
             <Link href="/track">
               <button className="hidden md:flex items-center gap-1.5 px-3 py-1.5  border border-black rounded-full hover:bg-white/40 cursor-pointer transition-colors text-sm">
                 <Truck className="h-4 w-4" />
@@ -46,10 +46,10 @@ export default function Header() {
               </button>
             </Link>
 
-            {/* Search Button */}
+            
             <SearchBar />
 
-            {/* Cart Button */}
+            
             <CartButton />
 
             <MobileMenu />

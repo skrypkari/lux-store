@@ -24,7 +24,7 @@ export default function ContactForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('https://api.lux-store.eu/contact', {
+      const response = await fetch('http://localhost:5000/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export default function ContactForm() {
 
       setIsSubmitted(true);
 
-      // Reset form after showing success message
+
       setTimeout(() => {
         setIsSubmitted(false);
         setFormData({
@@ -71,7 +71,7 @@ export default function ContactForm() {
     return (
       <div className="flex min-h-[700px] items-center justify-center rounded-3xl border border-black/5 bg-gradient-to-br from-white via-gray-50/30 to-white p-12 shadow-2xl">
         <div className="max-w-2xl text-center">
-          {/* Animated Check Icon */}
+          
           <div className="mb-8 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 animate-ping rounded-full bg-black/20"></div>
@@ -81,12 +81,12 @@ export default function ContactForm() {
             </div>
           </div>
 
-          {/* Main Heading */}
+          
           <h3 className="mb-6 font-editorial text-5xl font-light tracking-tight text-black">
             Thank you for your message.
           </h3>
 
-          {/* Confirmation Text */}
+          
           <div className="space-y-4">
             <p className="font-satoshi text-xl font-medium text-black/90">
               Your request has been successfully received.
@@ -100,7 +100,7 @@ export default function ContactForm() {
             </p>
           </div>
 
-          {/* Footer Note */}
+          
           <div className="mt-10">
             <p className="font-general-sans text-base italic text-black/60">
               We appreciate your trust in <span className="font-semibold not-italic tracking-wide">LUX STORE</span>.
@@ -123,7 +123,7 @@ export default function ContactForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="p-8 space-y-6">
-        {/* Name Fields */}
+        
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="firstName" className="font-satoshi font-semibold">
@@ -155,7 +155,7 @@ export default function ContactForm() {
           </div>
         </div>
 
-        {/* Contact Fields */}
+        
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="email" className="font-satoshi font-semibold">
@@ -195,7 +195,7 @@ export default function ContactForm() {
 
         <Separator />
 
-        {/* Subject */}
+        
         <div className="space-y-2">
           <Label htmlFor="subject" className="font-satoshi font-semibold">
             Subject
@@ -211,7 +211,7 @@ export default function ContactForm() {
           />
         </div>
 
-        {/* Message */}
+        
         <div className="space-y-2">
           <Label htmlFor="message" className="font-satoshi font-semibold">
             Message
@@ -228,7 +228,7 @@ export default function ContactForm() {
           />
         </div>
 
-        {/* Privacy Notice */}
+        
         <div className="rounded-xl border border-black/10 bg-black/5 p-4">
           <p className="font-general-sans text-xs text-black/60">
             By submitting this form, you agree to our privacy policy. We respect your 
@@ -236,7 +236,7 @@ export default function ContactForm() {
           </p>
         </div>
 
-        {/* Submit Button */}
+        
         <Button
           type="submit"
           size="lg"

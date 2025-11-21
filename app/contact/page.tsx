@@ -12,7 +12,6 @@ export default async function ContactPage() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section */}
       <section className="relative overflow-hidden bg-black py-32">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:4rem_4rem]" />
         <div className="container relative mx-auto max-w-7xl px-6">
@@ -34,12 +33,9 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      {/* Main Content */}
       <section className="py-24">
         <div className="container mx-auto max-w-7xl px-6">
-          {/* Contact Info Cards - Top Row */}
           <div className="mb-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {/* Address Card */}
             <div className="group overflow-hidden rounded-2xl border border-black/10 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-2xl">
               <div className="mb-4 inline-flex rounded-xl bg-black p-3">
                 <MapPin className="h-6 w-6 text-white" />
@@ -64,7 +60,6 @@ export default async function ContactPage() {
               </Button>
             </div>
 
-            {/* Hours Card */}
             <div className="group overflow-hidden rounded-2xl border border-black/10 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-2xl">
               <div className="mb-4 inline-flex rounded-xl bg-black p-3">
                 <Clock className="h-6 w-6 text-white" />
@@ -80,7 +75,6 @@ export default async function ContactPage() {
               </p>
             </div>
 
-            {/* Phone Card */}
             <div className="group overflow-hidden rounded-2xl border border-black/10 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-2xl">
               <div className="mb-4 inline-flex rounded-xl bg-black p-3">
                 <Phone className="h-6 w-6 text-white" />
@@ -97,7 +91,6 @@ export default async function ContactPage() {
               </p>
             </div>
 
-            {/* Email Card */}
             <div className="group overflow-hidden rounded-2xl border border-black/10 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-2xl">
               <div className="mb-4 inline-flex rounded-xl bg-black p-3">
                 <Mail className="h-6 w-6 text-white" />
@@ -115,11 +108,8 @@ export default async function ContactPage() {
             </div>
           </div>
 
-          {/* Main Content Grid */}
           <div className="grid gap-12 lg:grid-cols-3">
-            {/* Left Column - Map & Social */}
             <div className="space-y-8 lg:col-span-1">
-              {/* Map */}
               <div className="overflow-hidden rounded-3xl border border-black/10 shadow-2xl">
                 <div className="border-b border-black/10 bg-black px-6 py-4">
                   <h3 className="font-satoshi text-xl font-bold text-white">
@@ -140,7 +130,6 @@ export default async function ContactPage() {
                 </div>
               </div>
 
-              {/* Contact Methods */}
               <div className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-2xl">
                 <div className="border-b border-black/10 bg-black px-6 py-4">
                   <h3 className="font-satoshi text-xl font-bold text-white">
@@ -148,7 +137,6 @@ export default async function ContactPage() {
                   </h3>
                 </div>
                 <div className="p-6 space-y-3">
-                  {/* Phone */}
                   <a
                     href="tel:+447700184435"
                     className="group flex items-center gap-4 rounded-xl border border-black/10 bg-black/5 p-4 transition-all duration-300 hover:scale-[1.02] hover:border-black hover:bg-black"
@@ -166,7 +154,6 @@ export default async function ContactPage() {
                     </div>
                   </a>
 
-                  {/* Email */}
                   <a
                     href="mailto:info@lux-store.eu"
                     className="group flex items-center gap-4 rounded-xl border border-black/10 bg-black/5 p-4 transition-all duration-300 hover:scale-[1.02] hover:border-black hover:bg-black"
@@ -184,13 +171,11 @@ export default async function ContactPage() {
                     </div>
                   </a>
 
-                  {/* Online Chat */}
                   <JivoChatButton />
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Contact Form */}
             <div className="lg:col-span-2">
               <ContactForm />
             </div>

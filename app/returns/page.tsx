@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export default function ReturnsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA]">
-      {/* Header */}
+      
       <div className="border-b border-black/10 bg-white/80 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
           <Link href="/">
@@ -17,7 +17,7 @@ export default function ReturnsPage() {
         </div>
       </div>
 
-      {/* Content */}
+      
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="mb-8 text-center">
           <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
@@ -28,7 +28,7 @@ export default function ReturnsPage() {
           </p>
         </div>
 
-        {/* Quick Info Cards */}
+        
         <div className="mb-12 grid gap-6 sm:grid-cols-3">
           <div className="rounded-xl border border-black/10 bg-white p-6 text-center shadow-lg">
             <div className="mb-4 flex justify-center">
@@ -66,14 +66,14 @@ export default function ReturnsPage() {
         </div>
 
         <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 shadow-lg sm:p-8 lg:p-12">
-          {/* Introduction */}
+          
           <section>
             <p className="font-general-sans text-lg leading-relaxed text-black/80">
               This Returns and Exchanges Policy details your options on how you can cancel a contract with us, how you can return your purchase, and your rights in relation to obtaining a refund or exchange.
             </p>
           </section>
 
-          {/* Right to Cancel */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               RIGHT TO CANCEL
@@ -98,7 +98,7 @@ export default function ReturnsPage() {
             </div>
           </section>
 
-          {/* Return Process */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               RETURN PROCESS
@@ -184,7 +184,7 @@ export default function ReturnsPage() {
             </div>
           </section>
 
-          {/* Condition of Returned Products */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               CONDITION OF RETURNED PRODUCTS
@@ -216,7 +216,7 @@ export default function ReturnsPage() {
             </div>
           </section>
 
-          {/* Products You Cannot Return */}
+          
           <section>
             <h2 className="mb-4 flex items-center gap-3 font-satoshi text-2xl font-bold tracking-tight">
               <XCircle className="h-7 w-7" />
@@ -273,7 +273,7 @@ export default function ReturnsPage() {
             </div>
           </section>
 
-          {/* Refunds */}
+          
           <section>
             <h2 className="mb-4 flex items-center gap-3 font-satoshi text-2xl font-bold tracking-tight">
               <CheckCircle className="h-7 w-7" />
@@ -300,7 +300,7 @@ export default function ReturnsPage() {
             </div>
           </section>
 
-          {/* Exchanges */}
+          
           <section>
             <h2 className="mb-4 flex items-center gap-3 font-satoshi text-2xl font-bold tracking-tight">
               <RotateCcw className="h-7 w-7" />
@@ -323,7 +323,7 @@ export default function ReturnsPage() {
             </div>
           </section>
 
-          {/* Model Cancellation Form */}
+          
           <section className="rounded-xl border-2 border-black/20 bg-gradient-to-br from-black/5 to-transparent p-6">
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               MODEL CANCELLATION FORM
@@ -341,7 +341,7 @@ export default function ReturnsPage() {
             </div>
           </section>
 
-          {/* Contact CTA */}
+          
           <div className="mt-8 rounded-xl border border-black/10 bg-gradient-to-r from-black/5 to-transparent p-8 text-center">
             <h3 className="mb-3 font-satoshi text-2xl font-bold">Need help with a return?</h3>
             <p className="mb-6 font-general-sans text-black/60">
@@ -363,7 +363,7 @@ export default function ReturnsPage() {
           </div>
         </div>
 
-        {/* Back Button */}
+        
         <div className="mt-12 text-center">
           <Link href="/">
             <Button size="lg" className="gap-2 px-8 py-6 font-satoshi text-base shadow-lg transition-all duration-300 hover:scale-105">

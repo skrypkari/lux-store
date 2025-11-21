@@ -37,18 +37,18 @@ export default function SearchBar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Load categories for quick links
+
   useEffect(() => {
-    fetch('https://api.lux-store.eu/categories')
+    fetch('http://localhost:5000/categories')
       .then(res => res.json())
       .then(data => {
-        // Get top 4 categories for quick links
+
         setCategories(data.slice(0, 4));
       })
       .catch(err => console.error('Failed to load categories:', err));
   }, []);
 
-  // Load recent searches from localStorage
+
   useEffect(() => {
     const saved = localStorage.getItem('recentSearches');
     if (saved) {
@@ -60,7 +60,7 @@ export default function SearchBar() {
     }
   }, []);
 
-  // Save search to recent searches
+
   const saveRecentSearch = (searchQuery: string) => {
     if (!searchQuery.trim()) return;
     
@@ -69,7 +69,7 @@ export default function SearchBar() {
     localStorage.setItem('recentSearches', JSON.stringify(updated));
   };
 
-  // Close on click outside
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -88,7 +88,7 @@ export default function SearchBar() {
     };
   }, [isOpen]);
 
-  // Search with debounce
+
   useEffect(() => {
     if (query.length === 0) {
       setResults([]);
@@ -98,14 +98,14 @@ export default function SearchBar() {
 
     setIsSearching(true);
     const timer = setTimeout(() => {
-      // Fetch from API with search parameter
+
       const searchParams = new URLSearchParams({
         page: '1',
         limit: '20',
         search: query,
       });
 
-      fetch(`https://api.lux-store.eu/products?${searchParams.toString()}`)
+      fetch(`http://localhost:5000/products?${searchParams.toString()}`)
         .then(res => res.json())
         .then(data => {
           setResults(data.products || []);
@@ -144,7 +144,7 @@ export default function SearchBar() {
         <span className="font-medium hidden md:flex">Search</span>
       </button>
 
-      {/* Backdrop */}
+      
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 animate-in fade-in duration-200"
@@ -152,7 +152,7 @@ export default function SearchBar() {
         />
       )}
 
-      {/* Search Panel */}
+      
       {isOpen && (
         <div
           ref={searchRef}
@@ -160,7 +160,7 @@ export default function SearchBar() {
           style={{ top: "80px" }}
         >
           <div className="container mx-auto px-4 py-6">
-            {/* Search Input */}
+            
             <div className="relative max-w-3xl mx-auto mb-6">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
@@ -180,12 +180,12 @@ export default function SearchBar() {
               </Button>
             </div>
 
-            {/* Results Container */}
+            
             <div className="max-w-5xl mx-auto max-h-[calc(100vh-240px)] overflow-y-auto">
               {query.length === 0 ? (
-                // No Query - Show Recent & Trending
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Recent Searches */}
+                  
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <Clock className="h-4 w-4 text-muted-foreground" />
@@ -205,7 +205,7 @@ export default function SearchBar() {
                     </div>
                   </div>
 
-                  {/* Trending Searches */}
+                  
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <TrendingUp className="h-4 w-4 text-primary" />
@@ -225,7 +225,7 @@ export default function SearchBar() {
                   </div>
                 </div>
               ) : isSearching ? (
-                // Loading State
+
                 <div className="flex items-center justify-center py-12">
                   <div className="flex flex-col items-center gap-3">
                     <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -233,7 +233,7 @@ export default function SearchBar() {
                   </div>
                 </div>
               ) : results.length > 0 ? (
-                // Results
+
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-sm text-muted-foreground">
@@ -287,7 +287,7 @@ export default function SearchBar() {
                   </div>
                 </div>
               ) : (
-                // No Results
+
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
                     <Search className="h-8 w-8 text-muted-foreground" />
@@ -305,7 +305,7 @@ export default function SearchBar() {
               )}
             </div>
 
-            {/* Quick Links */}
+            
             {query.length === 0 && categories.length > 0 && (
               <div className="max-w-5xl mx-auto mt-8 pt-6 border-t">
                 <div className="flex flex-wrap items-center gap-4 text-sm">

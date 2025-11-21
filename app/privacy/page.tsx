@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA]">
-      {/* Header */}
+      
       <div className="border-b border-black/10 bg-white/80 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
           <Link href="/">
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
         </div>
       </div>
 
-      {/* Content */}
+      
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="mb-8 text-center">
           <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
           </p>
         </div>
 
-        {/* Privacy Commitments */}
+        
         <div className="mb-12 grid gap-6 sm:grid-cols-3">
           <div className="rounded-xl border border-black/10 bg-white p-6 text-center shadow-lg">
             <div className="mb-4 flex justify-center">
@@ -71,7 +71,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 shadow-lg sm:p-8 lg:p-12">
-          {/* Section 1 */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               ABOUT LUX STORE
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* Section 2 */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               OUR DATA PROMISE
@@ -97,7 +97,7 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* Section 3 */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               OUR PRIVACY COMMITMENTS
@@ -157,7 +157,7 @@ export default function PrivacyPage() {
             </div>
           </section>
 
-          {/* Section 4 */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               THIS PRIVACY POLICY & UPDATES
@@ -196,7 +196,7 @@ export default function PrivacyPage() {
             </div>
           </section>
 
-          {/* Section 5 */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               GENERAL DATA PROTECTION REGULATION REPRESENTATIVE
@@ -218,7 +218,7 @@ export default function PrivacyPage() {
             </div>
           </section>
 
-          {/* Section 6 */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               COMMITMENT 1: TRANSPARENCY & TRUST
@@ -372,7 +372,7 @@ export default function PrivacyPage() {
             </div>
           </section>
 
-          {/* Section 7 */}
+          
           <section>
             <h3 className="mb-3 font-satoshi text-xl font-bold">
               Purposes of processing and our legal justification for processing
@@ -423,7 +423,7 @@ export default function PrivacyPage() {
             </div>
           </section>
 
-          {/* Section 8 */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               COMMITMENT 2: PROTECTING YOUR PERSONAL INFORMATION
@@ -483,7 +483,7 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* Section 9 */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               COMMITMENT 3: RESPECTING YOUR RIGHTS
@@ -569,7 +569,7 @@ export default function PrivacyPage() {
             </div>
           </section>
 
-          {/* Section 10 */}
+          
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               Children
@@ -585,7 +585,7 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* Section 11 - Contact */}
+          
           <section className="rounded-xl border border-black/10 bg-black/5 p-6">
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               CONTACT US
@@ -615,7 +615,7 @@ export default function PrivacyPage() {
             </div>
           </section>
 
-          {/* Related Links */}
+          
           <div className="mt-8 rounded-xl border border-black/10 bg-gradient-to-r from-black/5 to-transparent p-8">
             <h3 className="mb-4 text-center font-satoshi text-xl font-bold">
               Related Policies
@@ -649,7 +649,7 @@ export default function PrivacyPage() {
           </div>
         </div>
 
-        {/* Back Button */}
+        
         <div className="mt-12 text-center">
           <Link href="/">
             <Button

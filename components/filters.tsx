@@ -50,7 +50,7 @@ export function Filters({ className }: FiltersProps) {
       </div>
       
       <Accordion type="multiple" defaultValue={["price", "brand", "category"]} className="space-y-0">
-        {/* Price Filter */}
+        
         <AccordionItem value="price" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Brand Filter */}
+        
         <AccordionItem value="brand" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -127,7 +127,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Category Filter */}
+        
         <AccordionItem value="category" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -156,7 +156,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Color Filter */}
+        
         <AccordionItem value="color" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -184,7 +184,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Selection For */}
+        
         <AccordionItem value="selection" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -208,7 +208,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Collection */}
+        
         <AccordionItem value="collection" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Size */}
+        
         <AccordionItem value="size" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -267,7 +267,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Metal */}
+        
         <AccordionItem value="metal" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -293,7 +293,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Model */}
+        
         <AccordionItem value="model" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -319,7 +319,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Movement */}
+        
         <AccordionItem value="movement" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -343,7 +343,7 @@ export function Filters({ className }: FiltersProps) {
 
         <Separator className="my-1" />
 
-        {/* Diamonds */}
+        
         <AccordionItem value="diamonds" className="border-0">
           <AccordionTrigger className="text-sm font-semibold hover:no-underline py-4">
             <span className="flex items-center gap-2">
@@ -369,7 +369,7 @@ export function Filters({ className }: FiltersProps) {
         </AccordionItem>
       </Accordion>
 
-      {/* Apply Button */}
+      
       <div className="mt-8 pt-6 border-t border-neutral-200">
         <Button className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold shadow-lg">
           <Sparkles className="h-4 w-4 mr-2" />

@@ -3,7 +3,13 @@
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Copy, Check, Upload, FileText, AlertCircle } from "lucide-react";
 
 interface FpBankDetails {
@@ -19,7 +25,6 @@ interface OrderInfo {
   total: number;
 }
 
-// Client-side image compression
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -32,7 +37,6 @@ async function compressImage(file: File): Promise<File> {
         let width = img.width;
         let height = img.height;
 
-        // Max dimensions
         const MAX_WIDTH = 1920;
         const MAX_HEIGHT = 1920;
 
@@ -106,7 +110,7 @@ function FpPaymentContent() {
 
   const fetchBankDetails = async () => {
     try {
-      const response = await fetch("https://api.lux-store.eu/fp/details");
+      const response = await fetch("http://localhost:5000/fp/details");
       const data = await response.json();
       setBankDetails(data);
     } catch (err) {
@@ -118,7 +122,9 @@ function FpPaymentContent() {
 
   const fetchOrderInfo = async () => {
     try {
-      const response = await fetch(`https://api.lux-store.eu/orders/${orderId}/cointopay-status`);
+      const response = await fetch(
+        `http://localhost:5000/orders/${orderId}/cointopay-status`
+      );
       const data = await response.json();
       setOrderInfo({
         id: data.id,
@@ -131,15 +137,16 @@ function FpPaymentContent() {
 
   const convertToGBP = async (eurAmount: number) => {
     try {
-      // Using exchangerate-api.com free API
-      const response = await fetch('https://api.exchangerate-api.com/v4/latest/EUR');
+      const response = await fetch(
+        "https://api.exchangerate-api.com/v4/latest/EUR"
+      );
       const data = await response.json();
       const rate = data.rates.GBP;
       setExchangeRate(rate);
       setGbpAmount(eurAmount * rate);
     } catch (err) {
       console.error("Error converting to GBP:", err);
-      // Fallback rate if API fails
+
       const fallbackRate = 0.83;
       setExchangeRate(fallbackRate);
       setGbpAmount(eurAmount * fallbackRate);
@@ -158,14 +165,17 @@ function FpPaymentContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "application/pdf",
+    ];
     if (!allowedTypes.includes(file.type)) {
       setError("Please upload a JPEG, JPG, PNG, or PDF file");
       return;
     }
 
-    // Validate file size (10MB)
     const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
       setError("File size must be less than 10MB");
@@ -178,7 +188,6 @@ function FpPaymentContent() {
     try {
       let fileToUpload = file;
 
-      // Compress if it's an image
       if (file.type.startsWith("image/")) {
         try {
           fileToUpload = await compressImage(file);
@@ -192,7 +201,6 @@ function FpPaymentContent() {
 
       setSelectedFile(fileToUpload);
 
-      // Automatically upload the file
       await uploadFile(fileToUpload);
     } catch (err) {
       setError("Failed to process file");
@@ -207,10 +215,13 @@ function FpPaymentContent() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch(`https://api.lux-store.eu/fp/upload-proof/${orderId}`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `http://localhost:5000/fp/upload-proof/${orderId}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Upload failed");
@@ -248,8 +259,12 @@ function FpPaymentContent() {
           <CardContent className="pt-6">
             <div className="text-center">
               <Check className="h-16 w-16 text-green-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Payment Proof Uploaded!</h2>
-              <p className="text-gray-600">Redirecting to order status page...</p>
+              <h2 className="text-2xl font-bold mb-2">
+                Payment Proof Uploaded!
+              </h2>
+              <p className="text-gray-600">
+                Redirecting to order status page...
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -265,11 +280,11 @@ function FpPaymentContent() {
         <CardHeader>
           <CardTitle>Bank Transfer Details - United Kingdom</CardTitle>
           <CardDescription>
-            Please transfer the exact order amount in GBP to the following bank account
+            Please transfer the exact order amount in GBP to the following bank
+            account
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Transfer Amount in GBP */}
           {orderInfo && gbpAmount !== null && (
             <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Transfer Amount</p>
@@ -278,19 +293,18 @@ function FpPaymentContent() {
               </p>
               {exchangeRate && (
                 <p className="text-sm text-gray-600 mt-2">
-                  Original: €{orderInfo.total.toFixed(2)} EUR (Rate: 1 EUR = £{exchangeRate.toFixed(4)} GBP)
+                  Original: €{orderInfo.total.toFixed(2)} EUR (Rate: 1 EUR = £
+                  {exchangeRate.toFixed(4)} GBP)
                 </p>
               )}
             </div>
           )}
 
-          {/* Account Name */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Account Name</p>
             <p className="font-bold">{bankDetails.accountName}</p>
           </div>
 
-          {/* Sort Code */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
               <p className="text-sm text-gray-600">Sort Code</p>
@@ -301,11 +315,14 @@ function FpPaymentContent() {
               size="sm"
               onClick={() => copyToClipboard(bankDetails.sortCode, "sortCode")}
             >
-              {copied.sortCode ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied.sortCode ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
             </Button>
           </div>
 
-          {/* Account Number */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
               <p className="text-sm text-gray-600">Account Number</p>
@@ -314,33 +331,39 @@ function FpPaymentContent() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => copyToClipboard(bankDetails.accountNumber, "account")}
+              onClick={() =>
+                copyToClipboard(bankDetails.accountNumber, "account")
+              }
             >
-              {copied.account ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied.account ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
             </Button>
           </div>
 
-          {/* Bank Name */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Bank Name</p>
             <p className="font-bold">{bankDetails.bankName}</p>
           </div>
 
-          {/* Bank Address */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Bank Address</p>
             <p>{bankDetails.bankAddress}</p>
           </div>
 
-          {/* Reference */}
           <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-lg">
             <div className="flex items-start gap-2">
               <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-amber-900 mb-1">Important: Payment Reference</p>
+                <p className="text-sm font-semibold text-amber-900 mb-1">
+                  Important: Payment Reference
+                </p>
                 <p className="font-mono font-bold text-lg mb-2">{orderId}</p>
                 <p className="text-sm text-amber-800">
-                  Please use this order ID as your payment reference. Do NOT change or modify it.
+                  Please use this order ID as your payment reference. Do NOT
+                  change or modify it.
                 </p>
               </div>
               <Button
@@ -348,19 +371,23 @@ function FpPaymentContent() {
                 size="sm"
                 onClick={() => orderId && copyToClipboard(orderId, "reference")}
               >
-                {copied.reference ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied.reference ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Upload Payment Proof */}
       <Card>
         <CardHeader>
           <CardTitle>Upload Payment Proof</CardTitle>
           <CardDescription>
-            After completing the transfer, please upload a screenshot or PDF of the payment confirmation
+            After completing the transfer, please upload a screenshot or PDF of
+            the payment confirmation
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -377,7 +404,9 @@ function FpPaymentContent() {
               {selectedFile ? (
                 <div className="flex flex-col items-center gap-2">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
-                  <p className="font-medium">Uploading {selectedFile.name}...</p>
+                  <p className="font-medium">
+                    Uploading {selectedFile.name}...
+                  </p>
                   <p className="text-sm text-gray-500">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                   </p>
@@ -414,11 +443,13 @@ function FpPaymentContent() {
 
 export default function FpPaymentPage() {
   return (
-    <Suspense fallback={
-      <div className="container mx-auto px-4 py-16 text-center">
-        <p>Loading...</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-16 text-center">
+          <p>Loading...</p>
+        </div>
+      }
+    >
       <FpPaymentContent />
     </Suspense>
   );

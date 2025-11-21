@@ -7,7 +7,7 @@ export default function JivoChatButton() {
   const [isJivoReady, setIsJivoReady] = useState(false);
 
   useEffect(() => {
-    // Check if Jivo is loaded
+
     const checkJivo = () => {
       if (typeof window !== 'undefined' && (window as any).jivo_api) {
         setIsJivoReady(true);
@@ -15,10 +15,10 @@ export default function JivoChatButton() {
       }
     };
 
-    // Check immediately
+
     checkJivo();
 
-    // Check periodically for 5 seconds
+
     const interval = setInterval(checkJivo, 500);
     const timeout = setTimeout(() => {
       clearInterval(interval);

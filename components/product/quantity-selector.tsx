@@ -12,7 +12,7 @@ interface QuantitySelectorProps {
 
 export default function QuantitySelector({ inStock, quantity, onQuantityChange, maxAvailable }: QuantitySelectorProps) {
 
-  // Calculate delivery estimate (21-35 days from now)
+
   const today = new Date();
   const minDays = 21;
   const maxDays = 35;
@@ -32,7 +32,7 @@ export default function QuantitySelector({ inStock, quantity, onQuantityChange, 
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Quantity Selector */}
+      
       <div>
         <label className="text-sm font-semibold mb-2 block">Quantity</label>
         <div className="flex items-center gap-3">
@@ -63,7 +63,7 @@ export default function QuantitySelector({ inStock, quantity, onQuantityChange, 
         )}
       </div>
 
-      {/* Delivery Estimate */}
+      
       <div>
         <label className="text-sm font-semibold mb-2 block">Delivery Estimate</label>
         <div className="border rounded-lg p-3 bg-muted/30">

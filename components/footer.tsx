@@ -29,10 +29,10 @@ export default function Footer() {
 
   return (
     <footer className="bg-neutral-950 text-neutral-300">
-      {/* Main Footer Content */}
+      
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
-          {/* Column 1 - Logo & Description */}
+          
           <div className="space-y-6">
             <Link href="/" className="inline-block">
               <Image
@@ -54,7 +54,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2 - Quick Links */}
+          
           <div className="space-y-6">
             <h3 className="text-sm font-semibold text-white tracking-[0.2em] uppercase">
               Quick Links
@@ -73,7 +73,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3 - Customer Service */}
+          
           <div className="space-y-6">
             <h3 className="text-sm font-semibold text-white tracking-[0.2em] uppercase">
               Customer Service
@@ -92,7 +92,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4 - Concierge & Authentication */}
+          
           <div className="space-y-6">
             <h3 className="text-sm font-semibold text-white tracking-[0.2em] uppercase">
               The World of Timeless Luxury
@@ -105,18 +105,18 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Divider */}
+      
       <div className="border-t border-neutral-800" />
 
-      {/* Bottom Bar */}
+      
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-          {/* Copyright */}
+          
           <p className="text-sm text-neutral-500">
             All rights reserved © {new Date().getFullYear()} | LUX STORE | LUX TRADE L.P.
           </p>
 
-          {/* Payment Methods */}
+          
           <div className="flex items-center gap-4">
             <span className="text-xs text-neutral-500">Secure payment:</span>
             <div className="flex flex-wrap items-center gap-2">
@@ -134,7 +134,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Decorative Bottom Border */}
+      
       <div className="h-1 bg-gradient-to-r from-transparent via-amber-600 to-transparent" />
     </footer>
   );

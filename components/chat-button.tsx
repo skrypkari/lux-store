@@ -7,7 +7,7 @@ export default function ChatButton() {
   const [isJivoReady, setIsJivoReady] = useState(false);
 
   useEffect(() => {
-    // Проверяем загрузку Jivo API
+
     const checkJivo = () => {
       if (typeof window !== 'undefined' && (window as any).jivo_api) {
         setIsJivoReady(true);
@@ -15,10 +15,10 @@ export default function ChatButton() {
       }
     };
 
-    // Проверяем сразу
+
     checkJivo();
 
-    // Проверяем периодически в течение 5 секунд
+
     const interval = setInterval(checkJivo, 500);
     const timeout = setTimeout(() => {
       clearInterval(interval);

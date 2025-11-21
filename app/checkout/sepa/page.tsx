@@ -3,7 +3,13 @@
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Copy, Check, Upload, FileText, AlertCircle } from "lucide-react";
 import Image from "next/image";
 
@@ -20,7 +26,6 @@ interface OrderInfo {
   total: number;
 }
 
-// Client-side image compression
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -33,7 +38,6 @@ async function compressImage(file: File): Promise<File> {
         let width = img.width;
         let height = img.height;
 
-        // Max dimensions
         const MAX_WIDTH = 1920;
         const MAX_HEIGHT = 1920;
 
@@ -99,7 +103,7 @@ function SepaPaymentContent() {
 
   const fetchBankDetails = async () => {
     try {
-      const response = await fetch("https://api.lux-store.eu/sepa/details");
+      const response = await fetch("http://localhost:5000/sepa/details");
       const data = await response.json();
       setBankDetails(data);
     } catch (err) {
@@ -111,7 +115,9 @@ function SepaPaymentContent() {
 
   const fetchOrderInfo = async () => {
     try {
-      const response = await fetch(`https://api.lux-store.eu/orders/${orderId}/cointopay-status`);
+      const response = await fetch(
+        `http://localhost:5000/orders/${orderId}/cointopay-status`
+      );
       const data = await response.json();
       setOrderInfo({
         id: data.id,
@@ -134,8 +140,12 @@ function SepaPaymentContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "application/pdf",
+    ];
     if (!allowedTypes.includes(file.type)) {
       setError("Please upload a JPEG, JPG, PNG, or PDF file");
       return;
@@ -147,7 +157,6 @@ function SepaPaymentContent() {
     try {
       let fileToUpload = file;
 
-      // Compress image files
       if (file.type.startsWith("image/")) {
         try {
           fileToUpload = await compressImage(file);
@@ -160,7 +169,6 @@ function SepaPaymentContent() {
 
       setSelectedFile(fileToUpload);
 
-      // Automatically upload the file
       await uploadFile(fileToUpload);
     } catch (err) {
       setError("Failed to process file");
@@ -176,7 +184,7 @@ function SepaPaymentContent() {
       formData.append("file", file);
 
       const response = await fetch(
-        `https://api.lux-store.eu/sepa/upload-proof/${orderId}`,
+        `http://localhost:5000/sepa/upload-proof/${orderId}`,
         {
           method: "POST",
           body: formData,
@@ -198,8 +206,6 @@ function SepaPaymentContent() {
       setUploading(false);
     }
   };
-
-
 
   if (loading) {
     return (
@@ -229,17 +235,16 @@ function SepaPaymentContent() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Transfer Amount */}
           {orderInfo && (
             <div className="p-6 bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Transfer Amount</p>
               <p className="text-4xl font-bold text-amber-900">
-                €{orderInfo.total.toFixed(2)} <span className="text-2xl">EUR</span>
+                €{orderInfo.total.toFixed(2)}{" "}
+                <span className="text-2xl">EUR</span>
               </p>
             </div>
           )}
 
-          {/* IBAN */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
               <p className="text-sm text-gray-600">IBAN</p>
@@ -250,11 +255,14 @@ function SepaPaymentContent() {
               size="sm"
               onClick={() => copyToClipboard(bankDetails.iban, "iban")}
             >
-              {copied.iban ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied.iban ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
             </Button>
           </div>
 
-          {/* BIC/SWIFT */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
               <p className="text-sm text-gray-600">BIC/SWIFT</p>
@@ -265,37 +273,40 @@ function SepaPaymentContent() {
               size="sm"
               onClick={() => copyToClipboard(bankDetails.bic_swift, "bic")}
             >
-              {copied.bic ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied.bic ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
             </Button>
           </div>
 
-          {/* Account Name */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Account Name</p>
             <p className="font-bold">{bankDetails.accountName}</p>
           </div>
 
-          {/* Bank Name */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Bank Name</p>
             <p className="font-bold">{bankDetails.bankName}</p>
           </div>
 
-          {/* Bank Address */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Bank Address</p>
             <p>{bankDetails.bankAddress}</p>
           </div>
 
-          {/* Reference */}
           <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-lg">
             <div className="flex items-start gap-2">
               <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-amber-900 mb-1">Important: Payment Reference</p>
+                <p className="text-sm font-semibold text-amber-900 mb-1">
+                  Important: Payment Reference
+                </p>
                 <p className="font-mono font-bold text-lg mb-2">{orderId}</p>
                 <p className="text-sm text-amber-800">
-                  Please use this order ID as your payment reference. Do NOT change or modify it.
+                  Please use this order ID as your payment reference. Do NOT
+                  change or modify it.
                 </p>
               </div>
               <Button
@@ -303,19 +314,23 @@ function SepaPaymentContent() {
                 size="sm"
                 onClick={() => orderId && copyToClipboard(orderId, "reference")}
               >
-                {copied.reference ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied.reference ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Upload Payment Proof */}
       <Card>
         <CardHeader>
           <CardTitle>Upload Payment Proof</CardTitle>
           <CardDescription>
-            After completing the transfer, please upload a screenshot or PDF of your payment confirmation
+            After completing the transfer, please upload a screenshot or PDF of
+            your payment confirmation
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -328,12 +343,14 @@ function SepaPaymentContent() {
                 onChange={handleFileSelect}
                 className="hidden"
               />
-              
+
               {!selectedFile ? (
                 <div>
                   <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                   <p className="mb-2">Click to upload payment proof</p>
-                  <p className="text-sm text-gray-500">JPEG, JPG, PNG, or PDF (max 10MB)</p>
+                  <p className="text-sm text-gray-500">
+                    JPEG, JPG, PNG, or PDF (max 10MB)
+                  </p>
                   <Button
                     variant="outline"
                     className="mt-4"
@@ -345,7 +362,9 @@ function SepaPaymentContent() {
               ) : (
                 <div className="flex flex-col items-center gap-2">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
-                  <p className="font-medium">Uploading {selectedFile.name}...</p>
+                  <p className="font-medium">
+                    Uploading {selectedFile.name}...
+                  </p>
                   <p className="text-sm text-gray-500">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                   </p>
@@ -375,11 +394,13 @@ function SepaPaymentContent() {
 
 export default function SepaPaymentPage() {
   return (
-    <Suspense fallback={
-      <div className="container mx-auto px-4 py-16 text-center">
-        <p>Loading...</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-16 text-center">
+          <p>Loading...</p>
+        </div>
+      }
+    >
       <SepaPaymentContent />
     </Suspense>
   );

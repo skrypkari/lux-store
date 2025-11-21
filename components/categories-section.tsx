@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, ShoppingBag, Watch, Glasses, Gem, LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// Иконки для категорий
+
 const categoryIcons: Record<string, LucideIcon> = {
   'Handbags': ShoppingBag,
   'Watches': Watch,
@@ -39,12 +39,12 @@ export default function CategoriesSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://api.lux-store.eu/categories")
+    fetch("http://localhost:5000/categories")
       .then((res) => res.json())
       .then((data: Category[]) => {
         console.log("Categories data:", data);
         if (Array.isArray(data)) {
-          // Преобразуем данные из API в формат для отображения
+
           const displayCategories: CategoryDisplay[] = data.slice(0, 4).map((cat, index) => ({
             ...cat,
             description: `Explore ${cat.name.toLowerCase()}`,
@@ -64,7 +64,7 @@ export default function CategoriesSection() {
       });
   }, []);
 
-  // Функция для получения дефолтных изображений
+
   const getDefaultImage = (categoryName: string) => {
     const imageMap: Record<string, string> = {
       'Handbags': '/bags_main.png',
@@ -79,7 +79,7 @@ export default function CategoriesSection() {
   };
   return (
     <section className="relative py-32 bg-background overflow-hidden">
-      {/* Background Pattern */}
+      
       <div className="absolute inset-0 opacity-[0.02]">
         <div className="absolute inset-0" style={{
           backgroundImage: `repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 50%)`,
@@ -88,7 +88,7 @@ export default function CategoriesSection() {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
+        
         <div className="text-center mb-20 space-y-6">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="h-px w-16 bg-gradient-to-r from-transparent to-foreground/30" />
@@ -110,7 +110,7 @@ export default function CategoriesSection() {
           </p>
         </div>
 
-        {/* Categories Grid */}
+        
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {loading ? (
             <div className="col-span-2 text-center py-20">
@@ -135,7 +135,7 @@ export default function CategoriesSection() {
                 <div className={`relative overflow-hidden rounded-2xl border-2 hover:border-foreground/30 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ${
                   category.featured ? 'md:row-span-1' : ''
                 }`}>
-                  {/* Image Container */}
+                  
                   <div className={`relative overflow-hidden h-[400px]`}>
                     <Image
                       src={category.image}
@@ -145,43 +145,43 @@ export default function CategoriesSection() {
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
                     
-                    {/* Gradient Overlay */}
+                    
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
                     
-                    {/* Icon Badge */}
+                    
                     <div className="absolute top-6 right-6 w-14 h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Icon className="w-7 h-7 text-white" />
                     </div>
 
-                    {/* Content */}
+                    
                     <div className="absolute inset-0 flex flex-col justify-end p-8 text-white">
-                      {/* Item Count Badge */}
+                      
                       <Badge className="w-fit mb-4 bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
                         {index === 0 ? '5 Brands' : '4 Brands'}
                       </Badge>
 
-                      {/* Category Name */}
+                      
                       <h3 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight transform group-hover:translate-x-2 transition-transform duration-300">
                         {category.name}
                       </h3>
                       
-                      {/* Description */}
+                      
                       <p className="text-white/90 font-light text-lg mb-6 transform group-hover:translate-x-2 transition-transform duration-300 delay-75">
                         {category.description}
                       </p>
 
-                      {/* Explore Button */}
+                      
                       <div className="flex items-center gap-2 text-white font-medium group-hover:gap-4 transition-all duration-300">
                         <span>Explore Collection</span>
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
                       </div>
                     </div>
 
-                    {/* Decorative Elements */}
+                    
                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
 
-                  {/* Shine Effect */}
+                  
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
                   </div>
@@ -193,7 +193,7 @@ export default function CategoriesSection() {
         </div>
       </div>
 
-      {/* Decorative Bottom Line */}
+      
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
     </section>
   );

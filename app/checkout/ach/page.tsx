@@ -3,7 +3,13 @@
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Copy, Check, Upload, FileText, AlertCircle } from "lucide-react";
 
 interface AchBankDetails {
@@ -25,7 +31,6 @@ interface OrderInfo {
   total: number;
 }
 
-// Client-side image compression
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -38,7 +43,6 @@ async function compressImage(file: File): Promise<File> {
         let width = img.width;
         let height = img.height;
 
-        // Max dimensions
         const MAX_WIDTH = 1920;
         const MAX_HEIGHT = 1920;
 
@@ -112,7 +116,7 @@ function AchPaymentContent() {
 
   const fetchBankDetails = async () => {
     try {
-      const response = await fetch("https://api.lux-store.eu/ach/details");
+      const response = await fetch("http://localhost:5000/ach/details");
       const data = await response.json();
       setBankDetails(data);
     } catch (err) {
@@ -124,7 +128,9 @@ function AchPaymentContent() {
 
   const fetchOrderInfo = async () => {
     try {
-      const response = await fetch(`https://api.lux-store.eu/orders/${orderId}/cointopay-status`);
+      const response = await fetch(
+        `http://localhost:5000/orders/${orderId}/cointopay-status`
+      );
       const data = await response.json();
       setOrderInfo({
         id: data.id,
@@ -137,15 +143,16 @@ function AchPaymentContent() {
 
   const convertToUSD = async (eurAmount: number) => {
     try {
-      // Using exchangerate-api.com free API
-      const response = await fetch('https://api.exchangerate-api.com/v4/latest/EUR');
+      const response = await fetch(
+        "https://api.exchangerate-api.com/v4/latest/EUR"
+      );
       const data = await response.json();
       const rate = data.rates.USD;
       setExchangeRate(rate);
       setUsdAmount(eurAmount * rate);
     } catch (err) {
       console.error("Error converting to USD:", err);
-      // Fallback rate if API fails
+
       const fallbackRate = 1.08;
       setExchangeRate(fallbackRate);
       setUsdAmount(eurAmount * fallbackRate);
@@ -164,14 +171,17 @@ function AchPaymentContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "application/pdf",
+    ];
     if (!allowedTypes.includes(file.type)) {
       setError("Please upload a JPEG, JPG, PNG, or PDF file");
       return;
     }
 
-    // Validate file size (10MB)
     const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
       setError("File size must be less than 10MB");
@@ -184,7 +194,6 @@ function AchPaymentContent() {
     try {
       let fileToUpload = file;
 
-      // Compress if it's an image
       if (file.type.startsWith("image/")) {
         try {
           fileToUpload = await compressImage(file);
@@ -198,7 +207,6 @@ function AchPaymentContent() {
 
       setSelectedFile(fileToUpload);
 
-      // Automatically upload the file
       await uploadFile(fileToUpload);
     } catch (err) {
       setError("Failed to process file");
@@ -213,10 +221,13 @@ function AchPaymentContent() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch(`https://api.lux-store.eu/ach/upload-proof/${orderId}`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `http://localhost:5000/ach/upload-proof/${orderId}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Upload failed");
@@ -254,8 +265,12 @@ function AchPaymentContent() {
           <CardContent className="pt-6">
             <div className="text-center">
               <Check className="h-16 w-16 text-green-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Payment Proof Uploaded!</h2>
-              <p className="text-gray-600">Redirecting to order status page...</p>
+              <h2 className="text-2xl font-bold mb-2">
+                Payment Proof Uploaded!
+              </h2>
+              <p className="text-gray-600">
+                Redirecting to order status page...
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -271,11 +286,11 @@ function AchPaymentContent() {
         <CardHeader>
           <CardTitle>Bank Transfer Details - United States</CardTitle>
           <CardDescription>
-            Please transfer the exact order amount in USD to the following bank account
+            Please transfer the exact order amount in USD to the following bank
+            account
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Transfer Amount in USD */}
           {orderInfo && usdAmount !== null && (
             <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Transfer Amount</p>
@@ -284,75 +299,88 @@ function AchPaymentContent() {
               </p>
               {exchangeRate && (
                 <p className="text-sm text-gray-600 mt-2">
-                  Original: €{orderInfo.total.toFixed(2)} EUR (Rate: 1 EUR = ${exchangeRate.toFixed(4)} USD)
+                  Original: €{orderInfo.total.toFixed(2)} EUR (Rate: 1 EUR = $
+                  {exchangeRate.toFixed(4)} USD)
                 </p>
               )}
             </div>
           )}
 
-          {/* Recipient Name */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Recipient Name</p>
             <p className="font-bold">{bankDetails.recipient.name}</p>
           </div>
 
-          {/* Recipient Address */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Recipient Address</p>
             <p>{bankDetails.recipient.address}</p>
           </div>
 
-          {/* Bank Name */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Bank Name</p>
             <p className="font-bold">{bankDetails.bank.name}</p>
           </div>
 
-          {/* Payment Method */}
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Payment Method</p>
             <p className="font-bold">{bankDetails.bank.paymentMethod}</p>
           </div>
 
-          {/* Routing Number */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
               <p className="text-sm text-gray-600">Routing Number</p>
-              <p className="font-mono font-bold">{bankDetails.bank.routingNumber}</p>
+              <p className="font-mono font-bold">
+                {bankDetails.bank.routingNumber}
+              </p>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => copyToClipboard(bankDetails.bank.routingNumber, "routing")}
+              onClick={() =>
+                copyToClipboard(bankDetails.bank.routingNumber, "routing")
+              }
             >
-              {copied.routing ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied.routing ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
             </Button>
           </div>
 
-          {/* Account Number */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
               <p className="text-sm text-gray-600">Account Number</p>
-              <p className="font-mono font-bold">{bankDetails.bank.accountNumber}</p>
+              <p className="font-mono font-bold">
+                {bankDetails.bank.accountNumber}
+              </p>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => copyToClipboard(bankDetails.bank.accountNumber, "account")}
+              onClick={() =>
+                copyToClipboard(bankDetails.bank.accountNumber, "account")
+              }
             >
-              {copied.account ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied.account ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
             </Button>
           </div>
 
-          {/* Reference */}
           <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-lg">
             <div className="flex items-start gap-2">
               <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-amber-900 mb-1">Important: Payment Reference</p>
+                <p className="text-sm font-semibold text-amber-900 mb-1">
+                  Important: Payment Reference
+                </p>
                 <p className="font-mono font-bold text-lg mb-2">{orderId}</p>
                 <p className="text-sm text-amber-800">
-                  Please use this order ID as your payment reference. Do NOT change or modify it.
+                  Please use this order ID as your payment reference. Do NOT
+                  change or modify it.
                 </p>
               </div>
               <Button
@@ -360,19 +388,23 @@ function AchPaymentContent() {
                 size="sm"
                 onClick={() => orderId && copyToClipboard(orderId, "reference")}
               >
-                {copied.reference ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied.reference ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Upload Payment Proof */}
       <Card>
         <CardHeader>
           <CardTitle>Upload Payment Proof</CardTitle>
           <CardDescription>
-            After completing the transfer, please upload a screenshot or PDF of the payment confirmation
+            After completing the transfer, please upload a screenshot or PDF of
+            the payment confirmation
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -389,7 +421,9 @@ function AchPaymentContent() {
               {selectedFile ? (
                 <div className="flex flex-col items-center gap-2">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
-                  <p className="font-medium">Uploading {selectedFile.name}...</p>
+                  <p className="font-medium">
+                    Uploading {selectedFile.name}...
+                  </p>
                   <p className="text-sm text-gray-500">
                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                   </p>
@@ -426,11 +460,13 @@ function AchPaymentContent() {
 
 export default function AchPaymentPage() {
   return (
-    <Suspense fallback={
-      <div className="container mx-auto px-4 py-16 text-center">
-        <p>Loading...</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-16 text-center">
+          <p>Loading...</p>
+        </div>
+      }
+    >
       <AchPaymentContent />
     </Suspense>
   );

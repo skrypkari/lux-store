@@ -1,11 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-// Читаем XML файл
+
 const xmlPath = path.join(__dirname, '../public/sitemap.xml');
 const xmlContent = fs.readFileSync(xmlPath, 'utf-8');
 
-// Парсим URL'ы и priority
+
 const urlRegex = /<url>\s*<loc>(.*?)<\/loc>\s*<priority>(.*?)<\/priority>\s*<\/url>/gs;
 const urls = [];
 const uniqueUrls = new Set();
@@ -15,7 +15,7 @@ while ((match = urlRegex.exec(xmlContent)) !== null) {
   const url = match[1].replace('https://lux-store.eu', '');
   const priority = parseFloat(match[2]);
   
-  // Убираем дубликаты
+
   const urlKey = `${url}|${priority}`;
   if (!uniqueUrls.has(urlKey)) {
     uniqueUrls.add(urlKey);
@@ -25,7 +25,7 @@ while ((match = urlRegex.exec(xmlContent)) !== null) {
 
 console.log(`Найдено ${urls.length} уникальных URL'ов (из ${xmlContent.match(/<url>/g)?.length || 0} всего)`);
 
-// Группируем URL'ы по типу
+
 const staticPages = urls.filter(u => !u.url.startsWith('/products/') && !u.url.startsWith('/store/'));
 const storePages = urls.filter(u => u.url.startsWith('/store/'));
 const productPages = urls.filter(u => u.url.startsWith('/products/'));
@@ -34,7 +34,7 @@ console.log(`Статические страницы: ${staticPages.length}`);
 console.log(`Страницы магазина: ${storePages.length}`);
 console.log(`Страницы товаров: ${productPages.length}`);
 
-// Генерируем TypeScript код для основного sitemap
+
 const staticEntries = staticPages.map(({ url, priority }) => {
   const urlPath = url || '/';
   const changeFreq = priority >= 0.9 ? 'daily' : priority >= 0.7 ? 'weekly' : priority >= 0.5 ? 'monthly' : 'yearly';
@@ -70,13 +70,13 @@ ${storeEntries}
 }
 `;
 
-// Сохраняем основной sitemap
+
 const sitemapPath = path.join(__dirname, '../app/sitemap.ts');
 fs.writeFileSync(sitemapPath, sitemapContent, 'utf-8');
 console.log(`✅ Создан app/sitemap.ts с ${staticPages.length + storePages.length} URL'ами`);
 
-// Генерируем TypeScript код для products sitemap
-// Извлекаем slug'и товаров
+
+
 const productSlugs = [...new Set(productPages.map(p => {
   const slug = p.url.replace('/products/', '');
   return slug;
@@ -86,10 +86,10 @@ console.log(`Уникальных товаров: ${productSlugs.length}`);
 
 const productSitemapContent = `import { MetadataRoute } from 'next';
 
-// Функция для получения всех товаров
+
 async function getProducts() {
   try {
-    const response = await fetch('https://api.lux-store.eu/products', {
+    const response = await fetch('http://localhost:5000/products', {
       cache: 'no-store',
     });
     
@@ -109,7 +109,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://lux-store.eu';
   const products = await getProducts();
 
-  // Создаем URL для каждого товара
+
   const productUrls = products.map((product: any) => ({
     url: \`\${baseUrl}/products/\${product.slug}\`,
     lastModified: new Date(product.updated_at || product.created_at || Date.now()),

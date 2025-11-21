@@ -92,7 +92,7 @@ export default function CareersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA]">
-      {/* Header */}
+      
       <div className="border-b border-black/10 bg-white/80 backdrop-blur-sm">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
           <Link href="/">

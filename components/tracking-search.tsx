@@ -49,7 +49,7 @@ export default function TrackingSearch() {
       return;
     }
 
-    // Validate email format
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setError("Please enter a valid email address");
@@ -59,8 +59,8 @@ export default function TrackingSearch() {
     setIsSearching(true);
 
     try {
-      // Call the new track endpoint
-      const response = await fetch(`https://api.lux-store.eu/orders/track`, {
+
+      const response = await fetch(`http://localhost:5000/orders/track`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ export default function TrackingSearch() {
         throw new Error(data.message || "Order not found");
       }
 
-      // Redirect to order page with token
+
       router.push(`/orders/${data.orderId}?token=${data.token}`);
     } catch (err: any) {
       console.error("Tracking error:", err);
@@ -99,14 +99,14 @@ export default function TrackingSearch() {
 
   return (
     <div className="space-y-12">
-      {/* Search Box - Redesigned */}
+      
       <div className="mx-auto max-w-4xl">
         <div className="group relative">
-          {/* Glow Effect */}
+          
           <div className="absolute -inset-1 rounded-[2rem] bg-gradient-to-r from-black/20 via-black/10 to-black/20 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
           
           <div className="relative overflow-hidden rounded-[2rem] border border-black/10 bg-gradient-to-br from-white to-black/5 shadow-2xl">
-            {/* Header with Pattern */}
+            
             <div className="relative overflow-hidden border-b border-black/10 bg-gradient-to-r from-black via-black/95 to-black px-4 py-6 sm:px-8 sm:py-8">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.08)_1px,transparent_0)] bg-[size:32px_32px]" />
               <div className="relative flex items-center justify-between gap-3">
@@ -123,7 +123,7 @@ export default function TrackingSearch() {
             </div>
 
             <div className="p-4 sm:p-6 md:p-10">
-              {/* Search Inputs - Premium Design */}
+              
               <div className="mb-4 space-y-3 sm:mb-6 sm:space-y-4">
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center sm:left-4">
@@ -191,7 +191,7 @@ export default function TrackingSearch() {
         </div>
       </div>
 
-      {/* Info Card */}
+      
       <div className="mx-auto max-w-4xl">
         <div className="overflow-hidden rounded-2xl border border-black/10 bg-gradient-to-br from-white to-black/5 p-6 shadow-lg sm:rounded-3xl sm:p-8">
           <div className="flex items-start gap-4">

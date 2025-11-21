@@ -6,67 +6,66 @@ import { Button } from "@/components/ui/button";
 import { Copy, Check, ExternalLink, Clock, Bitcoin } from "lucide-react";
 import Image from "next/image";
 
-// Маппинг технических кодов на пользовательские названия
 const CRYPTO_NAMES: { [key: string]: string } = {
-  'ETH': 'ETH',
-  'ETH_BASE': 'ETH (Base)',
-  'BTC': 'BTC',
-  'LTC': 'LTC',
-  'DASH': 'DASH',
-  'TZEC': 'ZEC',
-  'DOGE': 'DOGE',
-  'BCH': 'BCH',
-  'XMR': 'XMR',
-  'USDT': 'USDT (ERC-20)',
-  'USDC': 'USDC (ERC-20)',
-  'USDC_BASE': 'USDC (Base)',
-  'SHIB': 'SHIB',
-  'APE': 'APE',
-  'BTT_TRX': 'BTT (TRC-20)',
-  'USDT_TRX': 'USDT (TRC-20)',
-  'TRX': 'TRX',
-  'BNB': 'BNB',
-  'BUSD': 'BUSD (BEP-20)',
-  'USDT_BSC': 'USDT (BEP-20)',
-  'USDС_BSC': 'USDC (BEP-20)',
-  'LB': 'LB (BEP-20)',
-  'ETC': 'ETC',
-  'TON': 'TON',
-  'USDT_TON': 'USDT (TON)',
-  'SOL': 'SOL',
-  'USDT_SOL': 'USDT (SPL)',
-  'USDC_SOL': 'USDC (SPL)',
+  ETH: "ETH",
+  ETH_BASE: "ETH (Base)",
+  BTC: "BTC",
+  LTC: "LTC",
+  DASH: "DASH",
+  TZEC: "ZEC",
+  DOGE: "DOGE",
+  BCH: "BCH",
+  XMR: "XMR",
+  USDT: "USDT (ERC-20)",
+  USDC: "USDC (ERC-20)",
+  USDC_BASE: "USDC (Base)",
+  SHIB: "SHIB",
+  APE: "APE",
+  BTT_TRX: "BTT (TRC-20)",
+  USDT_TRX: "USDT (TRC-20)",
+  TRX: "TRX",
+  BNB: "BNB",
+  BUSD: "BUSD (BEP-20)",
+  USDT_BSC: "USDT (BEP-20)",
+  USDС_BSC: "USDC (BEP-20)",
+  LB: "LB (BEP-20)",
+  ETC: "ETC",
+  TON: "TON",
+  USDT_TON: "USDT (TON)",
+  SOL: "SOL",
+  USDT_SOL: "USDT (SPL)",
+  USDC_SOL: "USDC (SPL)",
 };
 
 const NETWORK_NAMES: { [key: string]: string } = {
-  'ETH': 'Ethereum',
-  'ETH_BASE': 'Base Network',
-  'BTC': 'Bitcoin',
-  'LTC': 'Litecoin',
-  'DASH': 'Dash',
-  'TZEC': 'Zcash',
-  'DOGE': 'Dogecoin',
-  'BCH': 'Bitcoin Cash',
-  'XMR': 'Monero',
-  'USDT': 'Ethereum (ERC-20)',
-  'USDC': 'Ethereum (ERC-20)',
-  'USDC_BASE': 'Base Network',
-  'SHIB': 'Ethereum (ERC-20)',
-  'APE': 'Ethereum (ERC-20)',
-  'BTT_TRX': 'Tron (TRC-20)',
-  'USDT_TRX': 'Tron (TRC-20)',
-  'TRX': 'Tron',
-  'BNB': 'BSC',
-  'BUSD': 'BSC (BEP-20)',
-  'USDT_BSC': 'BSC (BEP-20)',
-  'USDС_BSC': 'BSC (BEP-20)',
-  'LB': 'BSC (BEP-20)',
-  'ETC': 'Ethereum Classic',
-  'TON': 'TON Network',
-  'USDT_TON': 'TON Network',
-  'SOL': 'Solana',
-  'USDT_SOL': 'Solana (SPL)',
-  'USDC_SOL': 'Solana (SPL)',
+  ETH: "Ethereum",
+  ETH_BASE: "Base Network",
+  BTC: "Bitcoin",
+  LTC: "Litecoin",
+  DASH: "Dash",
+  TZEC: "Zcash",
+  DOGE: "Dogecoin",
+  BCH: "Bitcoin Cash",
+  XMR: "Monero",
+  USDT: "Ethereum (ERC-20)",
+  USDC: "Ethereum (ERC-20)",
+  USDC_BASE: "Base Network",
+  SHIB: "Ethereum (ERC-20)",
+  APE: "Ethereum (ERC-20)",
+  BTT_TRX: "Tron (TRC-20)",
+  USDT_TRX: "Tron (TRC-20)",
+  TRX: "Tron",
+  BNB: "BSC",
+  BUSD: "BSC (BEP-20)",
+  USDT_BSC: "BSC (BEP-20)",
+  USDС_BSC: "BSC (BEP-20)",
+  LB: "BSC (BEP-20)",
+  ETC: "Ethereum Classic",
+  TON: "TON Network",
+  USDT_TON: "TON Network",
+  SOL: "Solana",
+  USDT_SOL: "Solana (SPL)",
+  USDC_SOL: "Solana (SPL)",
 };
 
 function CryptoPaymentContent() {
@@ -77,22 +76,24 @@ function CryptoPaymentContent() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [status, setStatus] = useState<string>("pending");
 
-  // Функция для получения читаемого названия валюты
   const getCryptoName = (code: string) => {
     return CRYPTO_NAMES[code] || code;
   };
 
-  // Функция для получения названия сети
   const getNetworkName = (code: string) => {
     return NETWORK_NAMES[code] || code;
   };
 
-  // Редирект на страницу заказа после подтверждения оплаты
   useEffect(() => {
-    if (paymentData && (paymentData.status === "completed" || paymentData.status === "paid")) {
+    if (
+      paymentData &&
+      (paymentData.status === "completed" || paymentData.status === "paid")
+    ) {
       const timeout = setTimeout(() => {
         if (paymentData.orderId && paymentData.accessToken) {
-          router.push(`/orders/${paymentData.orderId}?token=${paymentData.accessToken}`);
+          router.push(
+            `/orders/${paymentData.orderId}?token=${paymentData.accessToken}`
+          );
         } else {
           router.push("/checkout/success");
         }
@@ -101,14 +102,13 @@ function CryptoPaymentContent() {
     }
   }, [paymentData, router]);
 
-  // Функция для загрузки данных платежа
   const fetchPaymentData = () => {
     const txnId = searchParams.get("txn_id");
     if (!txnId) {
       router.push("/");
       return;
     }
-    fetch(`https://api.lux-store.eu/plisio/invoice/${txnId}`)
+    fetch(`http://localhost:5000/plisio/invoice/${txnId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch payment data");
         return res.json();
@@ -116,7 +116,7 @@ function CryptoPaymentContent() {
       .then((data) => {
         setPaymentData(data);
         setStatus(data.status);
-        // Calculate time left
+
         const expiryTime = data.expire_utc * 1000;
         const now = Date.now();
         const diff = Math.floor((expiryTime - now) / 1000);
@@ -128,25 +128,25 @@ function CryptoPaymentContent() {
       });
   };
 
-  // Первый fetch при монтировании
   useEffect(() => {
     fetchPaymentData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, router]);
 
-  // Polling для обновления статуса и подтверждений
   useEffect(() => {
     if (!paymentData) return;
-    // Не опрашивать, если завершён
-    if (["completed", "paid", "expired", "cancelled", "error"].includes(paymentData.status)) return;
+
+    if (
+      ["completed", "paid", "expired", "cancelled", "error"].includes(
+        paymentData.status
+      )
+    )
+      return;
     const interval = setInterval(() => {
       fetchPaymentData();
     }, 10000); // 10 секунд
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentData]);
 
-  // Countdown timer
   useEffect(() => {
     if (timeLeft <= 0) return;
 
@@ -191,20 +191,20 @@ function CryptoPaymentContent() {
   return (
     <div className="min-h-screen bg-white py-12">
       <div className="container mx-auto max-w-4xl px-4">
-        {/* Header */}
         <div className="mb-8 text-center">
           <div className="mb-4 flex justify-center">
             <div className="rounded-full bg-black p-4">
               <Bitcoin className="h-12 w-12 text-white" />
             </div>
           </div>
-          <h1 className="mb-2 font-satoshi text-4xl font-bold text-black">Complete Payment</h1>
+          <h1 className="mb-2 font-satoshi text-4xl font-bold text-black">
+            Complete Payment
+          </h1>
           <p className="font-general-sans text-lg text-black/60">
             Send exact amount to the address below
           </p>
         </div>
 
-        {/* Network Info */}
         <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
           <div className="flex items-center gap-2">
             <div className="rounded-full bg-blue-500 p-2">
@@ -221,7 +221,6 @@ function CryptoPaymentContent() {
           </div>
         </div>
 
-        {/* Timer */}
         {timeLeft > 0 ? (
           <div className="mb-6 rounded-xl border border-black/10 bg-white p-6 text-center">
             <div className="mb-2 flex items-center justify-center gap-2">
@@ -236,7 +235,9 @@ function CryptoPaymentContent() {
           </div>
         ) : (
           <div className="mb-6 rounded-xl border border-black/10 bg-white p-6 text-center">
-            <p className="font-satoshi text-lg font-bold text-black">Payment Expired</p>
+            <p className="font-satoshi text-lg font-bold text-black">
+              Payment Expired
+            </p>
             <p className="mt-2 font-general-sans text-sm text-black/60">
               Please create a new payment request
             </p>
@@ -244,9 +245,10 @@ function CryptoPaymentContent() {
         )}
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* QR Code */}
           <div className="rounded-2xl border border-black/10 bg-white p-8 shadow-xl">
-            <h2 className="mb-4 text-center font-satoshi text-xl font-bold">Scan QR Code</h2>
+            <h2 className="mb-4 text-center font-satoshi text-xl font-bold">
+              Scan QR Code
+            </h2>
             <div className="mb-4 flex justify-center">
               <div className="rounded-xl border-4 border-black/10 bg-white p-4">
                 <Image
@@ -263,9 +265,7 @@ function CryptoPaymentContent() {
             </p>
           </div>
 
-          {/* Payment Details */}
           <div className="space-y-4">
-            {/* Wallet Address */}
             <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
               <p className="mb-2 font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
                 Wallet Address
@@ -277,7 +277,9 @@ function CryptoPaymentContent() {
                 size="sm"
                 variant="outline"
                 className="w-full gap-2"
-                onClick={() => copyToClipboard(paymentData.wallet_hash, "address")}
+                onClick={() =>
+                  copyToClipboard(paymentData.wallet_hash, "address")
+                }
               >
                 {copied.address ? (
                   <>
@@ -293,19 +295,21 @@ function CryptoPaymentContent() {
               </Button>
             </div>
 
-            {/* Amount */}
             <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
               <p className="mb-2 font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
                 Amount to Send
               </p>
               <p className="mb-1 font-mono text-3xl font-bold text-black">
-                {paymentData.invoice_total_sum} {getCryptoName(paymentData.currency)}
+                {paymentData.invoice_total_sum}{" "}
+                {getCryptoName(paymentData.currency)}
               </p>
               <Button
                 size="sm"
                 variant="outline"
                 className="w-full gap-2 mt-3"
-                onClick={() => copyToClipboard(paymentData.invoice_total_sum, "amount")}
+                onClick={() =>
+                  copyToClipboard(paymentData.invoice_total_sum, "amount")
+                }
               >
                 {copied.amount ? (
                   <>
@@ -322,33 +326,42 @@ function CryptoPaymentContent() {
               <div className="mt-4 space-y-1 border-t border-black/10 pt-4 text-sm">
                 <div className="flex justify-between">
                   <span className="text-black/60">Invoice Amount:</span>
-                  <span className="font-semibold">{paymentData.invoice_sum} {getCryptoName(paymentData.currency)}</span>
+                  <span className="font-semibold">
+                    {paymentData.invoice_sum}{" "}
+                    {getCryptoName(paymentData.currency)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-black/60">Service Fee:</span>
-                  <span className="font-semibold">{paymentData.invoice_commission} {getCryptoName(paymentData.currency)}</span>
+                  <span className="font-semibold">
+                    {paymentData.invoice_commission}{" "}
+                    {getCryptoName(paymentData.currency)}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Status */}
             <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
               <p className="mb-2 font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
                 Payment Status
               </p>
-              
+
               {status === "completed" || status === "paid" ? (
                 <div className="flex items-center gap-2">
                   <div className="rounded-full bg-green-500 p-1">
                     <Check className="h-5 w-5 text-white" />
                   </div>
-                  <p className="text-2xl font-bold text-green-600">Payment Confirmed</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    Payment Confirmed
+                  </p>
                 </div>
               ) : status === "pending" || status === "pending internal" ? (
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    <p className="text-xl font-bold text-blue-600">Payment Detected!</p>
+                    <p className="text-xl font-bold text-blue-600">
+                      Payment Detected!
+                    </p>
                   </div>
                   <p className="text-sm text-black/60">
                     Waiting for confirmations...
@@ -358,7 +371,9 @@ function CryptoPaymentContent() {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black"></div>
-                    <p className="text-2xl font-bold text-black">Awaiting Payment</p>
+                    <p className="text-2xl font-bold text-black">
+                      Awaiting Payment
+                    </p>
                   </div>
                   <p className="text-sm text-black/60">
                     Send crypto to the address above
@@ -369,13 +384,21 @@ function CryptoPaymentContent() {
           </div>
         </div>
 
-        {/* Instructions */}
         <div className="mt-8 rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
-          <h3 className="mb-4 font-satoshi text-xl font-bold">Payment Instructions</h3>
+          <h3 className="mb-4 font-satoshi text-xl font-bold">
+            Payment Instructions
+          </h3>
           <div className="space-y-3 font-general-sans text-sm text-black/70">
             <div className="flex gap-3">
               <span className="font-bold text-black">1.</span>
-              <p>Send <strong>exactly {paymentData.invoice_total_sum} {getCryptoName(paymentData.currency)}</strong> to the address above</p>
+              <p>
+                Send{" "}
+                <strong>
+                  exactly {paymentData.invoice_total_sum}{" "}
+                  {getCryptoName(paymentData.currency)}
+                </strong>{" "}
+                to the address above
+              </p>
             </div>
             <div className="flex gap-3">
               <span className="font-bold text-black">2.</span>
@@ -387,11 +410,12 @@ function CryptoPaymentContent() {
             </div>
             <div className="flex gap-3">
               <span className="font-bold text-black">4.</span>
-              <p>You will receive email confirmation once payment is processed</p>
+              <p>
+                You will receive email confirmation once payment is processed
+              </p>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

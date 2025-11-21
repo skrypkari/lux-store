@@ -46,7 +46,7 @@ export default function CartContent() {
   const shipping = cartItems.length > 0 ? 0 : 0; // Free shipping
   const total = subtotal + shipping - promoDiscount; // VAT already included in prices
 
-  // Calculate delivery date range (25-35 days from now)
+
   const getDeliveryDateRange = () => {
     const today = new Date();
     const minDate = new Date(today);
@@ -67,7 +67,7 @@ export default function CartContent() {
     setPromoLoading(true);
     setPromoError("");
     try {
-      const response = await fetch('https://api.lux-store.eu/promo-codes/validate', {
+      const response = await fetch('http://localhost:5000/promo-codes/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: promoCodeInput.toUpperCase() }),
@@ -102,7 +102,7 @@ export default function CartContent() {
 
     const fetchProducts = async (attempt = 1, maxAttempts = 5) => {
       try {
-        const res = await fetch('https://api.lux-store.eu/products/random?limit=20');
+        const res = await fetch('http://localhost:5000/products/random?limit=20');
         const data = await res.json();
         
         if (data && Array.isArray(data.products) && data.products.length > 0) {
@@ -133,7 +133,7 @@ export default function CartContent() {
   if (cartItems.length === 0) {
     return (
       <div className="relative overflow-hidden py-24">
-        {/* Subtle Background Gradient */}
+        
         <div className="absolute inset-0 bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.015)_1px,transparent_1px)] bg-[size:32px_32px]" />
         
@@ -205,9 +205,9 @@ export default function CartContent() {
   return (
     <div className="py-12">
       <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
-        {/* Cart Items */}
+        
         <div className="space-y-6 lg:col-span-2 lg:space-y-8">
-          {/* Cart Header */}
+          
           <div className="overflow-hidden rounded-xl border border-black/10 bg-gradient-to-r from-black/5 to-transparent">
             <div className="flex items-center justify-between p-3 sm:p-4">
               <div>
@@ -229,10 +229,10 @@ export default function CartContent() {
               </Button>
             </div>
 
-            {/* Progress Bar */}
+            
             <div className="border-t border-black/10 bg-white px-3 py-4 sm:px-4">
               <div className="flex items-center justify-between">
-                {/* Step 1 - Cart (Active) */}
+                
                 <div className="flex flex-1 items-center">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white shadow-lg">
@@ -246,7 +246,7 @@ export default function CartContent() {
                   <div className="mx-2 h-0.5 flex-1 bg-black/20" />
                 </div>
 
-                {/* Step 2 - Shipping */}
+                
                 <div className="flex flex-1 items-center">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-black/20 bg-white text-black/40">
@@ -260,7 +260,7 @@ export default function CartContent() {
                   <div className="mx-2 h-0.5 flex-1 bg-black/20" />
                 </div>
 
-                {/* Step 3 - Payment */}
+                
                 <div className="flex flex-1 items-center">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-black/20 bg-white text-black/40">
@@ -276,7 +276,7 @@ export default function CartContent() {
                   <div className="mx-2 h-0.5 flex-1 bg-black/20" />
                 </div>
 
-                {/* Step 4 - Confirmation */}
+                
                 <div className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-black/20 bg-white text-black/40">
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,12 +297,12 @@ export default function CartContent() {
                 key={item.id}
                 className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white p-4 shadow-lg transition-all duration-300 hover:border-black/20 hover:shadow-2xl md:p-6"
               >
-                {/* Desktop Layout */}
+                
                 <div className="hidden md:block">
-                  {/* Delivery Badge - Desktop */}
+                  
 
                   <div className="flex gap-6">
-                    {/* Product Image */}
+                    
                     <div className="relative h-36 w-36 flex-shrink-0 overflow-hidden rounded-xl border border-black/10 bg-gradient-to-br from-black/5 to-black/10 shadow-lg">
                       <Image
                         src={item.image}
@@ -325,7 +325,7 @@ export default function CartContent() {
                       </div>
                     </div>
 
-                    {/* Product Details */}
+                    
                     <div className="flex flex-1 flex-col">
                       <div className="mb-3 flex items-start justify-between">
                         <div className="flex-1">
@@ -385,7 +385,7 @@ export default function CartContent() {
                       </div>
 
                       <div className="mt-auto flex items-end justify-between">
-                        {/* Quantity Selector */}
+                        
                         <div className="flex items-center gap-3">
                           <span className="font-general-sans text-sm font-medium text-black/60">
                             Qty:
@@ -420,7 +420,7 @@ export default function CartContent() {
                           )}
                         </div>
 
-                        {/* Price */}
+                        
                         <div className="text-right">
                           <p className="font-satoshi text-3xl font-bold tracking-tight">
                             €{(item.price * item.quantity).toLocaleString()}
@@ -436,10 +436,10 @@ export default function CartContent() {
                   </div>
                 </div>
 
-                {/* Mobile Layout */}
+                
                 <div className="md:hidden">
                   <div className="mb-4 flex items-start gap-3">
-                    {/* Mobile Image */}
+                    
                     <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-black/10 bg-gradient-to-br from-black/5 to-black/10 shadow">
                       <Image
                         src={item.image}
@@ -457,7 +457,7 @@ export default function CartContent() {
                       )}
                     </div>
 
-                    {/* Mobile Details */}
+                    
                     <div className="flex-1 min-w-0">
                       <div className="mb-1 flex items-center gap-1.5">
                         <p className="font-general-sans text-[10px] font-bold uppercase tracking-wider text-black/50">
@@ -492,7 +492,7 @@ export default function CartContent() {
                       )}
                     </div>
 
-                    {/* Mobile Remove Button */}
+                    
                     <Button
                       variant="ghost"
                       size="icon"
@@ -503,7 +503,7 @@ export default function CartContent() {
                     </Button>
                   </div>
 
-                  {/* Mobile Delivery Info */}
+                  
                   <div className="mb-3 flex items-center gap-2 rounded-lg border border-black/10 bg-black/5 px-3 py-2">
                     <Clock className="h-3.5 w-3.5 text-black/60" />
                     <span className="font-general-sans text-xs font-medium text-black/70">
@@ -511,7 +511,7 @@ export default function CartContent() {
                     </span>
                   </div>
 
-                  {/* Mobile Quantity Controls */}
+                  
                   <div className="rounded-lg border border-black/10 bg-black/5 p-3">
                     <div className="flex items-center justify-between gap-4">
                       <span className="font-general-sans text-sm font-medium text-black/60">
@@ -552,18 +552,18 @@ export default function CartContent() {
             ))}
           </div>
 
-          {/* Luxury Promise Section - Desktop Only */}
+          
           <div className="relative mt-12 hidden overflow-hidden md:block">
-            {/* Elegant Background with Gradient */}
+            
             <div className="absolute inset-0 bg-gradient-to-br from-[#FAFAFA] via-white to-[#F5F5F5]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:24px_24px]" />
             
-            {/* Decorative Top Border with Fade */}
+            
             <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
             
             <div className="relative px-4 py-16 sm:px-6 md:py-20">
               <div className="mx-auto max-w-4xl text-center">
-                {/* Elegant Quote/Slogan */}
+                
                 <div className="mb-12">
                   <div className="mb-4 flex justify-center">
                     <div className="h-px w-12 bg-gradient-to-r from-transparent via-black/30 to-transparent" />
@@ -579,9 +579,9 @@ export default function CartContent() {
                   </div>
                 </div>
 
-                {/* Premium Services Grid */}
+                
                 <div className="grid gap-6 sm:grid-cols-3 md:gap-8">
-                  {/* Authenticity */}
+                  
                   <div className="group">
                     <div className="mb-4 flex justify-center">
                       <div className="relative">
@@ -599,7 +599,7 @@ export default function CartContent() {
                     </p>
                   </div>
 
-                  {/* Insured Delivery */}
+                  
                   <div className="group">
                     <div className="mb-4 flex justify-center">
                       <div className="relative">
@@ -617,7 +617,7 @@ export default function CartContent() {
                     </p>
                   </div>
 
-                  {/* White Glove Service */}
+                  
                   <div className="group">
                     <div className="mb-4 flex justify-center">
                       <div className="relative">
@@ -638,7 +638,7 @@ export default function CartContent() {
                   </div>
                 </div>
 
-                {/* Subtle CTA or Trust Statement */}
+                
                 <div className="mt-12">
                   <p className="font-general-sans text-xs uppercase tracking-[0.2em] text-black/40">
                     Trusted by luxury collectors worldwide since 2020
@@ -647,15 +647,15 @@ export default function CartContent() {
               </div>
             </div>
 
-            {/* Decorative Bottom Border with Fade */}
+            
             <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
           </div>
         </div>
 
-        {/* Order Summary */}
+        
         <div className="lg:col-span-1">
           <div className="space-y-6 lg:sticky lg:top-24">
-            {/* Summary Card */}
+            
             <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-xl">
               <div className="border-b border-black/10 bg-black px-6 py-5">
                 <h2 className="font-satoshi text-2xl font-bold text-white">Order Summary</h2>
@@ -689,7 +689,7 @@ export default function CartContent() {
                   )}
                 </div>
                 
-                {/* Promo Code */}
+                
                 <div className="rounded-xl border border-black/10 bg-black/5 p-4">
                   <div className="mb-3 flex items-center gap-2">
                     <Tag className="h-4 w-4 text-black/60" />
@@ -764,7 +764,7 @@ export default function CartContent() {
                     </Button>
                   </Link>
 
-                  {/* Security Microcopy */}
+                  
                   <div className="flex items-center justify-center gap-2 rounded-lg border border-black/10 bg-gradient-to-r from-black/5 to-transparent px-4 py-3">
                     <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-black/10">
                       <Lock className="h-3.5 w-3.5 text-black/70" />
@@ -828,7 +828,7 @@ export default function CartContent() {
               </div>
             </div>
 
-            {/* Benefits */}
+            
             <div className="space-y-4 overflow-hidden rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
               <h3 className="mb-4 font-satoshi text-lg font-bold">Service Excellence</h3>
               
@@ -881,7 +881,7 @@ export default function CartContent() {
         </div>
       </div>
 
-      {/* You May Also Like Section */}
+      
       {relatedProducts.length > 0 && (
         <div className="mt-16 lg:mt-20">
           <div className="mb-6 flex items-center justify-between">
@@ -944,7 +944,7 @@ export default function CartContent() {
         </div>
       )}
 
-      {/* Trust Badges */}
+      
       <div className="mt-12 rounded-2xl border-2 border-black/10 bg-gradient-to-r from-black/5 via-white to-black/5 p-8">
         <div className="grid gap-6 md:grid-cols-3">
           <div className="text-center">

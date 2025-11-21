@@ -38,7 +38,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [promoCode, setPromoCode] = useState<string>("");
   const [promoDiscount, setPromoDiscount] = useState<number>(0);
 
-  // Load cart from localStorage on mount
+
   useEffect(() => {
     const saved = localStorage.getItem("cart");
     if (saved) {
@@ -49,19 +49,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     }
     
-    // Load promo code from localStorage
+
     const savedPromo = localStorage.getItem("promoCode");
     const savedDiscount = localStorage.getItem("promoDiscount");
     if (savedPromo) setPromoCode(savedPromo);
     if (savedDiscount) setPromoDiscount(parseFloat(savedDiscount));
   }, []);
 
-  // Save to localStorage whenever cart changes
+
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Save promo code to localStorage
+
   useEffect(() => {
     if (promoCode) {
       localStorage.setItem("promoCode", promoCode);
@@ -72,7 +72,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [promoCode, promoDiscount]);
 
-  // Get max quantity allowed based on price
+
   const getMaxQuantity = (price: number): number => {
     if (price < 1000) return 5;
     if (price < 5000) return 3;
@@ -82,11 +82,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (item: Omit<CartItem, "quantity">, quantity: number = 1) => {
     setCartItems((prev) => {
-      // Check if item with same id AND same options exists
+
       const existing = prev.find((i) => {
         if (i.id !== item.id) return false;
         
-        // Compare options
+
         const iOptionsStr = JSON.stringify(i.options || {});
         const itemOptionsStr = JSON.stringify(item.options || {});
         return iOptionsStr === itemOptionsStr;
@@ -100,7 +100,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           const itemOptionsStr = JSON.stringify(item.options || {});
           
           if (i.id === item.id && iOptionsStr === itemOptionsStr) {
-            // Don't exceed max quantity
+
             const newQuantity = Math.min(i.quantity + quantity, maxQty);
             return { ...i, quantity: newQuantity };
           }

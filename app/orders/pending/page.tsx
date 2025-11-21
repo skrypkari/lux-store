@@ -3,10 +3,24 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, XCircle, Clock, ArrowRight, AlertCircle, Lock } from "lucide-react";
+import {
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  ArrowRight,
+  AlertCircle,
+  Lock,
+} from "lucide-react";
 import Link from "next/link";
 
-type PaymentStatus = "pending" | "paid" | "overpaid" | "underpaid" | "expired" | "error";
+type PaymentStatus =
+  | "pending"
+  | "paid"
+  | "overpaid"
+  | "underpaid"
+  | "expired"
+  | "error";
 
 interface OrderStatusResponse {
   id: number;
@@ -21,8 +35,9 @@ interface OrderStatusResponse {
 function PendingPaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  // Support both order_id and order_number parameters
-  const orderId = searchParams.get("order_id") || searchParams.get("order_number");
+
+  const orderId =
+    searchParams.get("order_id") || searchParams.get("order_number");
   const gatewayPaymentId = searchParams.get("gateway_payment_id");
 
   const [status, setStatus] = useState<PaymentStatus>("pending");
@@ -37,28 +52,29 @@ function PendingPaymentContent() {
       return;
     }
 
-    // Function to check payment status
     const checkPaymentStatus = async () => {
       try {
-        console.log('🔍 Checking payment status for order:', orderId);
-        const url = `https://api.lux-store.eu/orders/${orderId}/cointopay-status`;
-        console.log('📡 Fetching:', url);
-        
+        console.log("🔍 Checking payment status for order:", orderId);
+        const url = `http://localhost:5000/orders/${orderId}/cointopay-status`;
+        console.log("📡 Fetching:", url);
+
         const response = await fetch(url);
-        console.log('📥 Response status:', response.status, response.statusText);
-        
+        console.log(
+          "📥 Response status:",
+          response.status,
+          response.statusText
+        );
+
         if (!response.ok) {
           throw new Error(`Failed to check payment status: ${response.status}`);
         }
 
         const data: OrderStatusResponse = await response.json();
-        console.log('✅ Received data:', data);
+        console.log("✅ Received data:", data);
         setOrderData(data);
 
-        // Map payment_status OR order status to our status type
-        // For SEPA & Open Banking: when status becomes "Payment Confirmed" or any status after it
         if (
-          data.payment_status === "paid" || 
+          data.payment_status === "paid" ||
           data.status === "Payment Confirmed" ||
           data.status === "Under Review" ||
           data.status === "Processing" ||
@@ -71,9 +87,11 @@ function PendingPaymentContent() {
           data.status === "Delivered"
         ) {
           setStatus("paid");
-          // Redirect to order details page with token after 2 seconds
+
           setTimeout(() => {
-            router.push(`/orders/${data.order_number}?token=${data.access_token}`);
+            router.push(
+              `/orders/${data.order_number}?token=${data.access_token}`
+            );
           }, 2000);
         } else if (data.payment_status === "pending") {
           setStatus("pending");
@@ -89,7 +107,7 @@ function PendingPaymentContent() {
       } catch (err) {
         console.error("❌ Error checking payment status:", err);
         console.error("Error details:", {
-          message: err instanceof Error ? err.message : 'Unknown error',
+          message: err instanceof Error ? err.message : "Unknown error",
           orderId,
         });
         setError("Failed to check payment status");
@@ -97,91 +115,100 @@ function PendingPaymentContent() {
       }
     };
 
-    // Check immediately  
     checkPaymentStatus();
 
     const interval = setInterval(checkPaymentStatus, 150000);
 
-    // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, [orderId, router]);
 
-  // Render error state
-  // if (error) {
-  //   return (
-  //     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-rose-50 py-20">
-  //       <div className="container mx-auto max-w-3xl px-4">
-  //         <div className="relative overflow-hidden rounded-3xl border border-red-200 bg-white p-8 shadow-2xl sm:p-12">
-  //           <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-transparent" />
-            
-  //           <div className="relative z-10 text-center">
-  //             <div className="mb-8 flex justify-center">
-  //               <div className="relative">
-  //                 <div className="absolute inset-0 animate-pulse rounded-full bg-red-400 opacity-20" />
-  //                 <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-xl">
-  //                   <XCircle className="h-14 w-14 text-white" strokeWidth={2.5} />
-  //                 </div>
-  //               </div>
-  //             </div>
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-rose-50 py-20">
+        <div className="container mx-auto max-w-3xl px-4">
+          <div className="relative overflow-hidden rounded-3xl border border-red-200 bg-white p-8 shadow-2xl sm:p-12">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-transparent" />
 
-  //             <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight">
-  //               <span className="bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
-  //                 Unable to Process
-  //               </span>
-  //             </h1>
-  //             <p className="mb-8 font-general-sans text-lg text-black/60">
-  //               {error}
-  //             </p>
+            <div className="relative z-10 text-center">
+              <div className="mb-8 flex justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 animate-pulse rounded-full bg-red-400 opacity-20" />
+                  <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-rose-600 shadow-xl">
+                    <XCircle
+                      className="h-14 w-14 text-white"
+                      strokeWidth={2.5}
+                    />
+                  </div>
+                </div>
+              </div>
 
-  //             <div className="mb-8 rounded-2xl border border-red-100 bg-gradient-to-br from-red-50 to-white p-6">
-  //               <h3 className="mb-3 font-satoshi text-lg font-bold">Need Assistance?</h3>
-  //               <p className="font-general-sans text-sm text-black/70">
-  //                 Our support team is available 24/7 to help resolve any issues. Please don't hesitate to reach out.
-  //               </p>
-  //             </div>
+              <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight">
+                <span className="bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+                  Unable to Process
+                </span>
+              </h1>
+              <p className="mb-8 font-general-sans text-lg text-black/60">
+                {error}
+              </p>
 
-  //             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-  //               <Link href="/contact">
-  //                 <Button size="lg" className="gap-2 bg-gradient-to-r from-red-600 to-rose-600 px-8 font-satoshi font-semibold hover:from-red-700 hover:to-rose-700">
-  //                   Contact Support
-  //                   <ArrowRight className="h-5 w-5" />
-  //                 </Button>
-  //               </Link>
-  //               <Link href="/store/all">
-  //                 <Button variant="outline" size="lg" className="gap-2 border-2 font-satoshi font-semibold">
-  //                   Continue Shopping
-  //                   <ArrowRight className="h-5 w-5" />
-  //                 </Button>
-  //               </Link>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+              <div className="mb-8 rounded-2xl border border-red-100 bg-gradient-to-br from-red-50 to-white p-6">
+                <h3 className="mb-3 font-satoshi text-lg font-bold">
+                  Need Assistance?
+                </h3>
+                <p className="font-general-sans text-sm text-black/70">
+                  Our support team is available 24/7 to help resolve any issues.
+                  Please don't hesitate to reach out.
+                </p>
+              </div>
 
-  // Render paid state
+              <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
+                <Link href="/contact">
+                  <Button
+                    size="lg"
+                    className="gap-2 bg-gradient-to-r from-red-600 to-rose-600 px-8 font-satoshi font-semibold hover:from-red-700 hover:to-rose-700"
+                  >
+                    Contact Support
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href="/store/all">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="gap-2 border-2 font-satoshi font-semibold"
+                  >
+                    Continue Shopping
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (status === "paid") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 py-20">
         <div className="container mx-auto max-w-3xl px-4">
           <div className="relative overflow-hidden rounded-3xl border border-emerald-200 bg-white p-8 shadow-2xl sm:p-12">
-            {/* Success animation background */}
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent" />
-            
+
             <div className="relative z-10 text-center">
-              {/* Animated checkmark */}
               <div className="mb-8 flex justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 animate-ping rounded-full bg-emerald-400 opacity-20" />
                   <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-xl">
-                    <CheckCircle2 className="h-14 w-14 animate-bounce text-white" strokeWidth={2.5} />
+                    <CheckCircle2
+                      className="h-14 w-14 animate-bounce text-white"
+                      strokeWidth={2.5}
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Success message */}
               <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight">
                 <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
                   Payment Confirmed
@@ -191,7 +218,6 @@ function PendingPaymentContent() {
                 Your luxury order has been successfully processed
               </p>
 
-              {/* Order details card */}
               {orderData && (
                 <div className="mb-8 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-8">
                   <div className="mb-4 inline-flex rounded-full bg-emerald-100 px-4 py-1.5">
@@ -204,7 +230,9 @@ function PendingPaymentContent() {
                   </p>
                   <div className="mt-6 flex items-center justify-center gap-2 text-black/50">
                     <div className="h-px w-12 bg-black/20" />
-                    <p className="font-general-sans text-sm uppercase tracking-wider">Total Paid</p>
+                    <p className="font-general-sans text-sm uppercase tracking-wider">
+                      Total Paid
+                    </p>
                     <div className="h-px w-12 bg-black/20" />
                   </div>
                   <p className="mt-3 font-satoshi text-3xl font-bold">
@@ -213,7 +241,6 @@ function PendingPaymentContent() {
                 </div>
               )}
 
-              {/* Redirecting message */}
               <div className="flex items-center justify-center gap-3 text-emerald-600">
                 <Loader2 className="h-5 w-5 animate-spin" />
                 <p className="font-satoshi text-sm font-semibold">
@@ -223,13 +250,14 @@ function PendingPaymentContent() {
             </div>
           </div>
 
-          {/* What's next section */}
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-black/10 bg-white/80 p-6 backdrop-blur-sm">
               <div className="mb-3 inline-flex rounded-full bg-black/5 p-3">
                 <CheckCircle2 className="h-6 w-6 text-emerald-600" />
               </div>
-              <p className="font-satoshi text-sm font-bold">Confirmation Email</p>
+              <p className="font-satoshi text-sm font-bold">
+                Confirmation Email
+              </p>
               <p className="mt-1 font-general-sans text-xs text-black/60">
                 Sent to your inbox
               </p>
@@ -258,14 +286,13 @@ function PendingPaymentContent() {
     );
   }
 
-  // Render expired state
   if (status === "expired") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 py-20">
         <div className="container mx-auto max-w-3xl px-4">
           <div className="relative overflow-hidden rounded-3xl border border-orange-200 bg-white p-8 shadow-2xl sm:p-12">
             <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-transparent" />
-            
+
             <div className="relative z-10 text-center">
               <div className="mb-8 flex justify-center">
                 <div className="relative">
@@ -282,7 +309,8 @@ function PendingPaymentContent() {
                 </span>
               </h1>
               <p className="mb-8 font-general-sans text-lg text-black/60">
-                The payment session has timed out. No worries, you can restart the process.
+                The payment session has timed out. No worries, you can restart
+                the process.
               </p>
 
               {orderData && (
@@ -298,13 +326,20 @@ function PendingPaymentContent() {
 
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
                 <Link href="/checkout">
-                  <Button size="lg" className="gap-2 bg-gradient-to-r from-orange-600 to-amber-600 px-8 font-satoshi font-semibold hover:from-orange-700 hover:to-amber-700">
+                  <Button
+                    size="lg"
+                    className="gap-2 bg-gradient-to-r from-orange-600 to-amber-600 px-8 font-satoshi font-semibold hover:from-orange-700 hover:to-amber-700"
+                  >
                     Create New Payment
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
                 <Link href="/contact">
-                  <Button variant="outline" size="lg" className="gap-2 border-2 font-satoshi font-semibold">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="gap-2 border-2 font-satoshi font-semibold"
+                  >
                     Contact Support
                     <ArrowRight className="h-5 w-5" />
                   </Button>
@@ -317,27 +352,31 @@ function PendingPaymentContent() {
     );
   }
 
-  // Render underpaid/overpaid state
   if (status === "underpaid" || status === "overpaid") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-amber-50 py-20">
         <div className="container mx-auto max-w-3xl px-4">
           <div className="relative overflow-hidden rounded-3xl border border-yellow-200 bg-white p-8 shadow-2xl sm:p-12">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/50 to-transparent" />
-            
+
             <div className="relative z-10 text-center">
               <div className="mb-8 flex justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 animate-pulse rounded-full bg-yellow-400 opacity-20" />
                   <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 shadow-xl">
-                    <AlertCircle className="h-14 w-14 text-white" strokeWidth={2.5} />
+                    <AlertCircle
+                      className="h-14 w-14 text-white"
+                      strokeWidth={2.5}
+                    />
                   </div>
                 </div>
               </div>
 
               <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight">
                 <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">
-                  {status === "underpaid" ? "Payment Adjustment Required" : "Overpayment Received"}
+                  {status === "underpaid"
+                    ? "Payment Adjustment Required"
+                    : "Overpayment Received"}
                 </span>
               </h1>
               <p className="mb-8 font-general-sans text-lg text-black/60">
@@ -356,31 +395,49 @@ function PendingPaymentContent() {
                   </p>
                   <div className="inline-flex rounded-full bg-yellow-100 px-4 py-2">
                     <p className="font-satoshi text-xs font-bold uppercase tracking-wider text-yellow-700">
-                      {status === "underpaid" ? "Amount Mismatch" : "Refund Pending"}
+                      {status === "underpaid"
+                        ? "Amount Mismatch"
+                        : "Refund Pending"}
                     </p>
                   </div>
                 </div>
               )}
 
               <div className="mb-8 rounded-2xl border border-yellow-100 bg-yellow-50/50 p-6">
-                <h3 className="mb-3 font-satoshi text-lg font-bold">What Happens Next?</h3>
+                <h3 className="mb-3 font-satoshi text-lg font-bold">
+                  What Happens Next?
+                </h3>
                 <div className="space-y-2 text-left font-general-sans text-sm text-black/70">
                   <p>• Our payment team has been automatically notified</p>
-                  <p>• You'll receive an email within 24 hours with next steps</p>
-                  <p>• {status === "underpaid" ? "You may need to complete the remaining payment" : "The excess amount will be refunded to your account"}</p>
+                  <p>
+                    • You'll receive an email within 24 hours with next steps
+                  </p>
+                  <p>
+                    •{" "}
+                    {status === "underpaid"
+                      ? "You may need to complete the remaining payment"
+                      : "The excess amount will be refunded to your account"}
+                  </p>
                   <p>• Your order will be processed once resolved</p>
                 </div>
               </div>
 
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
                 <Link href="/contact">
-                  <Button size="lg" className="gap-2 bg-gradient-to-r from-yellow-600 to-amber-600 px-8 font-satoshi font-semibold hover:from-yellow-700 hover:to-amber-700">
+                  <Button
+                    size="lg"
+                    className="gap-2 bg-gradient-to-r from-yellow-600 to-amber-600 px-8 font-satoshi font-semibold hover:from-yellow-700 hover:to-amber-700"
+                  >
                     Contact Support Team
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
                 <Link href="/track">
-                  <Button variant="outline" size="lg" className="gap-2 border-2 font-satoshi font-semibold">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="gap-2 border-2 font-satoshi font-semibold"
+                  >
                     Track Order Status
                     <ArrowRight className="h-5 w-5" />
                   </Button>
@@ -393,31 +450,34 @@ function PendingPaymentContent() {
     );
   }
 
-  // Render pending state (default)
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-20">
       <div className="container mx-auto max-w-4xl px-4">
         <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white p-8 shadow-2xl sm:p-12">
-          {/* Premium background pattern */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,0,0,0.03)_0%,transparent_50%)]" />
           <div className="absolute right-0 top-0 h-96 w-96 bg-gradient-to-br from-blue-50 to-transparent opacity-30 blur-3xl" />
-          
+
           <div className="relative z-10">
-            {/* Animated loader */}
             <div className="mb-12 flex justify-center">
               <div className="relative">
-                {/* Pulsing rings */}
-                <div className="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-20" style={{ animationDuration: '2s' }} />
-                <div className="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-10" style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
-                
-                {/* Main loader circle */}
+                <div
+                  className="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-20"
+                  style={{ animationDuration: "2s" }}
+                />
+                <div
+                  className="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-10"
+                  style={{ animationDuration: "3s", animationDelay: "0.5s" }}
+                />
+
                 <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-2xl">
-                  <Loader2 className="h-16 w-16 animate-spin text-white" strokeWidth={2} />
+                  <Loader2
+                    className="h-16 w-16 animate-spin text-white"
+                    strokeWidth={2}
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Title */}
             <div className="mb-8 text-center">
               <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight sm:text-5xl">
                 Payment Processing
@@ -427,7 +487,6 @@ function PendingPaymentContent() {
               </p>
             </div>
 
-            {/* Order details - Premium card */}
             {orderData && (
               <div className="mb-10 overflow-hidden rounded-2xl border border-black/10 bg-gradient-to-br from-slate-50 to-white shadow-xl">
                 <div className="border-b border-black/5 bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-6">
@@ -447,7 +506,7 @@ function PendingPaymentContent() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="p-8">
                   <div className="grid gap-6 sm:grid-cols-2">
                     <div>
@@ -473,8 +532,7 @@ function PendingPaymentContent() {
               </div>
             )}
 
-            {/* Status indicator */}
-              <div className="mb-10 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6 shadow-lg">
+            <div className="mb-10 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6 shadow-lg">
               <div className="flex items-center gap-4">
                 <div className="flex-shrink-0">
                   <div className="relative">
@@ -485,47 +543,54 @@ function PendingPaymentContent() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <p className="font-satoshi text-sm font-bold">Monitoring Transfer Status</p>
+                  <p className="font-satoshi text-sm font-bold">
+                    Monitoring Transfer Status
+                  </p>
                   <p className="mt-0.5 font-general-sans text-xs text-black/60">
                     Checking status...
                   </p>
                 </div>
               </div>
-            </div>            {/* Grid of info cards */}
+            </div>
             <div className="mb-10 grid gap-4 sm:grid-cols-3">
               <div className="group rounded-xl border border-black/10 bg-white/50 p-6 backdrop-blur-sm transition-all hover:border-black/20 hover:shadow-lg">
                 <div className="mb-3 inline-flex rounded-full bg-black/5 p-3 transition-colors group-hover:bg-black/10">
                   <Lock className="h-5 w-5 text-black/70" />
                 </div>
-                <p className="mb-1 font-satoshi text-sm font-bold">Secure Transfer</p>
+                <p className="mb-1 font-satoshi text-sm font-bold">
+                  Secure Transfer
+                </p>
                 <p className="font-general-sans text-xs text-black/60">
                   256-bit encryption
                 </p>
               </div>
-              
+
               <div className="group rounded-xl border border-black/10 bg-white/50 p-6 backdrop-blur-sm transition-all hover:border-black/20 hover:shadow-lg">
                 <div className="mb-3 inline-flex rounded-full bg-black/5 p-3 transition-colors group-hover:bg-black/10">
                   <CheckCircle2 className="h-5 w-5 text-black/70" />
                 </div>
-                <p className="mb-1 font-satoshi text-sm font-bold">Processing Time</p>
+                <p className="mb-1 font-satoshi text-sm font-bold">
+                  Processing Time
+                </p>
                 <p className="font-general-sans text-xs text-black/60">
                   1-3 business days
                 </p>
               </div>
-              
+
               <div className="group rounded-xl border border-black/10 bg-white/50 p-6 backdrop-blur-sm transition-all hover:border-black/20 hover:shadow-lg">
                 <div className="mb-3 inline-flex rounded-full bg-black/5 p-3 transition-colors group-hover:bg-black/10">
                   <CheckCircle2 className="h-5 w-5 text-black/70" />
                 </div>
-                <p className="mb-1 font-satoshi text-sm font-bold">Safe to Close</p>
+                <p className="mb-1 font-satoshi text-sm font-bold">
+                  Safe to Close
+                </p>
                 <p className="font-general-sans text-xs text-black/60">
                   You can close this window
                 </p>
               </div>
             </div>
 
-            {/* Help section */}
-              <div className="rounded-2xl border border-black/10 bg-gradient-to-br from-slate-50 to-white p-8">
+            <div className="rounded-2xl border border-black/10 bg-gradient-to-br from-slate-50 to-white p-8">
               <h3 className="mb-6 flex items-center gap-2 font-satoshi text-lg font-bold">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white">
                   <AlertCircle className="h-4 w-4" />
@@ -546,7 +611,8 @@ function PendingPaymentContent() {
                     2
                   </div>
                   <p className="font-general-sans text-sm text-black/70">
-                    The transfer is being processed by your bank (1-3 business days)
+                    The transfer is being processed by your bank (1-3 business
+                    days)
                   </p>
                 </div>
                 <div className="flex gap-3">
@@ -562,16 +628,17 @@ function PendingPaymentContent() {
                     4
                   </div>
                   <p className="font-general-sans text-sm text-black/70">
-                    You'll receive a confirmation email once the payment is received
+                    You'll receive a confirmation email once the payment is
+                    received
                   </p>
                 </div>
               </div>
-            </div>            {/* Action buttons */}
+            </div>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Link href="/track">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
+                <Button
+                  variant="outline"
+                  size="lg"
                   className="w-full gap-2 border-2 border-black/20 font-satoshi font-semibold hover:bg-black hover:text-white sm:w-auto"
                 >
                   Track Order Status
@@ -579,9 +646,9 @@ function PendingPaymentContent() {
                 </Button>
               </Link>
               <Link href="/contact">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
+                <Button
+                  variant="outline"
+                  size="lg"
                   className="w-full gap-2 border-2 border-black/20 font-satoshi font-semibold hover:bg-black hover:text-white sm:w-auto"
                 >
                   Contact Support
@@ -592,7 +659,6 @@ function PendingPaymentContent() {
           </div>
         </div>
 
-        {/* Trust indicators */}
         <div className="mt-8 text-center">
           <p className="mb-4 font-general-sans text-xs uppercase tracking-wider text-black/40">
             Your Transaction is Protected By
@@ -610,18 +676,19 @@ function PendingPaymentContent() {
   );
 }
 
-// Suspense wrapper required for useSearchParams()
 export default function PendingPaymentPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-20">
-        <div className="container mx-auto max-w-4xl px-4">
-          <div className="flex items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin text-black/20" />
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-20">
+          <div className="container mx-auto max-w-4xl px-4">
+            <div className="flex items-center justify-center">
+              <Loader2 className="h-12 w-12 animate-spin text-black/20" />
+            </div>
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <PendingPaymentContent />
     </Suspense>
   );

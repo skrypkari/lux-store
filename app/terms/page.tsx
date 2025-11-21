@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA]">
-      {/* Header */}
       <div className="border-b border-black/10 bg-white/80 backdrop-blur-sm">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
           <Link href="/">
@@ -20,7 +19,6 @@ export default function TermsPage() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="mb-8 text-center">
           <h1 className="mb-3 font-satoshi text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
@@ -32,7 +30,6 @@ export default function TermsPage() {
         </div>
 
         <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 shadow-lg sm:p-8 lg:p-12">
-          {/* Section 1 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               ABOUT LUX STORE AND THESE TERMS OF USE
@@ -62,7 +59,6 @@ export default function TermsPage() {
             </div>
           </section>
 
-          {/* Section 2 */}
           <section>
             <h3 className="mb-3 font-satoshi text-xl font-bold">
               Updates to these Terms of Use
@@ -79,7 +75,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 3 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               ABOUT OUR HOSTING SERVICES
@@ -92,7 +87,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 4 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               OUR PRIVACY POLICY
@@ -112,7 +106,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 5 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               LUX STORE – CONDITIONS OF SALE AND RETURN AND EXCHANGES POLICY
@@ -127,7 +120,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 6 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               USE OF MATERIALS ON THE PLATFORMS
@@ -184,7 +176,6 @@ export default function TermsPage() {
             </div>
           </section>
 
-          {/* Section 7 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               YOUR SUBMISSIONS AND UNSOLICITED COMMUNICATIONS
@@ -213,7 +204,6 @@ export default function TermsPage() {
             </div>
           </section>
 
-          {/* Section 8 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               LIMITATION OF LIABILITY
@@ -271,7 +261,6 @@ export default function TermsPage() {
             </div>
           </section>
 
-          {/* Section 9 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               TRADEMARK NOTICE
@@ -291,7 +280,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 10 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               COPYRIGHT NOTICE
@@ -304,7 +292,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 11 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               LINKS & LINKING
@@ -329,7 +316,6 @@ export default function TermsPage() {
             </div>
           </section>
 
-          {/* Section 12 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               TERMINATION AND SUSPENSION
@@ -350,7 +336,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 13 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               GENERAL PROVISIONS
@@ -390,7 +375,6 @@ export default function TermsPage() {
             </div>
           </section>
 
-          {/* Section 14 */}
           <section>
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               APPLICABLE LAW AND JURISDICTION
@@ -408,7 +392,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* Section 15 - Contact */}
           <section className="rounded-xl border border-black/10 bg-black/5 p-6">
             <h2 className="mb-4 font-satoshi text-2xl font-bold tracking-tight">
               CONTACT US
@@ -434,7 +417,7 @@ export default function TermsPage() {
               </div>
             </div>
           </section>
-          {/* Related Links */}
+
           <div className="mt-8 rounded-xl border border-black/10 bg-gradient-to-r from-black/5 to-transparent p-8">
             <h3 className="mb-4 text-center font-satoshi text-xl font-bold">
               Related Policies
@@ -468,7 +451,6 @@ export default function TermsPage() {
           </div>
         </div>
 
-        {/* Back Button */}
         <div className="mt-12 text-center">
           <Link href="/">
             <Button

@@ -8,7 +8,7 @@ export default function CartPage() {
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
+        
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
           <a href="/" className="hover:text-foreground transition-colors">Home</a>
           <span>/</span>

@@ -22,7 +22,7 @@ interface BestSellerProduct {
 }
 
 const staticProducts: BestSellerProduct[] = [
-  // Оригинальные Hermès
+
   {
     id: '768026209',
     name: "Hermès Kelly Sellier 20 Black Epsom Gold Hardware",
@@ -127,7 +127,7 @@ const staticProducts: BestSellerProduct[] = [
     badgeColor: "amber",
     currency: "EUR",
   },
-  // Новые товары
+
   {
     id: '764748979',
     name: "Classic 11.12 Handbag",
@@ -402,7 +402,7 @@ const badgeStyles: Record<string, string> = {
 };
 
 export default function BestSellers() {
-  // Используем статические данные - они не меняются
+
   const products = staticProducts;
   const { addToCart } = useCart();
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
@@ -426,7 +426,7 @@ export default function BestSellers() {
   return (
     <section className="py-24 bg-gradient-to-b from-white to-neutral-50">
       <div className="container mx-auto px-4">
-        {/* Header */}
+        
         <div className="text-center mb-16 space-y-4">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-neutral-300" />
@@ -525,7 +525,7 @@ export default function BestSellers() {
                           </>
                         )}
                       </span>
-                      {/* Ripple effect */}
+                      
                       {addingToCart === product.id && (
                         <span className="absolute inset-0 bg-white/20 animate-ping rounded" />
                       )}
@@ -537,7 +537,7 @@ export default function BestSellers() {
           ))}
         </div>
 
-        {/* View All Button */}
+        
         <div className="text-center mt-16">
           <Button
             size="lg"

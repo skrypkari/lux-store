@@ -68,14 +68,14 @@ const brands = [
 export default function BrandsSection() {
   return (
     <section className="relative py-32 bg-gradient-to-b from-background via-muted/20 to-background overflow-hidden">
-      {/* Decorative Background Elements */}
+      
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 left-10 w-72 h-72 bg-foreground rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-foreground rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header with Premium Design */}
+        
         <div className="text-center mb-20 space-y-6">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="h-px w-16 bg-gradient-to-r from-transparent to-foreground/30" />
@@ -93,7 +93,7 @@ export default function BrandsSection() {
             Discover the world's most prestigious fashion houses and their timeless collections
           </p>
 
-          {/* Stats Row */}
+          
           <div className="flex flex-wrap items-center justify-center gap-8 pt-8">
             <div className="text-center">
               <div className="text-3xl font-bold mb-1">6</div>
@@ -112,7 +112,7 @@ export default function BrandsSection() {
           </div>
         </div>
 
-        {/* Brands Grid with Enhanced Cards */}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8 mb-16">
           {brands.map((brand, index) => (
             <Link 
@@ -126,14 +126,14 @@ export default function BrandsSection() {
               <Card className="relative overflow-hidden border-2 hover:border-foreground/20 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 bg-card/50 backdrop-blur p-0">
                 <CardContent className="p-0">
                   <div className="relative h-64 lg:h-96 overflow-hidden">
-                    {/* Since Badge */}
+                    
                     <div className="absolute top-4 right-4 z-20">
                       <Badge className="bg-white/90 text-black backdrop-blur-sm border-0 shadow-lg font-semibold">
                         Since {brand.established}
                       </Badge>
                     </div>
 
-                    {/* Brand Image */}
+                    
                     <Image
                       src={brand.image}
                       alt={brand.name}
@@ -142,42 +142,42 @@ export default function BrandsSection() {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     
-                    {/* Gradient Overlay */}
+                    
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
                     
-                    {/* Content */}
+                    
                     <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">
-                      {/* Category & Year */}
+                      
                       <div className="flex items-center gap-3 mb-3">
                         <Badge variant="secondary" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
                           {brand.category}
                         </Badge>
                       </div>
 
-                      {/* Brand Name */}
+                      
                       <h3 className="text-3xl md:text-4xl font-bold mb-2 tracking-wide transform group-hover:translate-x-2 transition-transform duration-300">
                         {brand.name}
                       </h3>
                       
-                      {/* Description */}
+                      
                       <p className="text-white/90 font-light text-lg mb-4 transform group-hover:translate-x-2 transition-transform duration-300 delay-75">
                         {brand.description}
                       </p>
 
-                      {/* Explore Link with Icon */}
+                      
                       <div className="flex items-center gap-2 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                         <span>Explore Collection</span>
                         <Sparkles className="w-4 h-4" />
                       </div>
                     </div>
 
-                    {/* Decorative Corner Accent */}
+                    
                     <div className="absolute top-0 right-0 w-24 h-24 opacity-20">
                       <div className="absolute top-4 right-4 w-16 h-px bg-white rotate-45" />
                       <div className="absolute top-4 right-4 h-16 w-px bg-white rotate-45" />
                     </div>
 
-                    {/* Shine Effect on Hover */}
+                    
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
                     </div>
@@ -188,7 +188,7 @@ export default function BrandsSection() {
           ))}
         </div>
 
-        {/* Enhanced CTA Section */}
+        
         <div className="text-center space-y-6">
           <div className="flex items-center justify-center gap-2 text-muted-foreground mb-4">
             <Star className="w-5 h-5 fill-current" />
@@ -213,7 +213,7 @@ export default function BrandsSection() {
         </div>
       </div>
 
-      {/* Bottom Decorative Line */}
+      
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
     </section>
   );

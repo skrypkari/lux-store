@@ -59,22 +59,22 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
   const [totalPages, setTotalPages] = useState(0);
   const productsPerPage = 24;
 
-  // Fetch products based on search query
+
   useEffect(() => {
     setLoading(true);
     setCurrentPage(1); // Reset to first page on filter change
     
-    // Build query parameters
+
     const params = new URLSearchParams();
     params.append('page', '1');
     params.append('limit', '1000'); // Get all products
     
-    // Add search query
+
     if (initialQuery) {
       params.append('search', initialQuery);
     }
     
-    // Add price range filter
+
     if (priceRange !== "all") {
       if (priceRange === "under-5000") {
         params.append('maxPrice', '5000');
@@ -89,12 +89,12 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
       }
     }
 
-    fetch(`https://api.lux-store.eu/products?${params.toString()}`)
+    fetch(`http://localhost:5000/products?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         let filteredProducts = data.products || [];
         
-        // Extract unique brands
+
         const uniqueBrands = new Set<string>();
         filteredProducts.forEach((product: Product) => {
           const brandAttr = product.attributes?.find(attr => attr.attribute.name === "Brand");
@@ -102,7 +102,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
         });
         setBrands(Array.from(uniqueBrands).sort());
         
-        // Extract unique categories
+
         const uniqueCategories = new Map<number, { id: number; name: string; slug: string }>();
         filteredProducts.forEach((product: Product) => {
           product.categories?.forEach((cat) => {
@@ -123,9 +123,9 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
       });
   }, [initialQuery, priceRange]);
 
-  // Client-side filtering
+
   const filteredProducts = products.filter((product) => {
-    // Brand filter
+
     if (selectedBrands.length > 0) {
       const brandAttr = product.attributes?.find(attr => attr.attribute.name === "Brand");
       if (!brandAttr || !selectedBrands.includes(brandAttr.value)) {
@@ -133,7 +133,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
       }
     }
 
-    // Category filter
+
     if (selectedCategories.length > 0) {
       const hasMatchingCategory = product.categories?.some(
         (cat) => selectedCategories.includes(cat.category.slug)
@@ -144,7 +144,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
     return true;
   });
 
-  // Client-side sorting
+
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === "price-asc") {
       return a.base_price - b.base_price;
@@ -156,14 +156,14 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
     return 0;
   });
 
-  // Pagination
+
   const totalFilteredProducts = sortedProducts.length;
   const totalPagesCount = Math.ceil(totalFilteredProducts / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
   const endIndex = startIndex + productsPerPage;
   const paginatedProducts = sortedProducts.slice(startIndex, endIndex);
 
-  // Reset to page 1 when filters change
+
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedBrands, selectedCategories, sortBy]);
@@ -189,10 +189,10 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
 
   const activeFiltersCount = selectedBrands.length + selectedCategories.length + (priceRange !== "all" ? 1 : 0);
 
-  // Filters component (reusable for desktop and mobile)
+
   const FiltersContent = () => (
     <div className="space-y-6">
-      {/* Active Filters Count */}
+      
       {activeFiltersCount > 0 && (
         <div className="flex items-center justify-between">
           <Badge variant="secondary">{activeFiltersCount} filters active</Badge>
@@ -232,7 +232,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      {/* Desktop Filters Sidebar */}
+      
       <aside className="hidden lg:block">
         <div className="sticky top-24">
           <div className="flex items-center justify-between mb-6">
@@ -242,12 +242,12 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
         </div>
       </aside>
 
-      {/* Main Content */}
+      
       <div className="lg:col-span-3">
-        {/* Toolbar */}
+        
         <div className="flex items-center justify-between mb-6 pb-4 border-b">
           <div className="flex items-center gap-4">
-            {/* Mobile Filters */}
+            
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" className="lg:hidden">
@@ -270,7 +270,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
               </SheetContent>
             </Sheet>
 
-            {/* Results Count */}
+            
             <p className="text-sm text-muted-foreground">
               <span className="font-semibold text-foreground">{totalFilteredProducts}</span> products
               {totalPagesCount > 1 && (
@@ -282,7 +282,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Sort */}
+            
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Sort by" />
@@ -296,7 +296,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
               </SelectContent>
             </Select>
 
-            {/* View Mode */}
+            
             <div className="hidden md:flex gap-1 border rounded-lg p-1">
               <Button
                 variant={viewMode === "grid-3" ? "secondary" : "ghost"}
@@ -318,7 +318,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
           </div>
         </div>
 
-        {/* Products Grid */}
+        
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -361,7 +361,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
                       {product.name}
                     </h3>
 
-                    {/* Condition Badge */}
+                    
                     <div className="flex items-center gap-2 mb-3">
                       <Badge variant="outline" className="text-xs">
                         {product.condition}
@@ -385,7 +385,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
               })}
             </div>
 
-            {/* Pagination */}
+            
             {totalPagesCount > 1 && (
               <div className="flex items-center justify-center gap-2 mt-12">
                 <Button
@@ -398,7 +398,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
                 
                 <div className="flex gap-1">
                   {Array.from({ length: totalPagesCount }, (_, i) => i + 1).map((page) => {
-                    // Show first page, last page, current page, and pages around current
+
                     if (
                       page === 1 ||
                       page === totalPagesCount ||
@@ -433,7 +433,7 @@ export default function SearchResults({ initialQuery }: SearchResultsProps) {
             )}
           </>
         ) : (
-          // No Results
+
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
               <SlidersHorizontal className="h-10 w-10 text-muted-foreground" />

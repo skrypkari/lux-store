@@ -22,7 +22,6 @@ function CryptoSuccessContent() {
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-20">
       <div className="container mx-auto max-w-3xl px-4">
         <div className="text-center">
-          {/* Success Icon */}
           <div className="mb-8 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 animate-pulse rounded-full bg-green-500/20 blur-3xl" />
@@ -32,8 +31,9 @@ function CryptoSuccessContent() {
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className="mb-4 font-satoshi text-5xl font-bold text-black">Payment Received!</h1>
+          <h1 className="mb-4 font-satoshi text-5xl font-bold text-black">
+            Payment Received!
+          </h1>
           <p className="mb-2 font-general-sans text-xl text-black/70">
             Your cryptocurrency payment is being processed
           </p>
@@ -41,7 +41,6 @@ function CryptoSuccessContent() {
             We're confirming your transaction on the blockchain
           </p>
 
-          {/* Transaction ID Card */}
           {txnId && (
             <div className="mb-10 rounded-2xl border border-black/10 bg-white p-8 shadow-xl">
               <div className="mb-4 flex items-center justify-center gap-2">
@@ -56,26 +55,28 @@ function CryptoSuccessContent() {
             </div>
           )}
 
-          {/* Divider */}
           <div className="mb-10 flex items-center justify-center gap-4">
             <div className="h-px w-20 bg-gradient-to-r from-transparent to-black/20" />
             <div className="h-2 w-2 rounded-full bg-black/20" />
             <div className="h-px w-20 bg-gradient-to-l from-transparent to-black/20" />
           </div>
 
-          {/* What's Next Section */}
           <div className="mb-10 text-left">
-            <h2 className="mb-6 text-center font-satoshi text-2xl font-bold">What Happens Next?</h2>
+            <h2 className="mb-6 text-center font-satoshi text-2xl font-bold">
+              What Happens Next?
+            </h2>
             <div className="space-y-4">
-              {/* Step 1 */}
               <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/10">
                   <CheckCircle2 className="h-6 w-6 text-black/60" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">Payment Received</h3>
+                  <h3 className="mb-1 font-satoshi text-lg font-bold">
+                    Payment Received
+                  </h3>
                   <p className="font-general-sans text-sm text-black/70">
-                    Your cryptocurrency payment has been detected and is being confirmed on the blockchain.
+                    Your cryptocurrency payment has been detected and is being
+                    confirmed on the blockchain.
                   </p>
                   <p className="mt-2 font-general-sans text-xs text-black/50">
                     ✓ Current Status
@@ -83,37 +84,50 @@ function CryptoSuccessContent() {
                 </div>
               </div>
 
-              {/* Step 2 */}
               <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/10">
-                  <svg className="h-6 w-6 text-black/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="h-6 w-6 text-black/60"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">Blockchain Confirmation</h3>
+                  <h3 className="mb-1 font-satoshi text-lg font-bold">
+                    Blockchain Confirmation
+                  </h3>
                   <p className="font-general-sans text-sm text-black/70">
-                    Waiting for network confirmations. This typically takes a few minutes depending on the cryptocurrency.
+                    Waiting for network confirmations. This typically takes a
+                    few minutes depending on the cryptocurrency.
                   </p>
                 </div>
               </div>
 
-              {/* Step 3 */}
               <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/10">
                   <Package className="h-6 w-6 text-black/60" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">Order Processing</h3>
+                  <h3 className="mb-1 font-satoshi text-lg font-bold">
+                    Order Processing
+                  </h3>
                   <p className="font-general-sans text-sm text-black/70">
-                    Once confirmed, your order will be prepared for shipment within 1-2 business days.
+                    Once confirmed, your order will be prepared for shipment
+                    within 1-2 business days.
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col items-center gap-6">
             <Link href="/store/all">
               <Button
@@ -136,23 +150,29 @@ function CryptoSuccessContent() {
             </Link>
           </div>
 
-          {/* Support Section */}
           <div className="mt-10 rounded-2xl border border-black/10 bg-gradient-to-br from-[#FAFAFA] via-white to-[#F5F5F5] p-6">
-            <p className="mb-3 font-satoshi text-sm font-bold">Need Assistance?</p>
+            <p className="mb-3 font-satoshi text-sm font-bold">
+              Need Assistance?
+            </p>
             <p className="mb-4 font-general-sans text-sm text-black/60">
-              If you have any questions about your payment or order, our support team is here to help.
+              If you have any questions about your payment or order, our support
+              team is here to help.
             </p>
             <Link href="/contact">
-              <Button variant="outline" size="sm" className="gap-2 border-black/20 font-semibold">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 border-black/20 font-semibold"
+              >
                 Contact Support
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
 
-          {/* Footer Note */}
           <p className="mt-8 font-general-sans text-xs text-black/40">
-            A confirmation email will be sent once your payment is fully confirmed
+            A confirmation email will be sent once your payment is fully
+            confirmed
           </p>
         </div>
       </div>

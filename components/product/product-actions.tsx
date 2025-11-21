@@ -23,7 +23,7 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
   const { addToCart, cartItems, getMaxQuantity } = useCart();
   const [quantity, setQuantity] = useState(1);
 
-  // Check current quantity in cart
+
   const cartItem = cartItems.find((i) => {
     if (i.id !== product.id) return false;
     const iOptionsStr = JSON.stringify(i.options || {});
@@ -40,7 +40,7 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
     const remainingSpace = maxQuantity - currentQuantityInCart;
     if (remainingSpace <= 0) return;
     
-    // Add selected quantity, but don't exceed max
+
     const quantityToAdd = Math.min(quantity, remainingSpace);
     addToCart({ ...product, inStock }, quantityToAdd);
   };
@@ -56,7 +56,7 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
 
   return (
     <div className="space-y-4">
-      {/* Quantity */}
+      
       <QuantitySelector 
         inStock={inStock} 
         quantity={quantity}
@@ -64,7 +64,7 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
         maxAvailable={remainingSpace > 0 ? remainingSpace : 0}
       />
 
-      {/* Max Quantity Info */}
+      
       {currentQuantityInCart > 0 && (
         <div className="rounded-lg border border-black/20 bg-black/5 p-3 text-sm">
           <p className="font-medium text-black">
@@ -78,7 +78,7 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
         </div>
       )}
 
-      {/* Action Buttons */}
+      
       <div className="space-y-3">
         <Button
           size="lg"

@@ -83,30 +83,33 @@ export default function OrderDetailsPage() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    
+    const token = urlParams.get("token");
+
     if (!token) {
-      setError("Access denied. Please use the tracking page to view your order.");
+      setError(
+        "Access denied. Please use the tracking page to view your order."
+      );
       setLoading(false);
       return;
     }
-    
+
     fetchOrder(token);
   }, []);
 
   const fetchOrder = async (token: string) => {
     try {
-      const response = await fetch(`https://api.lux-store.eu/orders/by-token/${token}`);
+      const response = await fetch(
+        `http://localhost:5000/orders/by-token/${token}`
+      );
       if (!response.ok) {
         throw new Error("Order not found or invalid access token");
       }
       const data = await response.json();
-      
-      // Verify that the order ID matches the URL parameter
+
       if (data.id !== orderId) {
         throw new Error("Order ID mismatch");
       }
-      
+
       setOrder(data);
     } catch (err: any) {
       setError(err.message || "Failed to load order details");
@@ -180,7 +183,6 @@ export default function OrderDetailsPage() {
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
         <div className="container mx-auto max-w-6xl px-4">
-          {/* Header */}
           <div className="mb-8">
             <Link href="/">
               <Button variant="ghost" className="mb-4 gap-2">
@@ -221,9 +223,7 @@ export default function OrderDetailsPage() {
           </div>
 
           <div className="grid gap-8 lg:grid-cols-3">
-            {/* Main Content */}
             <div className="space-y-6 lg:col-span-2">
-              {/* Current Status */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="rounded-full bg-black p-3">
@@ -251,8 +251,9 @@ export default function OrderDetailsPage() {
                           {currentStatus.status}
                         </p>
                         <p className="mb-3 font-general-sans text-sm text-black/60">
-                          {ORDER_STATUS_DESCRIPTIONS[currentStatus.status as keyof typeof ORDER_STATUS_DESCRIPTIONS] || 
-                           'Your order is being processed.'}
+                          {ORDER_STATUS_DESCRIPTIONS[
+                            currentStatus.status as keyof typeof ORDER_STATUS_DESCRIPTIONS
+                          ] || "Your order is being processed."}
                         </p>
                         {currentStatus.notes && (
                           <p className="font-general-sans text-xs text-black/50 italic">
@@ -263,10 +264,8 @@ export default function OrderDetailsPage() {
                     </div>
                   </div>
                 )}
-
               </div>
 
-              {/* Tracking Information */}
               {order.tracking_number && (
                 <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
                   <div className="mb-4 flex items-center gap-3">
@@ -274,7 +273,9 @@ export default function OrderDetailsPage() {
                       <Package className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="font-satoshi text-xl font-bold">Tracking Information</h2>
+                      <h2 className="font-satoshi text-xl font-bold">
+                        Tracking Information
+                      </h2>
                       <p className="font-general-sans text-sm text-black/60">
                         Track your package delivery
                       </p>
@@ -298,14 +299,21 @@ export default function OrderDetailsPage() {
                         </div>
                       )}
                       {order.tracking_url ? (
-                        <Link href={order.tracking_url} target="_blank" rel="noopener noreferrer">
+                        <Link
+                          href={order.tracking_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <Button className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700">
                             <Package className="h-5 w-5" />
                             Click Here To Track Your Order
                           </Button>
                         </Link>
                       ) : (
-                        <Link href={`/track?id=${order.tracking_number}`} target="_blank">
+                        <Link
+                          href={`/track?id=${order.tracking_number}`}
+                          target="_blank"
+                        >
                           <Button className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700">
                             <Package className="h-5 w-5" />
                             Click Here To Track Your Order
@@ -317,8 +325,7 @@ export default function OrderDetailsPage() {
                 </div>
               )}
 
-            {/* Order Timeline */}
-            <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
+              <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
                 <h2 className="mb-6 font-satoshi text-xl font-bold">
                   Order Timeline
                 </h2>
@@ -357,8 +364,9 @@ export default function OrderDetailsPage() {
                             {formatDate(status.created_at)}
                           </p>
                           <p className="mb-2 font-general-sans text-sm text-black/70">
-                            {ORDER_STATUS_DESCRIPTIONS[status.status as keyof typeof ORDER_STATUS_DESCRIPTIONS] || 
-                             'Order status updated.'}
+                            {ORDER_STATUS_DESCRIPTIONS[
+                              status.status as keyof typeof ORDER_STATUS_DESCRIPTIONS
+                            ] || "Order status updated."}
                           </p>
                           {status.notes && (
                             <p className="font-general-sans text-xs text-black/50 italic">
@@ -371,7 +379,6 @@ export default function OrderDetailsPage() {
                 </div>
               </div>
 
-              {/* Order Items */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
                 <h2 className="mb-6 font-satoshi text-xl font-bold">
                   Order Items
@@ -420,9 +427,7 @@ export default function OrderDetailsPage() {
               </div>
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-6 lg:col-span-1">
-              {/* Order Summary */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
                 <h3 className="mb-4 font-satoshi text-lg font-bold">
                   Order Summary
@@ -431,27 +436,40 @@ export default function OrderDetailsPage() {
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Subtotal (excl. VAT)</span>
                     <span className="font-bold">
-                      €{(order.subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                      €
+                      {(order.subtotal / 1.2)
+                        .toFixed(2)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
                     </span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">VAT (20%)</span>
                     <span className="font-bold">
-                      €{(order.subtotal - order.subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                      €
+                      {(order.subtotal - order.subtotal / 1.2)
+                        .toFixed(2)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
                     </span>
                   </div>
                   {order.discount > 0 && (
                     <div className="flex justify-between font-general-sans text-base">
                       <span className="text-black/70">Discount</span>
                       <span className="font-bold text-red-600">
-                        -€{order.discount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                        -€
+                        {order.discount
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Shipping</span>
                     <span className="font-bold text-green-600">
-                      {order.shipping === 0 ? "FREE" : `€${order.shipping.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}`}
+                      {order.shipping === 0
+                        ? "FREE"
+                        : `€${order.shipping
+                            .toFixed(2)
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}`}
                     </span>
                   </div>
                 </div>
@@ -465,7 +483,10 @@ export default function OrderDetailsPage() {
                     </span>
                     <div className="text-right">
                       <span className="font-satoshi text-3xl font-bold tracking-tight">
-                        €{order.total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                        €
+                        {order.total
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
                       </span>
                     </div>
                   </div>
@@ -479,7 +500,6 @@ export default function OrderDetailsPage() {
                 </div>
               </div>
 
-              {/* Estimated Delivery Time */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
                 <h3 className="mb-4 font-satoshi text-lg font-bold">
                   Estimated Delivery
@@ -498,27 +518,29 @@ export default function OrderDetailsPage() {
                           minDate.setDate(minDate.getDate() + 25);
                           const maxDate = new Date(orderDate);
                           maxDate.setDate(maxDate.getDate() + 35);
-                          
+
                           const formatDateRange = (date: Date) => {
                             return date.toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",
-                              year: "numeric"
+                              year: "numeric",
                             });
                           };
-                          
-                          return `${formatDateRange(minDate)} - ${formatDateRange(maxDate)}`;
+
+                          return `${formatDateRange(
+                            minDate
+                          )} - ${formatDateRange(maxDate)}`;
                         })()}
                       </p>
                       <p className="mt-1 font-general-sans text-xs text-black/50">
-                        Delivery time may vary depending on customs clearance and your location.
+                        Delivery time may vary depending on customs clearance
+                        and your location.
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Customer Information */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
                 <h3 className="mb-4 font-satoshi text-lg font-bold">
                   Customer Information
@@ -551,7 +573,6 @@ export default function OrderDetailsPage() {
                 </div>
               </div>
 
-              {/* Shipping Address */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
                 <h3 className="mb-4 font-satoshi text-lg font-bold">
                   Shipping Address
@@ -584,7 +605,6 @@ export default function OrderDetailsPage() {
                 </div>
               </div>
 
-              {/* Support */}
               <div className="rounded-2xl border border-black/10 bg-gradient-to-br from-[#FAFAFA] via-white to-[#F5F5F5] p-6">
                 <h3 className="mb-2 font-satoshi text-sm font-bold">
                   Need Help?

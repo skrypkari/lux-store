@@ -14,7 +14,7 @@ interface ImageGalleryProps {
 export default function ImageGallery({ images, productName, inStock }: ImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(0);
 
-  // Handle edge case: no images
+
   if (!images || images.length === 0) {
     return (
       <div className="relative aspect-square overflow-hidden rounded-2xl border bg-muted flex items-center justify-center">
@@ -26,7 +26,7 @@ export default function ImageGallery({ images, productName, inStock }: ImageGall
   const hasMultipleImages = images.length > 1;
   const totalImages = images.length;
 
-  // Determine grid columns based on number of images
+
   const getGridCols = () => {
     if (totalImages === 1) return "grid-cols-1";
     if (totalImages === 2) return "grid-cols-2";
@@ -44,7 +44,7 @@ export default function ImageGallery({ images, productName, inStock }: ImageGall
 
   return (
     <>
-      {/* Main Image */}
+      
       <div className="relative aspect-square overflow-hidden rounded-2xl border bg-muted group">
         <Image
           src={images[selectedImage]}
@@ -59,7 +59,7 @@ export default function ImageGallery({ images, productName, inStock }: ImageGall
           </div>
         )}
 
-        {/* Navigation Arrows (only show if multiple images) */}
+        
         {hasMultipleImages && (
           <>
             <Button
@@ -82,7 +82,7 @@ export default function ImageGallery({ images, productName, inStock }: ImageGall
         )}
       </div>
 
-      {/* Thumbnail Gallery (only show if multiple images) */}
+      
       {hasMultipleImages && (
         <div className={`grid ${getGridCols()} gap-4`}>
           {images.slice(0, 4).map((image, index) => (
@@ -106,7 +106,7 @@ export default function ImageGallery({ images, productName, inStock }: ImageGall
         </div>
       )}
 
-      {/* More Images Indicator (if more than 4 images) */}
+      
       {totalImages > 4 && (
         <div className="flex items-center justify-between gap-4">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
@@ -132,7 +132,7 @@ export default function ImageGallery({ images, productName, inStock }: ImageGall
         </div>
       )}
 
-      {/* Image Navigation Info */}
+      
       {hasMultipleImages && (
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <span>Image {selectedImage + 1} of {totalImages}</span>

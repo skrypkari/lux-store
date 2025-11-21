@@ -9,7 +9,7 @@ export default async function AboutPage() {
     <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Hero Section */}
+      
       <section className="relative overflow-hidden bg-black py-32">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:4rem_4rem]" />
         <div className="container relative mx-auto max-w-7xl px-6">
@@ -31,10 +31,10 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Main Content */}
+      
       <section className="py-24">
         <div className="container mx-auto max-w-7xl px-6">
-          {/* Introduction */}
+          
           <div className="mx-auto mb-24 max-w-4xl">
             <div className="mb-12 flex justify-center">
               <div className="h-1 w-24 bg-black" />
@@ -52,7 +52,7 @@ export default async function AboutPage() {
             </p>
           </div>
 
-          {/* Stats */}
+          
           <div className="mb-24 grid gap-8 md:grid-cols-4">
             {[
               { number: "5000+", label: "Luxury Items" },
@@ -77,10 +77,10 @@ export default async function AboutPage() {
             ))}
           </div>
 
-          {/* Company Details */}
+          
           <div className="mb-24 overflow-hidden rounded-3xl border border-black/10 bg-white shadow-2xl">
             <div className="grid md:grid-cols-2">
-              {/* Left Side - Image */}
+              
               <div className="relative h-[500px] bg-black/5">
                 <Image
                   src="/office_img.jpeg"
@@ -94,7 +94,7 @@ export default async function AboutPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               </div>
 
-              {/* Right Side - Content */}
+              
               <div className="flex flex-col justify-center p-12 lg:p-16">
                 <div className="mb-6 flex items-center gap-3">
                   <div className="rounded-lg bg-black p-2.5">
@@ -122,11 +122,11 @@ export default async function AboutPage() {
             </div>
           </div>
 
-          {/* Strategic Location */}
+          
           <div className="mb-24">
             <div className="overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-black to-black/90 shadow-2xl">
               <div className="grid md:grid-cols-2">
-                {/* Left Side - Content */}
+                
                 <div className="flex flex-col justify-center p-12 lg:p-16">
                   <div className="mb-6 flex items-center gap-3">
                     <div className="rounded-lg bg-white p-2.5">
@@ -153,7 +153,7 @@ export default async function AboutPage() {
                   </div>
                 </div>
 
-                {/* Right Side - Image */}
+                
                 <div className="relative h-[500px]">
                   <Image
                     src="/langkawi.jpg"
@@ -169,7 +169,7 @@ export default async function AboutPage() {
             </div>
           </div>
 
-          {/* Our Promise */}
+          
           <div className="mb-24">
             <div className="mx-auto max-w-4xl text-center">
               <div className="mb-8 flex justify-center">
@@ -192,7 +192,7 @@ export default async function AboutPage() {
             </div>
           </div>
 
-          {/* Features Grid */}
+          
           <div className="mb-24 grid gap-8 md:grid-cols-3">
             {[
               {
@@ -229,7 +229,7 @@ export default async function AboutPage() {
             ))}
           </div>
 
-          {/* Closing Statement */}
+          
           <div className="overflow-hidden rounded-3xl border-2 border-black/10 bg-gradient-to-br from-black/5 via-white to-black/5 p-12 shadow-2xl lg:p-16">
             <div className="mx-auto max-w-3xl text-center">
               <div className="mb-8 flex justify-center">
@@ -246,7 +246,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Brand Showcase */}
+      
       <section className="border-t border-black/10 bg-black/5 py-16">
         <div className="container mx-auto max-w-7xl px-6">
           <div className="text-center">

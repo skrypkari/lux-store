@@ -23,7 +23,7 @@ export default function StoreDropdown() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    fetch("https://api.lux-store.eu/categories")
+    fetch("http://localhost:5000/categories")
       .then((res) => res.json())
       .then((data) => {
         console.log("Received data:", data);
@@ -86,12 +86,12 @@ export default function StoreDropdown() {
                     </DropdownMenuItem>
                   </a>
                   {category.children.map((subcategory) => {
-                    // Проверяем, есть ли у этого бренда модели (для Hermès в категории Bags)
+
                     const isHermes = subcategory.name.toLowerCase().includes('herm') && 
                                      category.slug_without_id === 'bags';
                     
                     if (isHermes) {
-                      // Hermès с вложенным меню моделей
+
                       return (
                         <DropdownMenu key={subcategory.id}>
                           <DropdownMenuTrigger asChild>
@@ -141,7 +141,7 @@ export default function StoreDropdown() {
                       );
                     }
                     
-                    // Обычный бренд без моделей
+
                     return (
                       <a 
                         key={subcategory.id}

@@ -17,7 +17,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Search Header */}
+        
         <div className="mb-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
             <a href="/" className="hover:text-foreground transition-colors">Home</a>

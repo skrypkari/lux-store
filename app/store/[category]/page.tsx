@@ -78,7 +78,7 @@ interface Product {
       type: string;
     };
   }>;
-  // Display properties
+
   brand?: string;
   price?: number;
   originalPrice?: number;
@@ -144,16 +144,16 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
         .join(" ")
     : null;
 
-  // Определение категории, бренда и модели
-  // URL: /store/bags - общая категория
-  // URL: /store/bags?brand=hermes - бренд Hermès
-  // URL: /store/hermes-kelly - модель Kelly
-  // URL: /store/jewellery?brand=earrings - подкатегория ювелирных изделий
+
+
+
+
+
   const getCategoryInfo = () => {
     const lowerCategory = category.toLowerCase();
     const normalizedBrand = brandName?.toLowerCase().replace(/è|e/g, 'e');
     
-    // Hermès models (специальные URL для моделей)
+
     if (lowerCategory === "hermes-kelly" || lowerCategory === "hermès-kelly") {
       return { type: "bags", brand: "Hermès", model: "Kelly" };
     }
@@ -164,15 +164,15 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       return { type: "bags", brand: "Hermès", model: "Constance" };
     }
     
-    // Jewellery с подкатегориями через brand параметр
+
     if (lowerCategory === "jewellery" || lowerCategory === "jewelry") {
-      // Нормализуем бренд для корректного отображения
+
       let displayBrand = brandName;
       if (normalizedBrand === "hermes") {
         displayBrand = "Hermès";
       }
       
-      // Если brand указывает на подкатегорию (earrings, rings, bracelets, necklaces)
+
       const jewelryCategories = ["earrings", "rings", "bracelets", "necklaces"];
       if (brandName && jewelryCategories.includes(brandName.toLowerCase())) {
         return {
@@ -189,9 +189,9 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       };
     }
     
-    // Обычная категория с опциональным брендом из query параметра
+
     if (lowerCategory === "bags" || lowerCategory === "watches" || lowerCategory === "sunglasses") {
-      // Нормализуем бренд для корректного отображения
+
       let displayBrand = brandName;
       if (normalizedBrand === "hermes") {
         displayBrand = "Hermès";
@@ -209,13 +209,13 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
 
   const categoryInfo = getCategoryInfo();
 
-  // Инициализация фильтров из URL при первой загрузке
+
   useEffect(() => {
     if (isInitialized) return;
 
     const filters: Record<string, string[]> = {};
     
-    // Читаем все параметры из URL
+
     urlSearchParams.forEach((value, key) => {
       if (key === 'sortBy' || key === 'page' || key === 'minPrice' || key === 'maxPrice' || key === 'brand') {
         return; // Пропускаем служебные параметры
@@ -227,19 +227,19 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       filters[key].push(value);
     });
 
-    // Восстанавливаем сортировку
+
     const urlSortBy = urlSearchParams.get('sortBy');
     if (urlSortBy) {
       setSortBy(urlSortBy);
     }
 
-    // Восстанавливаем страницу
+
     const urlPage = urlSearchParams.get('page');
     if (urlPage) {
       setPage(parseInt(urlPage));
     }
 
-    // Восстанавливаем ценовой диапазон
+
     const urlMinPrice = urlSearchParams.get('minPrice');
     const urlMaxPrice = urlSearchParams.get('maxPrice');
     if (urlMinPrice || urlMaxPrice) {
@@ -249,7 +249,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       tempPriceRef.current = [min, max];
     }
 
-    // Применяем фильтры
+
     if (Object.keys(filters).length > 0) {
       setSelectedFilters(filters);
       setAppliedFilters(filters);
@@ -258,7 +258,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     setIsInitialized(true);
   }, []);
 
-  // Функция для обновления URL
+
   const updateURL = (
     newFilters: Record<string, string[]>,
     newSortBy: string,
@@ -267,48 +267,48 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
   ) => {
     const params = new URLSearchParams();
 
-    // Добавляем brand если есть
+
     if (brand) {
       params.set('brand', brand);
     }
 
-    // Добавляем сортировку
+
     if (newSortBy && newSortBy !== 'featured') {
       params.set('sortBy', newSortBy);
     }
 
-    // Добавляем страницу если не первая
+
     if (newPage > 0) {
       params.set('page', newPage.toString());
     }
 
-    // Добавляем ценовой диапазон если изменен
+
     if (newPriceRange[0] > 0 || newPriceRange[1] < 400000) {
       params.set('minPrice', newPriceRange[0].toString());
       params.set('maxPrice', newPriceRange[1].toString());
     }
 
-    // Добавляем фильтры
+
     Object.entries(newFilters).forEach(([key, values]) => {
       values.forEach((value) => {
         params.append(key, value);
       });
     });
 
-    // Обновляем URL без перезагрузки страницы
+
     const newURL = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
     router.push(newURL, { scroll: false });
   };
 
-  // Функция для переключения фильтра
+
   const toggleFilter = (attributeName: string, value: string) => {
-    // Синхронно обновляем UI
+
     const currentValues = selectedFilters[attributeName] || [];
     const isSelected = currentValues.includes(value);
 
     let newFilters;
     if (isSelected) {
-      // Убираем значение
+
       const newValues = currentValues.filter((v) => v !== value);
       if (newValues.length === 0) {
         const { [attributeName]: _, ...rest } = selectedFilters;
@@ -317,17 +317,17 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
         newFilters = { ...selectedFilters, [attributeName]: newValues };
       }
     } else {
-      // Добавляем значение
+
       newFilters = {
         ...selectedFilters,
         [attributeName]: [...currentValues, value],
       };
     }
 
-    // Обновляем состояние сразу (синхронно)
+
     setSelectedFilters(newFilters);
 
-    // Применяем фильтры в фоне
+
     startTransition(() => {
       setAppliedFilters(newFilters);
       setPage(0);
@@ -336,7 +336,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     });
   };
 
-  // Функция для очистки всех фильтров
+
   const clearAllFilters = () => {
     setSelectedFilters({});
     setAppliedFilters({});
@@ -348,48 +348,48 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Загрузка товаров
+
   useEffect(() => {
     setLoading(true);
-    // Плавная прокрутка наверх при смене страницы
+
     if (page > 0) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
     const skip = page * pageSize;
 
-    // Строим query параметры для фильтров
+
     const queryParams = new URLSearchParams();
     queryParams.append("skip", skip.toString());
     queryParams.append("take", pageSize.toString());
 
-    // Добавляем сортировку
+
     if (sortBy) {
       queryParams.append("sortBy", sortBy);
     }
 
-    // Добавляем ценовой диапазон
+
     if (priceRange[0] > 0 || priceRange[1] < 400000) {
       queryParams.append("minPrice", priceRange[0].toString());
       queryParams.append("maxPrice", priceRange[1].toString());
     }
 
-    // Добавляем brand из URL если есть
+
     if (brand) {
       queryParams.append("Brand", brand);
     }
 
-    // Добавляем атрибуты (используем appliedFilters вместо selectedFilters)
+
     Object.entries(appliedFilters).forEach(([attributeName, values]) => {
       values.forEach((value) => {
         queryParams.append(attributeName, value);
       });
     });
 
-    // If category is "all", fetch all products, otherwise fetch by category
+
     const baseUrl =
       category === "all"
-        ? `https://api.lux-store.eu/products`
-        : `https://api.lux-store.eu/products/category/${category}`;
+        ? `http://localhost:5000/products`
+        : `http://localhost:5000/products/category/${category}`;
 
     const url = `${baseUrl}?${queryParams.toString()}`;
 
@@ -414,39 +414,39 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       });
   }, [category, page, priceRange, appliedFilters, brand, sortBy]);
 
-  // Загрузка атрибутов (фильтров) - адаптивных на основе примененных фильтров
+
   useEffect(() => {
     setLoadingFilters(true);
 
-    // Строим query параметры для получения доступных фильтров
+
     const queryParams = new URLSearchParams();
 
-    // Добавляем категорию
+
     if (category && category !== "all") {
       queryParams.append("categorySlug", category);
     } else {
       queryParams.append("categorySlug", "all");
     }
 
-    // Добавляем ценовой диапазон
+
     if (priceRange[0] > 0 || priceRange[1] < 400000) {
       queryParams.append("minPrice", priceRange[0].toString());
       queryParams.append("maxPrice", priceRange[1].toString());
     }
 
-    // Добавляем brand из URL если есть
+
     if (brand) {
       queryParams.append("Brand", brand);
     }
 
-    // Добавляем примененные фильтры
+
     Object.entries(appliedFilters).forEach(([attributeName, values]) => {
       values.forEach((value) => {
         queryParams.append(attributeName, value);
       });
     });
 
-    const url = `https://api.lux-store.eu/attributes/available/filtered?${queryParams.toString()}`;
+    const url = `http://localhost:5000/attributes/available/filtered?${queryParams.toString()}`;
 
     fetch(url)
       .then((res) => res.json())
@@ -462,7 +462,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       });
   }, [category, appliedFilters, priceRange, brand]);
 
-  // Преобразование данных из API в формат для отображения
+
   const displayProducts = products.map((product) => ({
     ...product,
     brand: getBrandFromProduct(product),
@@ -476,9 +476,9 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     description: getCollectionFromProduct(product),
   }));
 
-  // Функция для извлечения бренда из атрибутов или названия
+
   function getBrandFromProduct(product: Product): string {
-    // Сначала пытаемся найти бренд в атрибутах
+
     const brandAttribute = product.attributes?.find(
       (attr) =>
         attr.attribute.name === "Brand" || attr.attribute.type === "BRAND"
@@ -488,7 +488,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       return brandAttribute.value;
     }
 
-    // Если не найден в атрибутах, пытаемся извлечь из названия
+
     const brands = [
       "HERMÈS",
       "CARTIER",
@@ -503,13 +503,13 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       }
     }
 
-    // В крайнем случае берем первое слово из названия
+
     return product.name.split(" ")[0].toUpperCase();
   }
 
-  // Функция для извлечения коллекции из атрибутов
+
   function getCollectionFromProduct(product: Product): string {
-    // Ищем атрибут Collection
+
     const collectionAttribute = product.attributes?.find(
       (attr) => attr.attribute.name === "Collection"
     );
@@ -521,7 +521,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     return "Luxury Collection";
   }
 
-  // Функция для добавления в корзину
+
   const handleAddToCart = (product: typeof displayProducts[0]) => {
     setAddingToCart(prev => ({ ...prev, [product.id]: true }));
     
@@ -540,19 +540,19 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
   };
 
   const PriceSlider = () => {
-    // Локальное состояние для плавного движения слайдера
+
     const [localPrice, setLocalPrice] = useState(() => tempPriceRef.current);
     const [isInitialized, setIsInitialized] = useState(false);
 
-    // Синхронизируем локальное состояние при сбросе фильтров
+
     useEffect(() => {
       setLocalPrice(tempPriceRef.current);
       setIsInitialized(true);
     }, [priceResetTrigger]);
 
-    // Применяем ценовой фильтр автоматически с задержкой
+
     useEffect(() => {
-      // Не применяем на первом рендере
+
       if (!isInitialized) {
         setIsInitialized(true);
         return;
@@ -719,7 +719,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Premium Page Header */}
+      
       <div className="border-b bg-gradient-to-b from-muted/30 to-background">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl">
@@ -757,12 +757,12 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
           <aside className="hidden lg:block">
             <div className="sticky top-24 space-y-6">
-              {/* Main Filters */}
+              
               <div className="border rounded-lg p-6 bg-card shadow-sm">
                 <FiltersContent />
               </div>
 
-              {/* Premium Info Card */}
+              
               <div className="border rounded-lg p-6 bg-card shadow-sm">
                 <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
                   <svg
@@ -787,7 +787,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </p>
               </div>
 
-              {/* Support Card */}
+              
               <div className="border rounded-lg p-6 bg-card shadow-sm">
                 <h3 className="font-semibold text-sm mb-4">Need Help?</h3>
                 <div className="space-y-3 text-xs">
@@ -940,7 +940,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             </div>
 
-            {/* Trust Badges */}
+            
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-6 bg-muted/30 rounded-lg border">
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-background flex items-center justify-center">
@@ -1036,7 +1036,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             </div>
 
-            {/* Products Grid */}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {loading ? (
                 <div className="col-span-full text-center py-20">
@@ -1056,7 +1056,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                       key={product.id}
                       className="group relative flex flex-col bg-card border rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
                     >
-                      {/* Image Container */}
+                      
                       <div
                         className="relative aspect-square overflow-hidden bg-muted cursor-pointer"
                         onClick={() =>
@@ -1070,10 +1070,10 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                           className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
 
-                        {/* Gradient Overlay */}
+                        
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                        {/* Stock Status */}
+                        
                         {!product.inStock && (
                           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
                             <span className="text-white text-sm font-semibold tracking-wide">
@@ -1082,7 +1082,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                           </div>
                         )}
 
-                        {/* Discount Label */}
+                        
                         {product.originalPrice && (
                           <div className="absolute top-0 right-0 bg-foreground text-background px-3 py-1.5 text-xs font-bold tracking-wider">
                             -
@@ -1096,26 +1096,26 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                         )}
                       </div>
 
-                      {/* Content */}
+                      
                       <div className="flex flex-col flex-1 p-5">
-                        {/* Brand */}
+                        
                         <div className="mb-3">
                           <span className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">
                             {product.brand}
                           </span>
                         </div>
 
-                        {/* Title */}
+                        
                         <h3 className="font-bold text-base leading-tight mb-2 min-h-[2.5rem] line-clamp-2">
                           {product.name}
                         </h3>
 
-                        {/* Description */}
+                        
                         <p className="text-sm text-muted-foreground line-clamp-2 mb-3 flex-1">
                           {product.description}
                         </p>
 
-                        {/* SKU */}
+                        
                         <div className="flex items-center mb-4">
                           <code className="text-xs bg-muted/50 px-2 py-1 rounded font-mono">
                             {product.sku}
@@ -1124,7 +1124,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
 
                         <Separator className="mb-4" />
 
-                        {/* Price & Actions */}
+                        
                         <div className="flex items-end justify-between gap-3">
                           <div className="flex flex-col">
                             {product.originalPrice && (
@@ -1162,7 +1162,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                                 <ShoppingCart className="h-4 w-4" />
                               )}
                               
-                              {/* Ripple effect */}
+                              
                               {addingToCart[product.id] && (
                                 <span className="absolute inset-0 rounded-md bg-white animate-ping opacity-75" />
                               )}
@@ -1171,7 +1171,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                         </div>
                       </div>
 
-                      {/* Premium Border Effect */}
+                      
                       <div className="absolute inset-0 rounded-2xl ring-2 ring-transparent group-hover:ring-primary/20 transition-all duration-300 pointer-events-none" />
                     </div>
                   );
@@ -1179,7 +1179,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               )}
             </div>
 
-            {/* Pagination */}
+            
             {!loading && total > pageSize && (
               <div className="flex items-center justify-center gap-2 mt-12">
                 <Button
@@ -1210,7 +1210,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             )}
 
-            {/* Bottom Info Section */}
+            
             <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center p-6 border rounded-lg bg-card">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
@@ -1279,10 +1279,10 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             </div>
 
-            {/* Category Description for SEO */}
-            {/* Priority: Model > Brand > Category */}
             
-            {/* Bags - Hermès - Kelly */}
+            
+            
+            
             {categoryInfo.type === "bags" && categoryInfo.brand === "Hermès" && categoryInfo.model === "Kelly" ? (
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
@@ -1306,7 +1306,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </div>
               </div>
             ) : categoryInfo.type === "bags" && categoryInfo.brand === "Hermès" && categoryInfo.model === "Birkin" ? (
-              /* Bags - Hermès - Birkin */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Hermès Birkin Bags</h2>
@@ -1329,7 +1329,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </div>
               </div>
             ) : categoryInfo.type === "bags" && categoryInfo.brand === "Hermès" && categoryInfo.model === "Constance" ? (
-              /* Bags - Hermès - Constance */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Hermès Constance Bags</h2>
@@ -1352,7 +1352,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </div>
               </div>
             ) : categoryInfo.type === "bags" && categoryInfo.brand === "Cartier" ? (
-              /* Bags - Cartier */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Cartier Bags</h2>
@@ -1375,7 +1375,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </div>
               </div>
             ) : categoryInfo.type === "bags" && categoryInfo.brand === "Hermès" ? (
-              /* Bags - Hermès (general) */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Hermès Bags</h2>
@@ -1398,7 +1398,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </div>
               </div>
             ) : categoryInfo.type === "bags" && categoryInfo.brand === "Dior" ? (
-              /* Bags - Dior */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Dior Bags</h2>
@@ -1421,7 +1421,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </div>
               </div>
             ) : categoryInfo.type === "bags" && categoryInfo.brand === "Chanel" ? (
-              /* Bags - Chanel */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Chanel Bags</h2>
@@ -1444,7 +1444,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </div>
               </div>
             ) : categoryInfo.type === "bags" && categoryInfo.brand === "Gucci" ? (
-              /* Bags - Gucci */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Gucci Bags</h2>
@@ -1467,7 +1467,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </div>
               </div>
             ) : categoryInfo.type === "bags" && !categoryInfo.brand ? (
-              /* Bags - All brands */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">About Luxury Designer Bags Collection</h2>
@@ -1491,7 +1491,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "watches" && categoryInfo.brand === "Cartier" ? (
-              /* Watches - Cartier */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Cartier Watches</h2>
@@ -1511,7 +1511,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "watches" && categoryInfo.brand === "Rolex" ? (
-              /* Watches - Rolex */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Rolex Watches</h2>
@@ -1531,7 +1531,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "watches" && categoryInfo.brand === "Chanel" ? (
-              /* Watches - Chanel */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Chanel Watches</h2>
@@ -1551,7 +1551,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "watches" && categoryInfo.brand === "Gucci" ? (
-              /* Watches - Gucci */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Gucci Watches</h2>
@@ -1571,7 +1571,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "watches" && !categoryInfo.brand ? (
-              /* Watches - All brands */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Luxury Watches</h2>
@@ -1588,7 +1588,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "sunglasses" && categoryInfo.brand === "Cartier" ? (
-              /* Sunglasses - Cartier */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Cartier Sunglasses</h2>
@@ -1608,7 +1608,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "sunglasses" && categoryInfo.brand === "Dior" ? (
-              /* Sunglasses - Dior */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Dior Sunglasses</h2>
@@ -1628,7 +1628,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "sunglasses" && categoryInfo.brand === "Chanel" ? (
-              /* Sunglasses - Chanel */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Chanel Sunglasses</h2>
@@ -1648,7 +1648,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "sunglasses" && categoryInfo.brand === "Gucci" ? (
-              /* Sunglasses - Gucci */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Gucci Sunglasses</h2>
@@ -1668,7 +1668,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "sunglasses" && !categoryInfo.brand ? (
-              /* Sunglasses - All brands */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Luxury Sunglasses</h2>
@@ -1685,7 +1685,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "jewelry" && !categoryInfo.brand ? (
-              /* Jewelry - All brands */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Designer Jewelry</h2>
@@ -1702,7 +1702,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "bracelets" && !categoryInfo.brand ? (
-              /* Bracelets */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Designer Bracelets</h2>
@@ -1722,7 +1722,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "rings" && !categoryInfo.brand ? (
-              /* Rings */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Designer Rings</h2>
@@ -1739,7 +1739,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "necklaces" && !categoryInfo.brand ? (
-              /* Necklaces */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Designer Necklaces</h2>
@@ -1756,7 +1756,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             
             ) : categoryInfo.type === "earrings" && !categoryInfo.brand ? (
-              /* Earrings */
+
               <div className="mt-16 max-w-4xl mx-auto">
                 <div className="prose prose-lg max-w-none">
                   <h2 className="text-2xl font-bold mb-6">Designer Earrings</h2>
@@ -1780,7 +1780,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
   );
 }
 
-// Suspense wrapper required for useSearchParams()
+
 export default function CategoryPage({ params, searchParams }: PageProps) {
   return <CategoryPageContent params={params} searchParams={searchParams} />;
 }

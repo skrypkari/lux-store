@@ -16,7 +16,7 @@ interface PageProps {
 }
 
 async function getProductBySlug(slug: string) {
-  const res = await fetch(`https://api.lux-store.eu/products/slug/${slug}`, {
+  const res = await fetch(`http://localhost:5000/products/slug/${slug}`, {
     cache: 'no-store', // Always fetch fresh data
   });
   
@@ -28,7 +28,7 @@ async function getProductBySlug(slug: string) {
   return productData;
 }
 
-// Generate metadata for SEO
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   
@@ -100,33 +100,33 @@ export default async function ProductPage({ params }: PageProps) {
     );
   }
 
-  // Get images
+
   const images = productData.media?.map((m: any) => m.url_original) || [
     'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=90'
   ];
 
-  // Calculate price with VAT
+
   const price = productData.base_price || 0;
   const priceVAT = (price * 0.2).toFixed(2);
 
-  // Extract all attributes dynamically
+
   const productAttributes = productData.attributes?.reduce((acc: any, attr: any) => {
     acc[attr.attribute.name] = attr.value;
     return acc;
   }, {}) || {};
 
-  // Get description from raw_json or description_html
+
   const fullDescription = productData.raw_json?.description || 
                          productData.description_html?.replace(/<[^>]*>/g, ' ').trim() || 
                          productData.subtitle || 
                          "Luxury item from prestigious collection. This item undergoes rigorous authentication by our team of certified experts.";
 
-  // Get category from product data
+
   const category = productData.categories?.[0]?.category;
   const categoryName = category?.name || 'Products';
   const categorySlug = category?.slug_without_id || 'all';
 
-  // Build specifications from attributes
+
   const specifications = [
     { label: "SKU", value: productData.sku || 'N/A' },
     { label: "Condition", value: productData.condition || (productData.is_sold_out ? "Sold Out" : "Available") },
@@ -136,7 +136,7 @@ export default async function ProductPage({ params }: PageProps) {
     })),
   ];
 
-  // Format product data
+
   const product = {
     id: productData.id,
     name: productData.name,
@@ -264,7 +264,7 @@ export default async function ProductPage({ params }: PageProps) {
       <div className="min-h-screen bg-background">
         <Header />
 
-        {/* Breadcrumb */}
+        
       <div className="border-b bg-muted/30">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -284,7 +284,7 @@ export default async function ProductPage({ params }: PageProps) {
       </div>
 
       <main className="container mx-auto px-4 py-12">
-        {/* Limited Availability Banner */}
+        
         {/* <div className="mb-8 p-4 bg-primary/5 border border-primary/20 rounded-lg">
           <div className="flex items-center justify-center gap-2 text-sm">
             <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
@@ -296,7 +296,7 @@ export default async function ProductPage({ params }: PageProps) {
         </div> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left Column - Images */}
+          
           <div className="space-y-4">
             <ImageGallery 
               images={product.images}
@@ -304,7 +304,7 @@ export default async function ProductPage({ params }: PageProps) {
               inStock={product.inStock}
             />
 
-            {/* Trust Badges */}
+            
             <div className="grid grid-cols-3 gap-4 mt-8 p-6 bg-muted/30 rounded-lg border">
               <div className="text-center">
                 <ShieldCheck className="w-8 h-8 mx-auto mb-2 text-primary" />
@@ -324,16 +324,16 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Right Column - Product Info */}
+          
           <div className="space-y-6">
-            {/* Brand */}
+            
             <div>
               <span className="text-sm font-semibold tracking-widest uppercase text-muted-foreground">
                 {product.brand}
               </span>
             </div>
 
-            {/* Title & Condition Badge */}
+            
             <div>
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 {product.name}
@@ -344,7 +344,7 @@ export default async function ProductPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* SKU & Quick Info */}
+            
             <div className="flex flex-wrap items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">SKU:</span>
@@ -364,7 +364,7 @@ export default async function ProductPage({ params }: PageProps) {
 
             <Separator />
 
-            {/* Price */}
+            
             <div>
               <div className="flex items-baseline gap-3 mb-2">
                 <span itemProp="price" id="price" className="text-4xl font-bold tracking-tight">
@@ -379,7 +379,7 @@ export default async function ProductPage({ params }: PageProps) {
               </p>
             </div>
 
-            {/* Stock Status */}
+            
             <div className="flex items-center gap-2">
               {product.inStock ? (
                 <>
@@ -396,7 +396,7 @@ export default async function ProductPage({ params }: PageProps) {
 
             <Separator />
 
-            {/* Product Options & Actions (Client Component) */}
+            
             <ProductInteractive
               productId={productData.id}
               productName={product.name}
@@ -416,7 +416,7 @@ export default async function ProductPage({ params }: PageProps) {
               }
             />
 
-            {/* Product Details */}
+            
             <div className="border rounded-lg p-6 bg-card">
               <h3 className="font-semibold mb-4">Product Details</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -429,7 +429,7 @@ export default async function ProductPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Features */}
+            
             <div className="border rounded-lg p-6 bg-card">
               <h3 className="font-semibold mb-4">What's Included</h3>
               <ul className="space-y-2">
@@ -443,9 +443,9 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
           </div>
         </div>
-        {/* Product Information Sections */}
+        
         <div className="mt-16 space-y-8 border-t pt-10">
-          {/* Description */}
+          
           <div className="border rounded-lg p-8 bg-card">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -462,7 +462,7 @@ export default async function ProductPage({ params }: PageProps) {
             
           </div>
 
-          {/* Specifications */}
+          
           <div className="border rounded-lg p-8 bg-card">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -482,7 +482,7 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Shipping & Returns */}
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="border rounded-lg p-6 bg-card">
               <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
@@ -541,7 +541,7 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Authenticity Guarantee */}
+          
           <div className="border rounded-lg p-8 bg-card text-center">
             <ShieldCheck className="h-16 w-16 mx-auto mb-4 text-primary" />
             <h2 className="text-2xl font-bold mb-4">100% Authenticity Guaranteed</h2>
@@ -586,7 +586,7 @@ export default async function ProductPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Contact Support CTA */}
+        
         <div className="mt-16 border rounded-lg p-8 bg-card text-center">
           <h2 className="text-2xl font-bold mb-3">Have Questions?</h2>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">

@@ -30,7 +30,7 @@ export default function MobileMenu() {
           <SheetTitle className="text-left">Menu</SheetTitle>
         </SheetHeader>
         <div className="flex flex-col space-y-4 mt-8 px-4">
-          {/* Navigation Links */}
+          
           <nav className="flex flex-col space-y-2">
             <div className="space-y-1">
               <p className="font-semibold text-sm mb-2">STORE</p>
@@ -80,7 +80,7 @@ export default function MobileMenu() {
             </div>
           </nav>
 
-          {/* Divider */}
+          
           <div className="border-t pt-4">
             <Button
               variant="ghost"

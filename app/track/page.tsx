@@ -8,20 +8,20 @@ export default async function TrackPage() {
     <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Hero Section - Unique Design */}
+      
       <section className="relative overflow-hidden bg-gradient-to-br from-black via-black/95 to-black/90 py-16 sm:py-20 md:py-32">
-        {/* Animated Background Elements */}
+        
         <div className="absolute inset-0 opacity-30">
           <div className="absolute left-1/4 top-1/4 h-64 w-64 animate-pulse rounded-full bg-white/5 blur-3xl sm:h-96 sm:w-96" />
           <div className="absolute right-1/4 bottom-1/4 h-64 w-64 animate-pulse rounded-full bg-white/5 blur-3xl sm:h-96 sm:w-96" style={{ animationDelay: '1s' }} />
         </div>
         
-        {/* Dotted Pattern */}
+        
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.05)_1px,transparent_0)] bg-[size:24px_24px] sm:bg-[size:40px_40px]" />
         
         <div className="container relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mx-auto max-w-5xl">
-            {/* Floating Badge */}
+            
             <div className="mb-6 flex justify-center sm:mb-8">
               <div className="group relative">
                 <div className="absolute -inset-1 animate-pulse rounded-full bg-gradient-to-r from-white/20 to-white/5 opacity-75 blur-sm" />
@@ -34,7 +34,7 @@ export default async function TrackPage() {
               </div>
             </div>
 
-            {/* Main Title with Gradient */}
+            
             <h1 className="mb-4 text-center font-satoshi text-4xl font-bold leading-[1.1] tracking-tight text-white sm:mb-6 sm:text-6xl md:text-8xl">
               Track Your
               <span className="block bg-gradient-to-r from-white via-white/90 to-white/60 bg-clip-text text-transparent">
@@ -47,7 +47,7 @@ export default async function TrackPage() {
               <span className="hidden sm:inline"> Premium delivery tracking with complete transparency.</span>
             </p>
 
-            {/* Feature Pills */}
+            
             <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
               <div className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 backdrop-blur-sm sm:gap-2 sm:px-4 sm:py-2">
                 <Shield className="h-3.5 w-3.5 text-white/80 sm:h-4 sm:w-4" />
@@ -66,9 +66,9 @@ export default async function TrackPage() {
         </div>
       </section>
 
-      {/* Main Content with Unique Background */}
+      
       <section className="relative py-12 sm:py-16 md:py-24">
-        {/* Background Pattern */}
+        
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:2rem_2rem] sm:bg-[size:3rem_3rem]" />
         
         <div className="container relative mx-auto max-w-7xl px-4 sm:px-6">
@@ -76,7 +76,7 @@ export default async function TrackPage() {
         </div>
       </section>
 
-      {/* Help Section - Redesigned */}
+      
       <section className="relative overflow-hidden border-t border-black/10 py-12 sm:py-16 md:py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-white to-white" />
         
