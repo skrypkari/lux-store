@@ -269,6 +269,16 @@ export default function CheckoutPage() {
 
       // GTAG payment_start event
       if (typeof window !== "undefined" && typeof window.gtag === "function") {
+        // Get client_id from GA cookie (__ga)
+        let clientId = undefined;
+        const gaCookie = document.cookie.split('; ').find(row => row.startsWith('__ga='));
+        if (gaCookie) {
+          // __ga=GA1.1.1234567890.1234567890
+          const parts = gaCookie.split('=')[1].split('.');
+          if (parts.length >= 4) {
+            clientId = parts[2] + '.' + parts[3];
+          }
+        }
         window.gtag('event', 'payment_start', {
           value: cartData.total,
           currency: 'EUR',
@@ -281,6 +291,8 @@ export default function CheckoutPage() {
             quantity: item.quantity
           })),
           click_timestamp: Date.now(),
+          client_id: clientId,
+          ga_cookie: gaCookie ? gaCookie.split('=')[1] : undefined,
         });
       }
 
@@ -350,8 +362,15 @@ export default function CheckoutPage() {
       const result = await response.json();
       const orderId = result.id;
 
-      // GTAG payment_start с transaction_id (id заказа)
       if (typeof window !== "undefined" && typeof window.gtag === "function") {
+        let clientId = undefined;
+        const gaCookie = document.cookie.split('; ').find(row => row.startsWith('__ga='));
+        if (gaCookie) {
+          const parts = gaCookie.split('=')[1].split('.');
+          if (parts.length >= 4) {
+            clientId = parts[2] + '.' + parts[3];
+          }
+        }
         window.gtag('event', 'payment_start', {
           value: cartData.total,
           currency: 'EUR',
@@ -364,6 +383,8 @@ export default function CheckoutPage() {
             quantity: item.quantity
           })),
           click_timestamp: Date.now(),
+          client_id: clientId,
+          ga_cookie: gaCookie ? gaCookie.split('=')[1] : undefined,
         });
       }
 
