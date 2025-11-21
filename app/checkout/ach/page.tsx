@@ -116,7 +116,7 @@ function AchPaymentContent() {
 
   const fetchBankDetails = async () => {
     try {
-      const response = await fetch("http://localhost:5000/ach/details");
+      const response = await fetch("https://api.lux-store.eu/ach/details");
       const data = await response.json();
       setBankDetails(data);
     } catch (err) {
@@ -129,7 +129,7 @@ function AchPaymentContent() {
   const fetchOrderInfo = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/orders/${orderId}/cointopay-status`
+        `https://api.lux-store.eu/orders/${orderId}/cointopay-status`
       );
       const data = await response.json();
       setOrderInfo({
@@ -222,7 +222,7 @@ function AchPaymentContent() {
       formData.append("file", file);
 
       const response = await fetch(
-        `http://localhost:5000/ach/upload-proof/${orderId}`,
+        `https://api.lux-store.eu/ach/upload-proof/${orderId}`,
         {
           method: "POST",
           body: formData,

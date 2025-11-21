@@ -40,7 +40,7 @@ function OpenBankingContent() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/orders/${orderId}/ampay-payment`,
+        `https://api.lux-store.eu/orders/${orderId}/ampay-payment`,
         {
           method: "POST",
           headers: {

@@ -89,7 +89,7 @@ const productSitemapContent = `import { MetadataRoute } from 'next';
 
 async function getProducts() {
   try {
-    const response = await fetch('http://localhost:5000/products', {
+    const response = await fetch('https://api.lux-store.eu/products', {
       cache: 'no-store',
     });
     

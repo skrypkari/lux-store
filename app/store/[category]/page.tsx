@@ -388,8 +388,8 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
 
     const baseUrl =
       category === "all"
-        ? `http://localhost:5000/products`
-        : `http://localhost:5000/products/category/${category}`;
+        ? `https://api.lux-store.eu/products`
+        : `https://api.lux-store.eu/products/category/${category}`;
 
     const url = `${baseUrl}?${queryParams.toString()}`;
 
@@ -446,7 +446,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       });
     });
 
-    const url = `http://localhost:5000/attributes/available/filtered?${queryParams.toString()}`;
+    const url = `https://api.lux-store.eu/attributes/available/filtered?${queryParams.toString()}`;
 
     fetch(url)
       .then((res) => res.json())

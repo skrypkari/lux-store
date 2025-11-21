@@ -103,7 +103,7 @@ function SepaPaymentContent() {
 
   const fetchBankDetails = async () => {
     try {
-      const response = await fetch("http://localhost:5000/sepa/details");
+      const response = await fetch("https://api.lux-store.eu/sepa/details");
       const data = await response.json();
       setBankDetails(data);
     } catch (err) {
@@ -116,7 +116,7 @@ function SepaPaymentContent() {
   const fetchOrderInfo = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/orders/${orderId}/cointopay-status`
+        `https://api.lux-store.eu/orders/${orderId}/cointopay-status`
       );
       const data = await response.json();
       setOrderInfo({
@@ -184,7 +184,7 @@ function SepaPaymentContent() {
       formData.append("file", file);
 
       const response = await fetch(
-        `http://localhost:5000/sepa/upload-proof/${orderId}`,
+        `https://api.lux-store.eu/sepa/upload-proof/${orderId}`,
         {
           method: "POST",
           body: formData,

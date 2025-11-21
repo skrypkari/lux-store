@@ -55,7 +55,7 @@ function PendingPaymentContent() {
     const checkPaymentStatus = async () => {
       try {
         console.log("🔍 Checking payment status for order:", orderId);
-        const url = `http://localhost:5000/orders/${orderId}/cointopay-status`;
+        const url = `https://api.lux-store.eu/orders/${orderId}/cointopay-status`;
         console.log("📡 Fetching:", url);
 
         const response = await fetch(url);

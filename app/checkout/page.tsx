@@ -310,7 +310,7 @@ export default function CheckoutPage() {
         })),
       };
 
-      const response = await fetch("http://localhost:5000/orders", {
+      const response = await fetch("https://api.lux-store.eu/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -334,7 +334,7 @@ export default function CheckoutPage() {
         router.push(`/checkout/crypto-select?orderId=${orderId}`);
       } else if (paymentMethod === "ampay_open_banking") {
         const paymentResponse = await fetch(
-          `http://localhost:5000/orders/${orderId}/ampay-payment`,
+          `https://api.lux-store.eu/orders/${orderId}/ampay-payment`,
           {
             method: "POST",
           }
@@ -356,7 +356,7 @@ export default function CheckoutPage() {
         window.location.href = paymentData.redirect_url;
       } else if (paymentMethod === "open_banking") {
         const paymentResponse = await fetch(
-          `http://localhost:5000/orders/${orderId}/cointopay-payment`,
+          `https://api.lux-store.eu/orders/${orderId}/cointopay-payment`,
           {
             method: "POST",
           }

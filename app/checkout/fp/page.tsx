@@ -110,7 +110,7 @@ function FpPaymentContent() {
 
   const fetchBankDetails = async () => {
     try {
-      const response = await fetch("http://localhost:5000/fp/details");
+      const response = await fetch("https://api.lux-store.eu/fp/details");
       const data = await response.json();
       setBankDetails(data);
     } catch (err) {
@@ -123,7 +123,7 @@ function FpPaymentContent() {
   const fetchOrderInfo = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/orders/${orderId}/cointopay-status`
+        `https://api.lux-store.eu/orders/${orderId}/cointopay-status`
       );
       const data = await response.json();
       setOrderInfo({
@@ -216,7 +216,7 @@ function FpPaymentContent() {
       formData.append("file", file);
 
       const response = await fetch(
-        `http://localhost:5000/fp/upload-proof/${orderId}`,
+        `https://api.lux-store.eu/fp/upload-proof/${orderId}`,
         {
           method: "POST",
           body: formData,

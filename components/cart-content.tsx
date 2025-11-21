@@ -67,7 +67,7 @@ export default function CartContent() {
     setPromoLoading(true);
     setPromoError("");
     try {
-      const response = await fetch('http://localhost:5000/promo-codes/validate', {
+      const response = await fetch('https://api.lux-store.eu/promo-codes/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: promoCodeInput.toUpperCase() }),
@@ -102,7 +102,7 @@ export default function CartContent() {
 
     const fetchProducts = async (attempt = 1, maxAttempts = 5) => {
       try {
-        const res = await fetch('http://localhost:5000/products/random?limit=20');
+        const res = await fetch('https://api.lux-store.eu/products/random?limit=20');
         const data = await res.json();
         
         if (data && Array.isArray(data.products) && data.products.length > 0) {

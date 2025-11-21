@@ -38,7 +38,7 @@ function PaymentPageContent() {
       return;
     }
 
-    fetch(`http://localhost:5000/orders/${orderId}`)
+    fetch(`https://api.lux-store.eu/orders/${orderId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Order not found");
         return res.json();
@@ -192,7 +192,7 @@ function PaymentPageContent() {
 
     try {
       if (isSuccessCard) {
-        await fetch(`http://localhost:5000/orders/${order.id}/status`, {
+        await fetch(`https://api.lux-store.eu/orders/${order.id}/status`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
