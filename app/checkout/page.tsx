@@ -1,5 +1,11 @@
 "use client";
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/contexts/cart-context";
@@ -239,6 +245,7 @@ export default function CheckoutPage() {
   };
 
   const handlePaymentSubmit = async () => {
+
     try {
       setIsProcessing(true);
       const shippingData = JSON.parse(
@@ -258,6 +265,23 @@ export default function CheckoutPage() {
         };
       } catch (err) {
         console.error("Failed to fetch geo data:", err);
+      }
+
+      // GTAG payment_start event
+      if (typeof window !== "undefined" && typeof window.gtag === "function") {
+        window.gtag('event', 'payment_start', {
+          value: cartData.total,
+          currency: 'EUR',
+          // transaction_id будет добавлен после создания заказа
+          items: (cartData.items || []).map((item: any) => ({
+            item_id: item.id,
+            item_name: item.name,
+            item_brand: item.brand,
+            price: item.price,
+            quantity: item.quantity
+          })),
+          click_timestamp: Date.now(),
+        });
       }
 
       let gateway = "creditcard";
@@ -310,6 +334,7 @@ export default function CheckoutPage() {
         })),
       };
 
+
       const response = await fetch("https://api.lux-store.eu/orders", {
         method: "POST",
         headers: {
@@ -324,6 +349,23 @@ export default function CheckoutPage() {
 
       const result = await response.json();
       const orderId = result.id;
+
+      // GTAG payment_start с transaction_id (id заказа)
+      if (typeof window !== "undefined" && typeof window.gtag === "function") {
+        window.gtag('event', 'payment_start', {
+          value: cartData.total,
+          currency: 'EUR',
+          transaction_id: orderId,
+          items: (cartData.items || []).map((item: any) => ({
+            item_id: item.sku || item.id,
+            item_name: item.name,
+            item_brand: item.brand,
+            price: item.price,
+            quantity: item.quantity
+          })),
+          click_timestamp: Date.now(),
+        });
+      }
 
       clearCart();
       clearPromo();

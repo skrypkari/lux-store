@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
 
   if (slug && /[A-Z]/.test(slug)) {
     let newSlug = slug.toLowerCase().replace(/-p(\d+)$/, '-$1');
-    return NextResponse.redirect(new URL(`/products/${newSlug}`, request.url), 301);
+    return NextResponse.redirect(`https://lux-store.eu/products/${newSlug}`, 301);
   }
 
   return NextResponse.next();
