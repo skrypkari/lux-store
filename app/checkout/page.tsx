@@ -253,6 +253,25 @@ export default function CheckoutPage() {
       );
       const cartData = JSON.parse(localStorage.getItem("checkoutCart") || "{}");
 
+      let gclid: string | null = null;
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        gclid = urlParams.get("gclid");
+        
+        if (!gclid) {
+          gclid = localStorage.getItem("gclid");
+        }
+        
+        if (!gclid) {
+          const timestamp = Date.now();
+          const random = Math.floor(Math.random() * 1000000000);
+          gclid = `${timestamp}.${random}`;
+          localStorage.setItem("gclid", gclid);
+        } else {
+          localStorage.setItem("gclid", gclid);
+        }
+      }
+
       let geoData = { ip: "", country: "", city: "", region: "" };
       try {
         const geoRes = await fetch("https://ipapi.co/json/");
@@ -267,33 +286,60 @@ export default function CheckoutPage() {
         console.error("Failed to fetch geo data:", err);
       }
 
-      // GTAG payment_start event
-      if (typeof window !== "undefined" && typeof window.gtag === "function") {
-        // Get client_id from GA cookie (__ga)
-        let clientId = undefined;
-        const gaCookie = document.cookie.split('; ').find(row => row.startsWith('__ga='));
-        if (gaCookie) {
-          // __ga=GA1.1.1234567890.1234567890
-          const parts = gaCookie.split('=')[1].split('.');
-          if (parts.length >= 4) {
-            clientId = parts[2] + '.' + parts[3];
+      try {
+        console.log("[GTAG] typeof window:", typeof window);
+        alert("[GTAG] typeof window: " + typeof window);
+      } catch (e) {}
+      if (typeof window !== "undefined") {
+        try {
+          console.log("[GTAG] typeof window.gtag:", typeof window.gtag);
+          alert("[GTAG] typeof window.gtag: " + typeof window.gtag);
+          console.log("[GTAG] document.cookie:", document.cookie);
+          alert("[GTAG] document.cookie: " + document.cookie);
+        } catch (e) {}
+        if (typeof window.gtag === "function") {
+          let clientId = undefined;
+          const gaCookie = document.cookie.split('; ').find(row => row.startsWith('__ga='));
+          if (gaCookie) {
+            const parts = gaCookie.split('=')[1].split('.');
+            if (parts.length >= 4) {
+              clientId = parts[2] + '.' + parts[3];
+            }
           }
+
+          const data = {
+            value: cartData.total,
+            currency: 'EUR',
+            items: (cartData.items || []).map((item: any) => ({
+              item_id: item.id,
+              item_name: item.name,
+              item_brand: item.brand,
+              price: item.price,
+              quantity: item.quantity
+            })),
+            click_timestamp: Date.now(),
+            client_id: clientId,
+          };
+
+          try {
+            console.log("[GTAG] Payment_Start data:", data);
+            alert("[GTAG] Payment_Start data: " + JSON.stringify(data));
+            window.gtag('event', 'Payment_Start', {
+              ...data
+            });
+            console.log("[GTAG] Payment_Start event sent");
+            alert("[GTAG] Payment_Start event sent");
+          } catch (err) {
+            console.error("[GTAG] Error sending Payment_Start event:", err);
+            alert("[GTAG] Error sending Payment_Start event: " + err);
+          }
+        } else {
+          console.log("[GTAG] window.gtag is not a function", window.gtag);
+          alert("[GTAG] window.gtag is not a function: " + window.gtag);
         }
-        window.gtag('event', 'payment_start', {
-          value: cartData.total,
-          currency: 'EUR',
-          // transaction_id будет добавлен после создания заказа
-          items: (cartData.items || []).map((item: any) => ({
-            item_id: item.id,
-            item_name: item.name,
-            item_brand: item.brand,
-            price: item.price,
-            quantity: item.quantity
-          })),
-          click_timestamp: Date.now(),
-          client_id: clientId,
-          ga_cookie: gaCookie ? gaCookie.split('=')[1] : undefined,
-        });
+      } else {
+        console.log("[GTAG] window is undefined");
+        alert("[GTAG] window is undefined");
       }
 
       let gateway = "creditcard";
@@ -329,6 +375,7 @@ export default function CheckoutPage() {
         total: cartData.total,
         paymentMethod: gateway,
         gaClientId: getGAClientId(),
+        gclid: gclid || undefined,
         ipAddress: geoData.ip,
         geoCountry: geoData.country,
         geoCity: geoData.city,

@@ -93,6 +93,19 @@ export default function RootLayout({
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-EFT733S3K6');
+              
+              // Save gclid to localStorage if present in URL
+              (function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const gclid = urlParams.get('gclid');
+                if (gclid) {
+                  try {
+                    localStorage.setItem('gclid', gclid);
+                  } catch (e) {
+                    console.error('Failed to save gclid:', e);
+                  }
+                }
+              })();
             `
           }}
         />
