@@ -289,14 +289,14 @@ export default function CheckoutPage() {
 
       try {
         console.log("[GTAG] typeof window:", typeof window);
-        alert("[GTAG] typeof window: " + typeof window);
+        console.log("[GTAG] typeof window: " + typeof window);
       } catch (e) {}
       if (typeof window !== "undefined") {
         try {
           console.log("[GTAG] typeof window.gtag:", typeof window.gtag);
-          alert("[GTAG] typeof window.gtag: " + typeof window.gtag);
+          console.log("[GTAG] typeof window.gtag: " + typeof window.gtag);
           console.log("[GTAG] document.cookie:", document.cookie);
-          alert("[GTAG] document.cookie: " + document.cookie);
+          console.log("[GTAG] document.cookie: " + document.cookie);
         } catch (e) {}
         if (typeof window.gtag === "function") {
           let clientId = undefined;
@@ -324,23 +324,23 @@ export default function CheckoutPage() {
 
           try {
             console.log("[GTAG] Payment_Start data:", data);
-            alert("[GTAG] Payment_Start data: " + JSON.stringify(data));
+            console.log("[GTAG] Payment_Start data: " + JSON.stringify(data));
             window.gtag('event', 'Payment_Start', {
               ...data
             });
             console.log("[GTAG] Payment_Start event sent");
-            alert("[GTAG] Payment_Start event sent");
+            console.log("[GTAG] Payment_Start event sent");
           } catch (err) {
             console.error("[GTAG] Error sending Payment_Start event:", err);
-            alert("[GTAG] Error sending Payment_Start event: " + err);
+            console.log("[GTAG] Error sending Payment_Start event: " + err);
           }
         } else {
           console.log("[GTAG] window.gtag is not a function", window.gtag);
-          alert("[GTAG] window.gtag is not a function: " + window.gtag);
+          console.log("[GTAG] window.gtag is not a function: " + window.gtag);
         }
       } else {
         console.log("[GTAG] window is undefined");
-        alert("[GTAG] window is undefined");
+        console.log("[GTAG] window is undefined");
       }
 
       let gateway = "creditcard";
