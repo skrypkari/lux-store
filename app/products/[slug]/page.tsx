@@ -38,11 +38,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     console.log('Product Price:', price);
     const brand = productData.attributes?.find((attr: any) => attr.attribute.name === 'Brand')?.value || 'Luxury Brand';
     
+    const titleWithBrand = productData.seo?.title 
+      ? `${brand} ${productData.seo.title}`
+      : `${brand} ${productData.name}`;
+    
     return {
-      title: productData.seo?.title || productData.name,
+      title: titleWithBrand,
       description: productData.seo?.description || productData.subtitle,
       openGraph: {
-        title: productData.seo?.og_title || productData.name,
+        title: productData.seo?.og_title ? `${brand} ${productData.seo.og_title}` : titleWithBrand,
         description: productData.seo?.og_description || productData.subtitle,
         images: [
           {
@@ -58,7 +62,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
       twitter: {
         card: 'summary_large_image',
-        title: productData.seo?.twitter_title || productData.name,
+        title: productData.seo?.twitter_title ? `${brand} ${productData.seo.twitter_title}` : titleWithBrand,
         description: productData.seo?.twitter_description || productData.subtitle,
         images: [productData.media?.[0]?.url_original || productData.seo?.twitter_image],
       },

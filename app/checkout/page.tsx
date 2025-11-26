@@ -35,6 +35,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { getGAClientId } from "@/lib/ga-client-id";
+import { getUTMParams } from "@/lib/utm-tracking";
 
 const SEPA_COUNTRIES = [
   "Austria",
@@ -357,6 +358,8 @@ export default function CheckoutPage() {
         gateway = "Faster Payments";
       }
 
+      const utmParams = getUTMParams();
+
       const orderData = {
         customerEmail: shippingData.email,
         customerFirstName: shippingData.firstName,
@@ -376,6 +379,11 @@ export default function CheckoutPage() {
         paymentMethod: gateway,
         gaClientId: getGAClientId(),
         gclid: gclid || undefined,
+        utmSource: utmParams.utm_source,
+        utmMedium: utmParams.utm_medium,
+        utmCampaign: utmParams.utm_campaign,
+        utmTerm: utmParams.utm_term,
+        utmContent: utmParams.utm_content,
         ipAddress: geoData.ip,
         geoCountry: geoData.country,
         geoCity: geoData.city,

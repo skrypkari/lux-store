@@ -94,7 +94,6 @@ export default function RootLayout({
               gtag('js', new Date());
               gtag('config', 'G-EFT733S3K6');
               
-              // Save gclid to localStorage if present in URL
               (function() {
                 const urlParams = new URLSearchParams(window.location.search);
                 const gclid = urlParams.get('gclid');
@@ -105,10 +104,49 @@ export default function RootLayout({
                     console.error('Failed to save gclid:', e);
                   }
                 }
+
+                const utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+                utmParams.forEach(param => {
+                  const value = urlParams.get(param);
+                  if (value) {
+                    try {
+                      localStorage.setItem(param, value);
+                    } catch (e) {
+                      console.error('Failed to save ' + param + ':', e);
+                    }
+                  }
+                });
               })();
             `
           }}
         />
+
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '4410966249224179');
+              fbq('track', 'PageView');
+            `
+          }}
+        />
+
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=4410966249224179&ev=PageView&noscript=1"
+            alt=""
+          />
+        </noscript>
 
         <script src="//code.jivosite.com/widget/6iCt2ayMiM" async></script>
       </head>
