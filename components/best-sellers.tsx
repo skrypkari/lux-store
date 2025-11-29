@@ -415,6 +415,7 @@ export default function BestSellers() {
       brand: product.brand,
       price: product.price,
       image: product.image,
+      sku: product.sku,
       inStock: true,
     });
     

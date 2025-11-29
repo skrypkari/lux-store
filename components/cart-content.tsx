@@ -338,6 +338,13 @@ export default function CartContent() {
                               {item.inStock ? "In Stock" : "Out of Stock"}
                             </span>
                           </div>
+                          {item.sku && (
+                            <div className="mb-2">
+                              <span className="font-general-sans text-xs text-black/50">
+                                SKU: <span className="font-mono font-medium text-black/70">{item.sku}</span>
+                              </span>
+                            </div>
+                          )}
                           <h3 className="mb-3 font-satoshi text-xl font-bold leading-tight">
                             {item.name}
                           </h3>
@@ -423,11 +430,11 @@ export default function CartContent() {
                         
                         <div className="text-right">
                           <p className="font-satoshi text-3xl font-bold tracking-tight">
-                            €{(item.price * item.quantity).toLocaleString()}
+                            €{(item.price * item.quantity).toLocaleString('en-US')}
                           </p>
                           {item.quantity > 1 && (
                             <p className="font-general-sans text-sm text-black/50">
-                              €{item.price.toLocaleString()} × {item.quantity}
+                              €{item.price.toLocaleString('en-US')} × {item.quantity}
                             </p>
                           )}
                         </div>
@@ -467,6 +474,13 @@ export default function CartContent() {
                           • {item.inStock ? "In Stock" : "Out of Stock"}
                         </span>
                       </div>
+                      {item.sku && (
+                        <div className="mb-1">
+                          <span className="font-general-sans text-[10px] text-black/50">
+                            SKU: <span className="font-mono font-medium text-black/70">{item.sku}</span>
+                          </span>
+                        </div>
+                      )}
                       <h3 className="mb-2 font-satoshi text-base font-bold leading-tight">
                         {item.name}
                       </h3>
@@ -483,11 +497,11 @@ export default function CartContent() {
                         </div>
                       )}
                       <p className="font-satoshi text-xl font-bold">
-                        €{(item.price * item.quantity).toLocaleString()}
+                        €{(item.price * item.quantity).toLocaleString('en-US')}
                       </p>
                       {item.quantity > 1 && (
                         <p className="font-general-sans text-xs text-black/50">
-                          €{item.price.toLocaleString()} × {item.quantity}
+                          €{item.price.toLocaleString('en-US')} × {item.quantity}
                         </p>
                       )}
                     </div>
@@ -747,7 +761,7 @@ export default function CartContent() {
                     <span className="font-satoshi text-lg font-bold">Total Amount</span>
                     <div className="text-right">
                       <span className="font-satoshi text-3xl font-bold tracking-tight">
-                        €{total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                        €{total.toLocaleString('en-US')}
                       </span>
                     </div>
                   </div>

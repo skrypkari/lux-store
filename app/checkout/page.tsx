@@ -1213,6 +1213,11 @@ export default function CheckoutPage() {
                         <p className="font-general-sans text-xs text-black/60">
                           {item.brand}
                         </p>
+                        {item.sku && (
+                          <p className="font-general-sans text-xs text-black/50">
+                            SKU: <span className="font-mono">{item.sku}</span>
+                          </p>
+                        )}
                         <p className="font-satoshi text-sm font-bold">
                           €{item.price.toLocaleString()} × {item.quantity}
                         </p>
@@ -1274,7 +1279,7 @@ export default function CheckoutPage() {
                     <div className="text-right">
                       <span className="font-satoshi text-3xl font-bold tracking-tight">
                         €
-                        {total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                        {total.toLocaleString('en-US')}
                       </span>
                     </div>
                   </div>

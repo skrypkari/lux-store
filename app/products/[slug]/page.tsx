@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { Star, Truck, ShieldCheck, RotateCcw, Check, X } from "lucide-react";
 import ImageGallery from "@/components/product/image-gallery";
 import ProductInteractive from "@/components/product/product-interactive";
+import RelatedProducts from "@/components/product/related-products";
 import ChatButton from "@/components/chat-button";
 import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
@@ -407,6 +408,7 @@ export default async function ProductPage({ params }: PageProps) {
               productBrand={product.brand}
               productPrice={product.price}
               productImage={product.images[0] || ""}
+              productSku={product.sku}
               inStock={product.inStock}
               options={productData.raw_json?.options}
               optionsChoices={
@@ -448,8 +450,7 @@ export default async function ProductPage({ params }: PageProps) {
           </div>
         </div>
         
-        <div className="mt-16 space-y-8 border-t pt-10">
-          
+        <div className="mt-16 space-y-8 border-t pt-10">          
           <div className="border rounded-lg p-8 bg-card">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -545,6 +546,7 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
           </div>
 
+          <RelatedProducts currentProductId={productData.id} />
           
           <div className="border rounded-lg p-8 bg-card text-center">
             <ShieldCheck className="h-16 w-16 mx-auto mb-4 text-primary" />

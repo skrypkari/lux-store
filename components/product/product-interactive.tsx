@@ -11,6 +11,7 @@ interface ProductInteractiveProps {
   productBrand: string;
   productPrice: number;
   productImage: string;
+  productSku?: string;
   inStock: boolean;
   options?: any[];
   optionsChoices?: Record<string, any[]>;
@@ -22,6 +23,7 @@ export default function ProductInteractive({
   productBrand,
   productPrice,
   productImage,
+  productSku,
   inStock,
   options,
   optionsChoices,
@@ -57,6 +59,7 @@ export default function ProductInteractive({
           brand: productBrand,
           price: productPrice,
           image: productImage,
+          sku: productSku,
           options: selectedOptions,
         }}
         disabled={!allRequiredSelected}

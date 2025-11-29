@@ -531,6 +531,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       brand: product.brand || "Luxury Brand",
       price: product.price || 0,
       image: product.image || "",
+      sku: product.sku,
       inStock: product.inStock || false
     });
 
