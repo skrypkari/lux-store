@@ -14,6 +14,7 @@ interface ProductActionsProps {
     brand: string;
     price: number;
     image: string;
+    sku?: string;
     options?: Record<string, string>;
   };
   disabled?: boolean;
