@@ -148,7 +148,7 @@ export default function RootLayout({
           />
         </noscript>
 
-        <script src="//code.jivosite.com/widget/6iCt2ayMiM" async></script>
+        <script src="//code.tidio.co/lupn32ula20iti6m3umtgqkfljzbcaxe.js" async></script>
 
         <script
           dangerouslySetInnerHTML={{
