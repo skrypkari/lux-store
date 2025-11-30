@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { MapPin, Clock, Phone, Mail, Send } from "lucide-react";
 import ContactForm from "@/components/contact-form";
-import JivoChatButton from "@/components/jivo-chat-button";
+import WhatsAppButton from "@/components/whatsapp-button";
 
 export default async function ContactPage() {
   return (
@@ -171,7 +171,7 @@ export default async function ContactPage() {
                     </div>
                   </a>
 
-                  <JivoChatButton />
+                  <WhatsAppButton />
                 </div>
               </div>
             </div>
