@@ -142,6 +142,9 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
         .split("-")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ")
+        .replace(/\d+/g, '') // Удаляем цифры
+        .replace(/\s+/g, ' ') // Удаляем лишние пробелы
+        .trim() // Обрезаем пробелы по краям
     : null;
 
 
@@ -485,7 +488,8 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     );
 
     if (brandAttribute) {
-      return brandAttribute.value;
+      // Удаляем цифры и лишние пробелы из названия бренда
+      return brandAttribute.value.replace(/\d+/g, '').replace(/\s+/g, ' ').trim();
     }
 
 
@@ -504,7 +508,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     }
 
 
-    return product.name.split(" ")[0].toUpperCase();
+    return product.name.split(" ")[0].replace(/\d+/g, '').trim().toUpperCase();
   }
 
 
@@ -834,7 +838,7 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                     onClick={() => {
                       window.open('https://api.whatsapp.com/send/?phone=15558047959', '_blank');
                     }}
-                    className="flex items-center gap-2 text-[#25D366] hover:text-[#128C7E] transition-colors w-full text-left"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors w-full text-left"
                   >
                     <svg
                       className="w-4 h-4"
