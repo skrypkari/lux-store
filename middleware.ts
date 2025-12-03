@@ -11,7 +11,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Redirect brand URLs to store with brand filter
   const brandRedirects: { [key: string]: string } = {
     'hermes': 'Hermès',
     'hermès': 'Hermès',
