@@ -1386,7 +1386,7 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
-                    <span className="text-black/70">VAT (20%)</span>
+                    <span className="text-black/70">VATß</span>
                     <span className="font-bold text-green-600">
                       Included
                     </span>

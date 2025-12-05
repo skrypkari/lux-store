@@ -443,7 +443,7 @@ export default function OrderDetailsPage() {
                     </span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
-                    <span className="text-black/70">VAT (20%)</span>
+                    <span className="text-black/70">VAT</span>
                     <span className="font-bold">
                       €
                       {(order.subtotal - order.subtotal / 1.2)
