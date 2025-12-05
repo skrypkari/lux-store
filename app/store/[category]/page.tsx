@@ -926,7 +926,17 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
                 </Select>
               </div>
             </div>
-
+            
+            <div className="mb-8 overflow-hidden rounded-lg">
+              <Image
+                src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/e4898af2-9143-4b32-06f5-c93006295900/public"
+                alt="Luxury Collection"
+                width={1200}
+                height={300}
+                className="w-full h-auto object-cover"
+                unoptimized
+              />
+            </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-6 bg-muted/30 rounded-lg border">
               <div className="flex items-center gap-3">

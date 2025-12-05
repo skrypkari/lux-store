@@ -423,6 +423,15 @@ export default async function ProductPage({ params }: PageProps) {
             />
 
             
+            <div className="mb-6 overflow-hidden rounded-lg">
+              <img
+                src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/e4898af2-9143-4b32-06f5-c93006295900/public"
+                alt="Luxury Collection"
+                className="w-full h-auto object-cover"
+              />
+            </div>
+
+            
             <div className="border rounded-lg p-6 bg-card">
               <h3 className="font-semibold mb-4">Product Details</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">

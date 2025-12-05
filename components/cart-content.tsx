@@ -681,12 +681,12 @@ export default function CartContent() {
               <div className="space-y-5 p-6">
                 <div className="space-y-3">
                   <div className="flex justify-between font-general-sans text-base">
-                    <span className="text-black/70">Subtotal (excl. VAT)</span>
-                    <span className="font-bold text-black">€{(subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
+                    <span className="text-black/70">Total</span>
+                    <span className="font-bold text-black">€{total}</span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">VAT (20%)</span>
-                    <span className="font-bold text-black">€{(subtotal - subtotal / 1.2).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}</span>
+                    <span className="font-bold text-green-600">Included</span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Shipping</span>
@@ -755,6 +755,12 @@ export default function CartContent() {
                 </div>
                 
                 <Separator className="my-4" />
+                
+                <div className="mb-3 rounded-lg border border-green-600/20 bg-green-50 px-4 py-2.5">
+                  <p className="font-general-sans text-sm font-semibold text-green-700">
+                    VAT included — Paid by the seller (no extra charges)
+                  </p>
+                </div>
                 
                 <div className="rounded-xl bg-black/5 p-4">
                   <div className="flex items-baseline justify-between">

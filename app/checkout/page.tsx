@@ -292,7 +292,7 @@ export default function CheckoutPage() {
     country: "",
   });
 
-  const [paymentMethod, setPaymentMethod] = useState("credit_card");
+  const [paymentMethod, setPaymentMethod] = useState("");
 
   useEffect(() => {
     fetch("https://ipapi.co/json/")
@@ -307,6 +307,17 @@ export default function CheckoutPage() {
             phone: country.phoneCode + " ",
           }));
           setPhoneCode(country.phoneCode);
+          
+          // Set default payment method based on country
+          if (SEPA_COUNTRIES.includes(country.name)) {
+            setPaymentMethod("sepa");
+          } else if (country.name === "United States") {
+            setPaymentMethod("ach_wire");
+          } else if (country.name === "United Kingdom") {
+            setPaymentMethod("faster_payments");
+          } else {
+            setPaymentMethod("credit_card");
+          }
         }
       })
       .catch((err) => console.error("Failed to fetch geo data:", err));
@@ -967,6 +978,62 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="space-y-4">
+                  {isSepaCountry() && (
+                    <div
+                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                        paymentMethod === "sepa"
+                          ? "border-black bg-black/5"
+                          : "border-black/20 hover:border-black/40"
+                      }`}
+                      onClick={() => setPaymentMethod("sepa")}
+                    >
+                      <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
+                        <span className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-green-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
+                          Recommended
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                            paymentMethod === "sepa"
+                              ? "border-black bg-black"
+                              : "border-black/40"
+                          }`}
+                        >
+                          {paymentMethod === "sepa" && (
+                            <div className="h-3 w-3 rounded-full bg-white" />
+                          )}
+                        </div>
+                        <div className="flex-1 sm:pr-20">
+                          <div className="flex items-center gap-2">
+                            <p className="font-satoshi font-bold">
+                              SEPA Instant Transfer
+                            </p>
+                            <svg className="h-4 w-4 flex-shrink-0 text-green-600 sm:hidden" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          </div>
+                          <p className="font-general-sans text-sm text-black/60">
+                            Direct bank transfer - EU banks
+                          </p>
+                        </div>
+                        <svg
+                          className="h-8 w-8 text-black/40"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+
                   <div
                     className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
                       paymentMethod === "credit_card"
@@ -1041,7 +1108,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {isSepaCountry() && (
+                  {isSepaCountry() && total < 15000 && (
                     <div
                       className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
                         paymentMethod === "ampay_open_banking"
@@ -1131,52 +1198,6 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {isSepaCountry() && (
-                    <div
-                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                        paymentMethod === "sepa"
-                          ? "border-black bg-black/5"
-                          : "border-black/20 hover:border-black/40"
-                      }`}
-                      onClick={() => setPaymentMethod("sepa")}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                            paymentMethod === "sepa"
-                              ? "border-black bg-black"
-                              : "border-black/40"
-                          }`}
-                        >
-                          {paymentMethod === "sepa" && (
-                            <div className="h-3 w-3 rounded-full bg-white" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-satoshi font-bold">
-                            SEPA Instant Transfer
-                          </p>
-                          <p className="font-general-sans text-sm text-black/60">
-                            Direct bank transfer - EU banks
-                          </p>
-                        </div>
-                        <svg
-                          className="h-8 w-8 text-black/40"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-
                   {isUSA() && (
                     <div
                       className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
@@ -1225,13 +1246,18 @@ export default function CheckoutPage() {
 
                   {isUK() && (
                     <div
-                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
                         paymentMethod === "faster_payments"
                           ? "border-black bg-black/5"
                           : "border-black/20 hover:border-black/40"
                       }`}
                       onClick={() => setPaymentMethod("faster_payments")}
                     >
+                      <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
+                        <span className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-green-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
+                          Recommended
+                        </span>
+                      </div>
                       <div className="flex items-center gap-4">
                         <div
                           className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
@@ -1244,10 +1270,15 @@ export default function CheckoutPage() {
                             <div className="h-3 w-3 rounded-full bg-white" />
                           )}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-satoshi font-bold">
-                            Faster Payments
-                          </p>
+                        <div className="flex-1 sm:pr-20">
+                          <div className="flex items-center gap-2">
+                            <p className="font-satoshi font-bold">
+                              Faster Payments
+                            </p>
+                            <svg className="h-4 w-4 flex-shrink-0 text-green-600 sm:hidden" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          </div>
                           <p className="font-general-sans text-sm text-black/60">
                             Direct bank transfer - UK banks (GBP)
                           </p>
@@ -1346,7 +1377,7 @@ export default function CheckoutPage() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between font-general-sans text-base">
-                    <span className="text-black/70">Subtotal (excl. VAT)</span>
+                    <span className="text-black/70">Subtotal</span>
                     <span className="font-bold">
                       €
                       {(subtotal / 1.2)
@@ -1356,11 +1387,8 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">VAT (20%)</span>
-                    <span className="font-bold">
-                      €
-                      {(subtotal - subtotal / 1.2)
-                        .toFixed(2)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                    <span className="font-bold text-green-600">
+                      Included
                     </span>
                   </div>
                   {promoDiscount > 0 && (
@@ -1386,6 +1414,12 @@ export default function CheckoutPage() {
                 </div>
 
                 <Separator className="my-4" />
+
+                <div className="mb-3 rounded-lg border border-green-600/20 bg-green-50 px-4 py-2.5">
+                  <p className="font-general-sans text-sm font-semibold text-green-700">
+                    VAT included — Paid by the seller (no extra charges)
+                  </p>
+                </div>
 
                 <div className="rounded-xl bg-black/5 p-4">
                   <div className="flex items-baseline justify-between">
