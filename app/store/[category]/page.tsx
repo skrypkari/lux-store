@@ -130,6 +130,10 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
   const [sortBy, setSortBy] = useState("featured");
   const [addingToCart, setAddingToCart] = useState<Record<string, boolean>>({});
   const [isInitialized, setIsInitialized] = useState(false);
+  const [bannerSettings, setBannerSettings] = useState<{
+    url: string;
+    isEnabled: boolean;
+  }>({ url: '', isEnabled: false });
   const pageSize = 12;
 
   const categoryName = category
@@ -351,6 +355,12 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  useEffect(() => {
+    fetch('https://api.lux-store.eu/banner-settings')
+      .then((res) => res.json())
+      .then((data) => setBannerSettings(data))
+      .catch(() => setBannerSettings({ url: '', isEnabled: false }));
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -927,16 +937,18 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
               </div>
             </div>
             
-            <div className="mb-8 overflow-hidden rounded-lg">
-              <Image
-                src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/e4898af2-9143-4b32-06f5-c93006295900/public"
-                alt="Luxury Collection"
-                width={1200}
-                height={300}
-                className="w-full h-auto object-cover"
-                unoptimized
-              />
-            </div>
+            {bannerSettings.isEnabled && bannerSettings.url && (
+              <div className="mb-8 overflow-hidden rounded-lg">
+                <Image
+                  src={bannerSettings.url}
+                  alt="Luxury Collection"
+                  width={1200}
+                  height={300}
+                  className="w-full h-auto object-cover"
+                  unoptimized
+                />
+              </div>
+            )}
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-6 bg-muted/30 rounded-lg border">
               <div className="flex items-center gap-3">

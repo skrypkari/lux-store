@@ -29,6 +29,18 @@ async function getProductBySlug(slug: string) {
   return productData;
 }
 
+async function getBannerSettings() {
+  try {
+    const res = await fetch('https://api.lux-store.eu/banner-settings', {
+      cache: 'no-store',
+    });
+    if (!res.ok) return { url: '', isEnabled: false };
+    return await res.json();
+  } catch {
+    return { url: '', isEnabled: false };
+  }
+}
+
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -87,8 +99,12 @@ export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
   
   let productData;
+  let bannerSettings;
   try {
-    productData = await getProductBySlug(slug);
+    [productData, bannerSettings] = await Promise.all([
+      getProductBySlug(slug),
+      getBannerSettings(),
+    ]);
   } catch (error) {
     return (
       <div className="min-h-screen bg-background">
@@ -423,13 +439,15 @@ export default async function ProductPage({ params }: PageProps) {
             />
 
             
-            <div className="mb-6 overflow-hidden rounded-lg">
-              <img
-                src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/e4898af2-9143-4b32-06f5-c93006295900/public"
-                alt="Luxury Collection"
-                className="w-full h-auto object-cover"
-              />
-            </div>
+            {bannerSettings?.isEnabled && bannerSettings?.url && (
+              <div className="mb-6 overflow-hidden rounded-lg">
+                <img
+                  src={bannerSettings.url}
+                  alt="Luxury Collection"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            )}
 
             
             <div className="border rounded-lg p-6 bg-card">
