@@ -379,8 +379,8 @@ export default async function ProductPage({ params }: PageProps) {
                   Price Match Guarantee
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                VAT incl. (20%) €{product.priceVAT.toLocaleString()}
+              <p className="text-sm text-green-700 mb-2">
+                VAT <span className="font-semibold">included</span>
               </p>
             </div>
 
