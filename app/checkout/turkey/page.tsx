@@ -1,11 +1,18 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Copy, Check, ArrowLeft, Clock, Building2 } from "lucide-react";
+import { Copy, Check, ArrowLeft, Clock, Building2, Upload, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 function TurkeyIBANContent() {
   const searchParams = useSearchParams();
@@ -18,6 +25,12 @@ function TurkeyIBANContent() {
     reference: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showUpload, setShowUpload] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("https://id.lux-store.eu/tr.php")
@@ -36,6 +49,138 @@ function TurkeyIBANContent() {
     navigator.clipboard.writeText(text);
     setCopied(field);
     setTimeout(() => setCopied(null), 2000);
+  };
+
+  const router = useRouter();
+
+  const compressImage = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = document.createElement("img");
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          const MAX_WIDTH = 1920;
+          const MAX_HEIGHT = 1920;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = height * (MAX_WIDTH / width);
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = width * (MAX_HEIGHT / height);
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                });
+                resolve(compressedFile);
+              } else {
+                reject(new Error("Compression failed"));
+              }
+            },
+            "image/jpeg",
+            0.85
+          );
+        };
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "application/pdf",
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      setError("Lütfen JPEG, JPG, PNG veya PDF dosyası yükleyin");
+      return;
+    }
+
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setError("Dosya boyutu 10MB'dan küçük olmalıdır");
+      return;
+    }
+
+    setError("");
+    setUploading(true);
+
+    try {
+      let fileToUpload = file;
+
+      if (file.type.startsWith("image/")) {
+        try {
+          fileToUpload = await compressImage(file);
+        } catch (err) {
+          console.error("Compression error:", err);
+          setError("Görüntü sıkıştırılamadı");
+          setUploading(false);
+          return;
+        }
+      }
+
+      setSelectedFile(fileToUpload);
+      await uploadFile(fileToUpload);
+    } catch (err) {
+      setError("Dosya işlenemedi");
+      setUploading(false);
+    }
+  };
+
+  const uploadFile = async (file: File) => {
+    if (!orderId) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(
+        `https://api.lux-store.eu/turkey/upload-proof/${orderId}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      setUploadSuccess(true);
+      setTimeout(() => {
+        router.push(`/orders/pending?order_number=${orderId}`);
+      }, 1500);
+    } catch (err) {
+      setError("Ödeme kanıtı yüklenemedi. Lütfen tekrar deneyin.");
+      setSelectedFile(null);
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (loading) {
@@ -72,6 +217,102 @@ function TurkeyIBANContent() {
   }
 
   const reference = bankDetails.reference || orderId || "";
+
+  if (uploadSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
+        <div className="container mx-auto max-w-3xl px-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <Check className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold mb-2">
+                  Ödeme Kanıtı Yüklendi!
+                </h2>
+                <p className="text-gray-600">
+                  Sipariş durumu sayfasına yönlendiriliyorsunuz...
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (showUpload) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
+        <div className="container mx-auto max-w-3xl px-4">
+          <div className="mb-8">
+            <Button
+              variant="ghost"
+              onClick={() => setShowUpload(false)}
+              className="inline-flex items-center text-sm"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Banka Bilgilerine Dön
+            </Button>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Ödeme Kanıtı Yükle</CardTitle>
+              <CardDescription>
+                Transferi tamamladıktan sonra, lütfen ödeme onayının ekran görüntüsünü veya PDF'sini yükleyin
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,application/pdf"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+
+                  {selectedFile ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                      <p className="font-medium">
+                        {selectedFile.name} yükleniyor...
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <Upload className="h-12 w-12 text-gray-400 mx-auto" />
+                      <div>
+                        <Button
+                          onClick={() => fileInputRef.current?.click()}
+                          variant="outline"
+                        >
+                          Dosya Seç
+                        </Button>
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        Kabul edilen formatlar: JPEG, JPG, PNG, PDF (Maksimum 10MB)
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {error && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-800">{error}</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
@@ -212,17 +453,14 @@ function TurkeyIBANContent() {
             </ul>
           </div>
 
-          <div className="mt-8 flex gap-4">
-            <Link href="/orders" className="flex-1">
-              <Button variant="outline" size="lg" className="w-full">
-                Siparişlerimi Görüntüle
-              </Button>
-            </Link>
-            <Link href="/" className="flex-1">
-              <Button size="lg" className="w-full">
-                Ana Sayfaya Dön
-              </Button>
-            </Link>
+          <div className="mt-8">
+            <Button 
+              size="lg" 
+              className="w-full"
+              onClick={() => setShowUpload(true)}
+            >
+              Ödeme Kanıtı Yükle
+            </Button>
           </div>
         </div>
       </div>
