@@ -41,7 +41,10 @@ export default function CartContent() {
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoError, setPromoError] = useState("");
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
-
+  const [bannerSettings, setBannerSettings] = useState<{
+    url: string;
+    isEnabled: boolean;
+  }>({ url: '', isEnabled: false });
   const subtotal = cartTotal;
   const shipping = cartItems.length > 0 ? 0 : 0; // Free shipping
   const total = subtotal + shipping - promoDiscount; // VAT already included in prices
@@ -60,6 +63,22 @@ export default function CartContent() {
     
     return `${formatDate(minDate)}-${formatDate(maxDate).split(' ')[1]}`;
   };
+
+  async function getBannerSettings() {
+    try {
+      const res = await fetch('https://api.lux-store.eu/banner-settings', {
+        cache: 'no-store',
+      });
+      if (!res.ok) return { url: '', isEnabled: false };
+      return await res.json();
+    } catch {
+      return { url: '', isEnabled: false };
+    }
+  }
+
+  useEffect(() => {
+    getBannerSettings().then((data) => setBannerSettings(data));
+  }, []);
 
   const deliveryRange = getDeliveryDateRange();
 
@@ -564,8 +583,12 @@ export default function CartContent() {
                 </div>
               </div>
             ))}
+            {bannerSettings.isEnabled && bannerSettings.url && (
+              <div className="w-full overflow-hidden rounded-xl">
+                <Image src={bannerSettings.url} alt="Banner" width={1200} height={300} />
+              </div>
+            )}
           </div>
-
           
           <div className="relative mt-12 hidden overflow-hidden md:block">
             

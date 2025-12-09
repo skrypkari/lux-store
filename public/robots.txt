@@ -1,0 +1,41 @@
+User-agent: *
+Disallow: /track/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /payment*
+Disallow: /search*
+Allow: /
+
+# Allow Google, Meta (Facebook), TikTok, Pinterest crawlers full access
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Mobile
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: FacebookExternalHit
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+User-agent: facebot
+Allow: /
+
+User-agent: TikTokBot
+Allow: /
+
+User-agent: Pinterestbot
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
+# Sitemap location
+Sitemap: https://lux-store.eu/sitemap.xml

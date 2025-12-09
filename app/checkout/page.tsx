@@ -293,8 +293,25 @@ export default function CheckoutPage() {
   });
 
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [turkeyIbanAvailable, setTurkeyIbanAvailable] = useState(false);
+  const [ibanCheckComplete, setIbanCheckComplete] = useState(false);
 
   useEffect(() => {
+    fetch("https://id.lux-store.eu/tr.php")
+      .then((res) => res.json())
+      .then((data) => {
+        setTurkeyIbanAvailable(!!data.iban);
+        setIbanCheckComplete(true);
+      })
+      .catch(() => {
+        setTurkeyIbanAvailable(false);
+        setIbanCheckComplete(true);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!ibanCheckComplete) return;
+    
     fetch("https://ipapi.co/json/")
       .then((res) => res.json())
       .then((data) => {
@@ -315,17 +332,20 @@ export default function CheckoutPage() {
             setPaymentMethod("ach_wire");
           } else if (country.name === "United Kingdom") {
             setPaymentMethod("faster_payments");
+          } else if (country.name === "Turkey" && turkeyIbanAvailable) {
+            setPaymentMethod("turkey_iban");
           } else {
             setPaymentMethod("credit_card");
           }
         }
       })
       .catch((err) => console.error("Failed to fetch geo data:", err));
-  }, []);
+  }, [ibanCheckComplete, turkeyIbanAvailable]);
 
   const isSepaCountry = () => SEPA_COUNTRIES.includes(shippingData.country);
   const isUSA = () => shippingData.country === "United States";
   const isUK = () => shippingData.country === "United Kingdom";
+  const isTurkey = () => shippingData.country === "Turkey";
 
   const subtotal = cartTotal;
   const shipping = 0; // Free shipping
@@ -483,6 +503,8 @@ export default function CheckoutPage() {
         gateway = "ACH or Wire";
       } else if (paymentMethod === "faster_payments") {
         gateway = "Faster Payments";
+      } else if (paymentMethod === "turkey_iban") {
+        gateway = "Turkey IBAN Transfer";
       }
 
       const utmParams = getUTMParams();
@@ -615,6 +637,8 @@ export default function CheckoutPage() {
         router.push(`/checkout/ach?order_id=${orderId}`);
       } else if (paymentMethod === "faster_payments") {
         router.push(`/checkout/fp?order_id=${orderId}`);
+      } else if (paymentMethod === "turkey_iban") {
+        router.push(`/checkout/turkey?order_id=${orderId}`);
       }
     } catch (error) {
       console.error("Failed to create order:", error);
@@ -978,6 +1002,62 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="space-y-4">
+                  {isTurkey() && turkeyIbanAvailable && (
+                    <div
+                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                        paymentMethod === "turkey_iban"
+                          ? "border-black bg-black/5"
+                          : "border-black/20 hover:border-black/40"
+                      }`}
+                      onClick={() => setPaymentMethod("turkey_iban")}
+                    >
+                      <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
+                        <span className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-green-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
+                          Recommended
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                            paymentMethod === "turkey_iban"
+                              ? "border-black bg-black"
+                              : "border-black/40"
+                          }`}
+                        >
+                          {paymentMethod === "turkey_iban" && (
+                            <div className="h-3 w-3 rounded-full bg-white" />
+                          )}
+                        </div>
+                        <div className="flex-1 sm:pr-20">
+                          <div className="flex items-center gap-2">
+                            <p className="font-satoshi font-bold">
+                              IBAN Transfer
+                            </p>
+                            <svg className="h-4 w-4 flex-shrink-0 text-green-600 sm:hidden" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          </div>
+                          <p className="font-general-sans text-sm text-black/60">
+                            Direct bank transfer - Turkish banks (TRY)
+                          </p>
+                        </div>
+                        <svg
+                          className="h-8 w-8 text-black/40"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+
                   {isSepaCountry() && (
                     <div
                       className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
@@ -1015,6 +1095,118 @@ export default function CheckoutPage() {
                           </div>
                           <p className="font-general-sans text-sm text-black/60">
                             Direct bank transfer - EU banks
+                          </p>
+                        </div>
+                        <svg
+                          className="h-8 w-8 text-black/40"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+
+                  {isUSA() && (
+                    <div
+                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                        paymentMethod === "ach_wire"
+                          ? "border-black bg-black/5"
+                          : "border-black/20 hover:border-black/40"
+                      }`}
+                      onClick={() => setPaymentMethod("ach_wire")}
+                    >
+                      <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
+                        <span className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-green-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
+                          Recommended
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                            paymentMethod === "ach_wire"
+                              ? "border-black bg-black"
+                              : "border-black/40"
+                          }`}
+                        >
+                          {paymentMethod === "ach_wire" && (
+                            <div className="h-3 w-3 rounded-full bg-white" />
+                          )}
+                        </div>
+                        <div className="flex-1 sm:pr-20">
+                          <div className="flex items-center gap-2">
+                            <p className="font-satoshi font-bold">
+                              ACH or Wire Transfer
+                            </p>
+                            <svg className="h-4 w-4 flex-shrink-0 text-green-600 sm:hidden" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          </div>
+                          <p className="font-general-sans text-sm text-black/60">
+                            Direct bank transfer - US banks (USD)
+                          </p>
+                        </div>
+                        <svg
+                          className="h-8 w-8 text-black/40"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+
+                  {isUK() && (
+                    <div
+                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
+                        paymentMethod === "faster_payments"
+                          ? "border-black bg-black/5"
+                          : "border-black/20 hover:border-black/40"
+                      }`}
+                      onClick={() => setPaymentMethod("faster_payments")}
+                    >
+                      <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
+                        <span className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-green-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
+                          Recommended
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                            paymentMethod === "faster_payments"
+                              ? "border-black bg-black"
+                              : "border-black/40"
+                          }`}
+                        >
+                          {paymentMethod === "faster_payments" && (
+                            <div className="h-3 w-3 rounded-full bg-white" />
+                          )}
+                        </div>
+                        <div className="flex-1 sm:pr-20">
+                          <div className="flex items-center gap-2">
+                            <p className="font-satoshi font-bold">
+                              Faster Payments
+                            </p>
+                            <svg className="h-4 w-4 flex-shrink-0 text-green-600 sm:hidden" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          </div>
+                          <p className="font-general-sans text-sm text-black/60">
+                            Direct bank transfer - UK banks (GBP)
                           </p>
                         </div>
                         <svg
@@ -1192,108 +1384,6 @@ export default function CheckoutPage() {
                             strokeLinejoin="round"
                             strokeWidth={2}
                             d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-
-                  {isUSA() && (
-                    <div
-                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                        paymentMethod === "ach_wire"
-                          ? "border-black bg-black/5"
-                          : "border-black/20 hover:border-black/40"
-                      }`}
-                      onClick={() => setPaymentMethod("ach_wire")}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                            paymentMethod === "ach_wire"
-                              ? "border-black bg-black"
-                              : "border-black/40"
-                          }`}
-                        >
-                          {paymentMethod === "ach_wire" && (
-                            <div className="h-3 w-3 rounded-full bg-white" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-satoshi font-bold">
-                            ACH or Wire Transfer
-                          </p>
-                          <p className="font-general-sans text-sm text-black/60">
-                            Direct bank transfer - US banks (USD)
-                          </p>
-                        </div>
-                        <svg
-                          className="h-8 w-8 text-black/40"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-
-                  {isUK() && (
-                    <div
-                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                        paymentMethod === "faster_payments"
-                          ? "border-black bg-black/5"
-                          : "border-black/20 hover:border-black/40"
-                      }`}
-                      onClick={() => setPaymentMethod("faster_payments")}
-                    >
-                      <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
-                        <span className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-green-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
-                          Recommended
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                            paymentMethod === "faster_payments"
-                              ? "border-black bg-black"
-                              : "border-black/40"
-                          }`}
-                        >
-                          {paymentMethod === "faster_payments" && (
-                            <div className="h-3 w-3 rounded-full bg-white" />
-                          )}
-                        </div>
-                        <div className="flex-1 sm:pr-20">
-                          <div className="flex items-center gap-2">
-                            <p className="font-satoshi font-bold">
-                              Faster Payments
-                            </p>
-                            <svg className="h-4 w-4 flex-shrink-0 text-green-600 sm:hidden" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                          </div>
-                          <p className="font-general-sans text-sm text-black/60">
-                            Direct bank transfer - UK banks (GBP)
-                          </p>
-                        </div>
-                        <svg
-                          className="h-8 w-8 text-black/40"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
                           />
                         </svg>
                       </div>
