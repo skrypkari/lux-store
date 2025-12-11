@@ -1300,7 +1300,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {isSepaCountry() && total < 15000 && (
+                  {/* {isSepaCountry() && total < 15000 && (
                     <div
                       className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
                         paymentMethod === "ampay_open_banking"
@@ -1342,7 +1342,7 @@ export default function CheckoutPage() {
                         </svg>
                       </div>
                     </div>
-                  )}
+                  )} */}
 
                   {isSepaCountry() && (
                     <div
