@@ -65,7 +65,7 @@ export default function AboutSection() {
                 
                 <div className="relative">
                   <Image
-                    src="/aboutus.png"
+                    src="https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/880d7bee-e3cf-47aa-6637-39113016b000/public"
                     alt="LUX STORE"
                     width={280}
                     height={280}

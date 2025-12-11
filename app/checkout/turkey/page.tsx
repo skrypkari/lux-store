@@ -202,7 +202,7 @@ function TurkeyIBANContent() {
           <div className="rounded-2xl border border-black/10 bg-white p-8 shadow-xl text-center">
             <h1 className="text-2xl font-bold mb-4">Ödeme Yöntemi Mevcut Değil</h1>
             <p className="text-muted-foreground mb-6">
-              Türkiye IBAN transferi şu anda mevcut değil. Lütfen başka bir ödeme yöntemi seçin.
+              Türkiye IBAN Havalesi şu anda mevcut değil. Lütfen başka bir ödeme yöntemi seçin.
             </p>
             <Link href="/checkout">
               <Button>
@@ -329,7 +329,7 @@ function TurkeyIBANContent() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
               <Building2 className="h-8 w-8 text-blue-600" />
             </div>
-            <h1 className="text-3xl font-bold mb-2">IBAN Transferi</h1>
+            <h1 className="text-3xl font-bold mb-2">IBAN Havalesi</h1>
             <p className="text-muted-foreground">
               Lütfen tam tutarı aşağıdaki banka hesabına aktarın
             </p>
@@ -440,7 +440,7 @@ function TurkeyIBANContent() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-amber-600 mt-0.5">•</span>
-                <span>Sipariş onayınızda gösterilen tam tutarı transfer edin</span>
+                <span>Sipariş onayında belirtilen tam tutarı transfer ediniz</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-amber-600 mt-0.5">•</span>

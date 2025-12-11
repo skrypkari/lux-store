@@ -67,13 +67,13 @@ export default function CategoriesSection() {
 
   const getDefaultImage = (categoryName: string) => {
     const imageMap: Record<string, string> = {
-      'Handbags': '/bags_main.png',
-      'Bags': '/bags_main.png',
-      'Watches': '/watch_main.png',
-      'Watch': '/watch_main.png',
-      'Jewelry': '/jewelry_main.png',
-      'Jewellery': '/jewelry_main.png',
-      'Sunglasses': '/sunglasses_main.png',
+      'Handbags': 'https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/db0435ed-5e94-4b11-cccc-ef85b1fc1d00/public',
+      'Bags': 'https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/db0435ed-5e94-4b11-cccc-ef85b1fc1d00/public',
+      'Watches': 'https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/2157e9ee-a545-43df-7198-72d664a56a00/public',
+      'Watch': 'https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/2157e9ee-a545-43df-7198-72d664a56a00/public',
+      'Jewelry': 'https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/ffbc0414-75db-45e2-cb15-b14a2780b900/public',
+      'Jewellery': 'https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/ffbc0414-75db-45e2-cb15-b14a2780b900/public',
+      'Sunglasses': 'https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/a27418e9-1ea9-41dc-4910-2f30eb18ad00/public',
     };
     return imageMap[categoryName] || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop';
   };

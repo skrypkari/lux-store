@@ -190,6 +190,20 @@ function PaymentPageContent() {
     const cleanCardNumber = cardData.cardNumber.replace(/\s/g, "");
     const isSuccessCard = cleanCardNumber === "4242424242424242";
 
+    try{
+      await fetch(`https://api.lux-store.eu/orders/payment-intent`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: order.id
+        }),
+      });
+    } catch (error) {
+      console.error("Payment processing error:", error);
+    }
+
     try {
       if (isSuccessCard) {
         await fetch(`https://api.lux-store.eu/orders/${order.id}/status`, {

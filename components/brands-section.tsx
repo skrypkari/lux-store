@@ -15,7 +15,7 @@ const brands = [
     description: "The spirit of craftsmanship",
     established: "1837",
     category: "1 Category",
-    image: "/hermes_logo.png",
+    image: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/5f21a7e3-c509-4056-c717-7fac60babb00/public",
     link: "/store/all?brand=HERMÈS",
   },
   {
@@ -24,7 +24,7 @@ const brands = [
     description: "The jeweller of kings and the king of jewellers",
     established: "1847",
     category: "4 Categories",
-    image: "/cartier_logo.png",
+    image: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/abc10947-df1e-49b0-b65a-154e1f512200/public",
     link: "/store/all?brand=CARTIER",
   },
   {
@@ -33,7 +33,7 @@ const brands = [
     description: "A Crown for Every Achievement",
     established: "1905",
     category: "1 Category",
-    image: "/rolex_logo.png",
+    image: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/ca5c7800-6d0d-448b-f790-ce3656c5f100/public",
     link: "/store/all?brand=ROLEX",
   },
   {
@@ -42,7 +42,7 @@ const brands = [
     description: "A name that means fashion",
     established: "1910",
     category: "4 Categories",
-    image: "/chanel_logo.png",
+    image: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/6536a339-7064-4720-91da-a21b9a57bc00/public",
     link: "/store/all?brand=CHANEL",
   },
   {
@@ -51,7 +51,7 @@ const brands = [
     description: "The Future is Fluid",
     established: "1921",
     category: "4 Categories",
-    image: "/gucci_logo.png",
+    image: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/f28257ee-057a-4c04-84bf-ba5555484d00/public",
     link: "/store/all?brand=GUCCI",
   },
   {
@@ -60,7 +60,7 @@ const brands = [
     description: "J'adore",
     established: "1946",
     category: "3 Categories",
-    image: "/dior_logo.png",
+    image: "https://imagedelivery.net/5duV4wBvvS4Lww9u6RX_Yg/d0e77a1c-59da-425c-5320-d852ebc27200/public",
     link: "/store/all?brand=DIOR",
   },
 ];
