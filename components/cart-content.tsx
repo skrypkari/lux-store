@@ -705,7 +705,7 @@ export default function CartContent() {
                 <div className="space-y-3">
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">Total</span>
-                    <span className="font-bold text-black">€{total}</span>
+                    <span className="font-bold text-black">€{total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between font-general-sans text-base">
                     <span className="text-black/70">VAT</span>
