@@ -620,11 +620,11 @@ export default function CheckoutPage() {
 
           const paymentData = await paymentResponse.json();
 
-          if (!paymentData.paymentUrl) {
+          if (!paymentData.payment_url) {
             throw new Error("Invalid payment URL received from Stripe");
           }
 
-          window.location.href = paymentData.paymentUrl;
+          window.location.href = paymentData.payment_url;
           return;
         } else {
           router.push(`/checkout/payment?id=${orderId}`);
