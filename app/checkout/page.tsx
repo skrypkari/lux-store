@@ -275,7 +275,7 @@ export default function CheckoutPage() {
     clearPromo,
   } = useCart();
   const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(1); // 1: Shipping, 2: Payment
+  const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [phoneCode, setPhoneCode] = useState("+1");
 
@@ -296,6 +296,8 @@ export default function CheckoutPage() {
   const [turkeyIbanAvailable, setTurkeyIbanAvailable] = useState(false);
   const [ibanCheckComplete, setIbanCheckComplete] = useState(false);
 
+  const [isStripeEnabled, setIsStripeEnabled] = useState(true);
+
   useEffect(() => {
     fetch("https://id.lux-store.eu/tr.php")
       .then((res) => res.json())
@@ -307,11 +309,19 @@ export default function CheckoutPage() {
         setTurkeyIbanAvailable(false);
         setIbanCheckComplete(true);
       });
+    fetch("https://api.lux-store.eu/stripe-payments-status")
+      .then((res) => res.json())
+      .then((data) => {
+        setIsStripeEnabled(data.isEnabled);
+      })
+      .catch(() => {
+        setIsStripeEnabled(false);
+      });
   }, []);
 
   useEffect(() => {
     if (!ibanCheckComplete) return;
-    
+
     fetch("https://ipapi.co/json/")
       .then((res) => res.json())
       .then((data) => {
@@ -324,7 +334,7 @@ export default function CheckoutPage() {
             phone: country.phoneCode + " ",
           }));
           setPhoneCode(country.phoneCode);
-          
+
           // Set default payment method based on country
           if (SEPA_COUNTRIES.includes(country.name)) {
             setPaymentMethod("sepa");
@@ -348,7 +358,7 @@ export default function CheckoutPage() {
   const isTurkey = () => shippingData.country === "Turkey";
 
   const subtotal = cartTotal;
-  const shipping = 0; // Free shipping
+  const shipping = 0;
   const total = subtotal - promoDiscount;
 
   if (cartItems.length === 0) {
@@ -405,11 +415,11 @@ export default function CheckoutPage() {
       if (typeof window !== "undefined") {
         const urlParams = new URLSearchParams(window.location.search);
         gclid = urlParams.get("gclid");
-        
+
         if (!gclid) {
           gclid = localStorage.getItem("gclid");
         }
-        
+
         if (!gclid) {
           const timestamp = Date.now();
           const random = Math.floor(Math.random() * 1000000000);
@@ -437,14 +447,14 @@ export default function CheckoutPage() {
       try {
         console.log("[GTAG] typeof window:", typeof window);
         console.log("[GTAG] typeof window: " + typeof window);
-      } catch (e) {}
+      } catch (e) { }
       if (typeof window !== "undefined") {
         try {
           console.log("[GTAG] typeof window.gtag:", typeof window.gtag);
           console.log("[GTAG] typeof window.gtag: " + typeof window.gtag);
           console.log("[GTAG] document.cookie:", document.cookie);
           console.log("[GTAG] document.cookie: " + document.cookie);
-        } catch (e) {}
+        } catch (e) { }
         if (typeof window.gtag === "function") {
           let clientId = undefined;
           const gaCookie = document.cookie.split('; ').find(row => row.startsWith('__ga='));
@@ -596,7 +606,29 @@ export default function CheckoutPage() {
       clearPromo();
 
       if (paymentMethod === "credit_card") {
-        router.push(`/checkout/payment?id=${orderId}`);
+        if (isStripeEnabled) {
+          const paymentResponse = await fetch(
+            `https://api.lux-store.eu/orders/${orderId}/stripe-payment`,
+            {
+              method: "POST",
+            }
+          );
+
+          if (!paymentResponse.ok) {
+            throw new Error("Failed to create Stripe payment intent");
+          }
+
+          const paymentData = await paymentResponse.json();
+
+          if (!paymentData.paymentUrl) {
+            throw new Error("Invalid payment URL received from Stripe");
+          }
+
+          window.location.href = paymentData.paymentUrl;
+          return;
+        } else {
+          router.push(`/checkout/payment?id=${orderId}`);
+        }
       } else if (paymentMethod === "cryptocurrency") {
         router.push(`/checkout/crypto-select?orderId=${orderId}`);
       } else if (paymentMethod === "ampay_open_banking") {
@@ -655,11 +687,10 @@ export default function CheckoutPage() {
     <div className="mb-12 flex items-center justify-center">
       <div className="flex items-center">
         <div
-          className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${
-            currentStep >= 1
+          className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${currentStep >= 1
               ? "bg-black text-white shadow-lg"
               : "border-2 border-black/20 bg-white text-black/40"
-          }`}
+            }`}
         >
           {currentStep > 1 ? (
             <Check className="h-6 w-6" />
@@ -676,18 +707,16 @@ export default function CheckoutPage() {
       </div>
 
       <div
-        className={`mx-4 h-0.5 w-16 transition-all sm:w-24 ${
-          currentStep >= 2 ? "bg-black" : "bg-black/20"
-        }`}
+        className={`mx-4 h-0.5 w-16 transition-all sm:w-24 ${currentStep >= 2 ? "bg-black" : "bg-black/20"
+          }`}
       />
 
       <div className="flex items-center">
         <div
-          className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${
-            currentStep >= 2
+          className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${currentStep >= 2
               ? "bg-black text-white shadow-lg"
               : "border-2 border-black/20 bg-white text-black/40"
-          }`}
+            }`}
         >
           {currentStep > 2 ? (
             <Check className="h-6 w-6" />
@@ -1004,11 +1033,10 @@ export default function CheckoutPage() {
                 <div className="space-y-4">
                   {isTurkey() && turkeyIbanAvailable && (
                     <div
-                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                        paymentMethod === "turkey_iban"
+                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "turkey_iban"
                           ? "border-black bg-black/5"
                           : "border-black/20 hover:border-black/40"
-                      }`}
+                        }`}
                       onClick={() => setPaymentMethod("turkey_iban")}
                     >
                       <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
@@ -1018,11 +1046,10 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                            paymentMethod === "turkey_iban"
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${paymentMethod === "turkey_iban"
                               ? "border-black bg-black"
                               : "border-black/40"
-                          }`}
+                            }`}
                         >
                           {paymentMethod === "turkey_iban" && (
                             <div className="h-3 w-3 rounded-full bg-white" />
@@ -1060,11 +1087,10 @@ export default function CheckoutPage() {
 
                   {isSepaCountry() && (
                     <div
-                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                        paymentMethod === "sepa"
+                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "sepa"
                           ? "border-black bg-black/5"
                           : "border-black/20 hover:border-black/40"
-                      }`}
+                        }`}
                       onClick={() => setPaymentMethod("sepa")}
                     >
                       <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
@@ -1074,11 +1100,10 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                            paymentMethod === "sepa"
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${paymentMethod === "sepa"
                               ? "border-black bg-black"
                               : "border-black/40"
-                          }`}
+                            }`}
                         >
                           {paymentMethod === "sepa" && (
                             <div className="h-3 w-3 rounded-full bg-white" />
@@ -1116,11 +1141,10 @@ export default function CheckoutPage() {
 
                   {isUSA() && (
                     <div
-                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                        paymentMethod === "ach_wire"
+                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "ach_wire"
                           ? "border-black bg-black/5"
                           : "border-black/20 hover:border-black/40"
-                      }`}
+                        }`}
                       onClick={() => setPaymentMethod("ach_wire")}
                     >
                       <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
@@ -1130,11 +1154,10 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                            paymentMethod === "ach_wire"
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${paymentMethod === "ach_wire"
                               ? "border-black bg-black"
                               : "border-black/40"
-                          }`}
+                            }`}
                         >
                           {paymentMethod === "ach_wire" && (
                             <div className="h-3 w-3 rounded-full bg-white" />
@@ -1172,11 +1195,10 @@ export default function CheckoutPage() {
 
                   {isUK() && (
                     <div
-                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                        paymentMethod === "faster_payments"
+                      className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "faster_payments"
                           ? "border-black bg-black/5"
                           : "border-black/20 hover:border-black/40"
-                      }`}
+                        }`}
                       onClick={() => setPaymentMethod("faster_payments")}
                     >
                       <div className="absolute right-16 top-1/2 -translate-y-1/2 hidden sm:block">
@@ -1186,11 +1208,10 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                            paymentMethod === "faster_payments"
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${paymentMethod === "faster_payments"
                               ? "border-black bg-black"
                               : "border-black/40"
-                          }`}
+                            }`}
                         >
                           {paymentMethod === "faster_payments" && (
                             <div className="h-3 w-3 rounded-full bg-white" />
@@ -1227,20 +1248,18 @@ export default function CheckoutPage() {
                   )}
 
                   <div
-                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                      paymentMethod === "credit_card"
+                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "credit_card"
                         ? "border-black bg-black/5"
                         : "border-black/20 hover:border-black/40"
-                    }`}
+                      }`}
                     onClick={() => setPaymentMethod("credit_card")}
                   >
                     <div className="flex items-center gap-4">
                       <div
-                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                          paymentMethod === "credit_card"
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${paymentMethod === "credit_card"
                             ? "border-black bg-black"
                             : "border-black/40"
-                        }`}
+                          }`}
                       >
                         {paymentMethod === "credit_card" && (
                           <div className="h-3 w-3 rounded-full bg-white" />
@@ -1259,20 +1278,18 @@ export default function CheckoutPage() {
                   </div>
 
                   <div
-                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                      paymentMethod === "cryptocurrency"
+                    className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "cryptocurrency"
                         ? "border-black bg-black/5"
                         : "border-black/20 hover:border-black/40"
-                    }`}
+                      }`}
                     onClick={() => setPaymentMethod("cryptocurrency")}
                   >
                     <div className="flex items-center gap-4">
                       <div
-                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                          paymentMethod === "cryptocurrency"
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${paymentMethod === "cryptocurrency"
                             ? "border-black bg-black"
                             : "border-black/40"
-                        }`}
+                          }`}
                       >
                         {paymentMethod === "cryptocurrency" && (
                           <div className="h-3 w-3 rounded-full bg-white" />
@@ -1346,20 +1363,18 @@ export default function CheckoutPage() {
 
                   {isSepaCountry() && (
                     <div
-                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${
-                        paymentMethod === "open_banking"
+                      className={`cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "open_banking"
                           ? "border-black bg-black/5"
                           : "border-black/20 hover:border-black/40"
-                      }`}
+                        }`}
                       onClick={() => setPaymentMethod("open_banking")}
                     >
                       <div className="flex items-center gap-4">
                         <div
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                            paymentMethod === "open_banking"
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${paymentMethod === "open_banking"
                               ? "border-black bg-black"
                               : "border-black/40"
-                          }`}
+                            }`}
                         >
                           {paymentMethod === "open_banking" && (
                             <div className="h-3 w-3 rounded-full bg-white" />
