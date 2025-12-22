@@ -294,6 +294,9 @@ export default function CheckoutPage() {
 
   const [paymentMethod, setPaymentMethod] = useState("");
   const [turkeyIbanAvailable, setTurkeyIbanAvailable] = useState(false);
+  const [sepaIbanAvailable, setSepaIbanAvailable] = useState(false);
+  const [achAccountAvailable, setAchAccountAvailable] = useState(false);
+  const [fasterPaymentsAvailable, setFasterPaymentsAvailable] = useState(false);
   const [ibanCheckComplete, setIbanCheckComplete] = useState(false);
 
   const [isStripeEnabled, setIsStripeEnabled] = useState(true);
@@ -309,6 +312,33 @@ export default function CheckoutPage() {
         setTurkeyIbanAvailable(false);
         setIbanCheckComplete(true);
       });
+    fetch("https://api.lux-store.eu/sepa/details")
+      .then((res) => res.json())
+      .then((data) => {
+        setSepaIbanAvailable(!!data.iban);
+      })
+      .catch(() => {
+        setSepaIbanAvailable(false);
+      });
+    
+    fetch("https://api.lux-store.eu/ach/details")
+      .then((res) => res.json())
+      .then((data) => {
+        setAchAccountAvailable(!!data.accountNumber);
+      })
+      .catch(() => {
+        setAchAccountAvailable(false);
+      });
+
+    fetch("https://api.lux-store.eu/fp/details")
+      .then((res) => res.json())
+      .then((data) => {
+        setFasterPaymentsAvailable(!!data.accountNumber);
+      })
+      .catch(() => {
+        setFasterPaymentsAvailable(false);
+      });
+
     fetch("https://api.lux-store.eu/stripe-payments-status")
       .then((res) => res.json())
       .then((data) => {
@@ -1085,7 +1115,7 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {isSepaCountry() && (
+                  {isSepaCountry() && sepaIbanAvailable && (
                     <div
                       className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "sepa"
                           ? "border-black bg-black/5"
@@ -1139,7 +1169,7 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {isUSA() && (
+                  {isUSA() && achAccountAvailable && (
                     <div
                       className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "ach_wire"
                           ? "border-black bg-black/5"
@@ -1193,7 +1223,7 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {isUK() && (
+                  {isUK() && fasterPaymentsAvailable && (
                     <div
                       className={`relative cursor-pointer rounded-xl border-2 p-6 transition-all ${paymentMethod === "faster_payments"
                           ? "border-black bg-black/5"
