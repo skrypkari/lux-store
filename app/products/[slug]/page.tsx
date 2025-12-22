@@ -9,6 +9,7 @@ import RelatedProducts from "@/components/product/related-products";
 import ChatButton from "@/components/chat-button";
 import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
+import ViewItemDL from "@/components/ViewItem";
 
 interface PageProps {
   params: Promise<{
@@ -186,6 +187,16 @@ export default async function ProductPage({ params }: PageProps) {
 
   return (
     <>
+
+      <ViewItemDL item={{
+        id: product.id,
+        name: product.name,
+        brand: product.brand,
+        category: product.category.name,
+        price: product.price,
+        currency: "EUR",
+      }} />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
