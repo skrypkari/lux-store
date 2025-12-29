@@ -20,15 +20,19 @@ function SuccessPageContent() {
   const [orderId, setOrderId] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [orderData, setOrderData] = useState<any>(null);
+  const [hasFetched, setHasFetched] = useState(false);
   const { clearCart } = useCart();
 
   useEffect(() => {
+    if (hasFetched) return;
+
     const id = searchParams.get("orderId");
     const token = searchParams.get("token");
 
     if (id && token) {
       setOrderId(id);
       setAccessToken(token);
+      setHasFetched(true);
 
       fetch(`https://api.lux-store.eu/orders/${id}`)
         .then((res) => res.json())
@@ -40,10 +44,10 @@ function SuccessPageContent() {
         });
 
       clearCart();
-    } else {
+    } else if (!hasFetched) {
       router.push("/");
     }
-  }, [searchParams, router, clearCart]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && orderData && orderId && !window.__purchaseFired) {
