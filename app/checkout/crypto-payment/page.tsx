@@ -38,16 +38,14 @@ function CryptoPaymentContent() {
     if (paymentData && (paymentData.status === "paid" || paymentData.status === "manual_accept")) {
       const timeout = setTimeout(() => {
         if (paymentData.orderId && paymentData.token) {
-          router.push(`/checkout/success?orderId=${paymentData.orderId}&token=${paymentData.token}`);
-        } else if (paymentData.orderId) {
-          router.push(`/checkout/success?orderId=${paymentData.orderId}`);
+          window.location.href = `/checkout/success?orderId=${paymentData.orderId}&token=${paymentData.token}`;
         } else {
-          router.push("/checkout/crypto-success");
+          window.location.href = "/checkout/crypto-success";
         }
       }, 2000); 
       return () => clearTimeout(timeout);
     }
-  }, [paymentData, router]);
+  }, [paymentData]);
 
   useEffect(() => {
     const orderId = searchParams.get("orderId");

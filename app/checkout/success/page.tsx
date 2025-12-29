@@ -44,13 +44,6 @@ function SuccessPageContent() {
         });
 
       clearCart();
-    } else {
-      const timeout = setTimeout(() => {
-        if (!searchParams.get("orderId") || !searchParams.get("token")) {
-          router.push("/");
-        }
-      }, 1000);
-      return () => clearTimeout(timeout);
     }
   }, [searchParams]);
 
