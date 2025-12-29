@@ -17,6 +17,7 @@ interface PaymentData {
   status: string;
   expired_at: number;
   qr_code: string;
+  order_total?: number;
   txs?: Array<{
     address?: string;
     amount?: number;
@@ -218,16 +219,37 @@ function CryptoPaymentContent() {
         </div>
 
         {timeLeft > 0 ? (
-          <div className="mb-6 rounded-xl border border-black/10 bg-white p-6 text-center">
-            <div className="mb-2 flex items-center justify-center gap-2">
-              <Clock className="h-5 w-5 text-black/70" />
-              <p className="font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
-                Time Remaining
+          <div className="mb-6 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-black/10 bg-white p-6">
+              <div className="mb-4">
+                <p className="mb-2 font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
+                  Order ID
+                </p>
+                <code className="block rounded-lg bg-black/5 px-4 py-2 font-mono text-sm font-bold text-black">
+                  {paymentData.orderId}
+                </code>
+              </div>
+              <div>
+                <p className="mb-2 font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
+                  Total Amount
+                </p>
+                <p className="font-mono text-2xl font-bold text-black">
+                  {paymentData.order_total ? `€${paymentData.order_total.toFixed(2)}` : `${paymentData.amount} ${paymentData.currency?.toUpperCase()}`}
+                </p>
+              </div>
+            </div>
+            
+            <div className="rounded-xl border border-black/10 bg-white p-6 flex flex-col items-center justify-center">
+              <div className="mb-2 flex items-center gap-2">
+                <Clock className="h-5 w-5 text-black/70" />
+                <p className="font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
+                  Time Remaining
+                </p>
+              </div>
+              <p className="font-mono text-4xl font-bold text-black">
+                {formatTime(timeLeft)}
               </p>
             </div>
-            <p className="font-mono text-4xl font-bold text-black">
-              {formatTime(timeLeft)}
-            </p>
           </div>
         ) : (
           <div className="mb-6 rounded-xl border border-black/10 bg-white p-6 text-center">
