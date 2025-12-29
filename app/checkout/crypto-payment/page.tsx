@@ -91,6 +91,8 @@ function CryptoPaymentContent() {
             orderId: prev.orderId,
             token: prev.token,
             address: address, 
+            amount: parseFloat(amount || '0'),
+            currency: currency || '',
             qr_code: prev.qr_code, 
           }) : null);
           setStatus(result.data.status);
