@@ -25,9 +25,9 @@ type PaymentStatus =
 interface OrderStatusResponse {
   id: number;
   order_number: string;
-  access_token: string; // For secure redirect to order details
+  access_token: string; 
   payment_status: string;
-  status: string; // OrderStatusType (awaiting_payment, payment_confirmed, etc.)
+  status: string; 
   gateway_payment_id: string | null;
   total: number;
 }
@@ -56,9 +56,9 @@ function PendingPaymentContent() {
       try {
         console.log("🔍 Checking payment status for order:", orderId);
         const url = `https://api.lux-store.eu/orders/${orderId}/cointopay-status`;
-        console.log("📡 Fetching:", url);
-
+        
         const response = await fetch(url);
+        console.log("📡 Fetching:", url);
         console.log(
           "📥 Response status:",
           response.status,
@@ -89,9 +89,7 @@ function PendingPaymentContent() {
           setStatus("paid");
 
           setTimeout(() => {
-            router.push(
-              `/orders/${data.order_number}?token=${data.access_token}`
-            );
+            window.location.href = `/orders/processing?order_number=${data.order_number}&token=${data.access_token}`;
           }, 2000);
         } else if (data.payment_status === "pending") {
           setStatus("pending");

@@ -34,7 +34,6 @@ export default function RelatedProducts({ currentProductId }: RelatedProductsPro
         const response = await fetch('https://api.lux-store.eu/products/random?limit=8');
         if (response.ok) {
           const data = await response.json();
-          // Filter out the current product
           const filtered = data.filter((p: Product) => p.id !== currentProductId);
           setProducts(filtered.slice(0, 8));
         }
@@ -59,6 +58,25 @@ export default function RelatedProducts({ currentProductId }: RelatedProductsPro
       sku: product.sku,
       inStock: true,
     });
+
+    if (typeof window !== 'undefined') {
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      (window as any).dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          currency: 'EUR',
+          value: Number(product.base_price),
+          items: [{
+            item_id: String(product.id),
+            item_name: product.name,
+            item_brand: 'Luxury Brand',
+            item_category: undefined,
+            price: Number(product.base_price),
+            quantity: 1
+          }]
+        }
+      });
+    }
     
     setTimeout(() => {
       setAddingToCart(null);

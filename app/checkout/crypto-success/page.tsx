@@ -9,12 +9,12 @@ import Link from "next/link";
 function CryptoSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [txnId, setTxnId] = useState("");
+  const [orderId, setOrderId] = useState("");
 
   useEffect(() => {
-    const id = searchParams.get("txn_id");
+    const id = searchParams.get("orderId");
     if (id) {
-      setTxnId(id);
+      setOrderId(id);
     }
   }, [searchParams]);
 
@@ -41,16 +41,16 @@ function CryptoSuccessContent() {
             We're confirming your transaction on the blockchain
           </p>
 
-          {txnId && (
+          {orderId && (
             <div className="mb-10 rounded-2xl border border-black/10 bg-white p-8 shadow-xl">
               <div className="mb-4 flex items-center justify-center gap-2">
                 <Package className="h-6 w-6 text-black/60" />
                 <p className="font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
-                  Transaction ID
+                  Order ID
                 </p>
               </div>
               <code className="block rounded-xl bg-black/5 px-6 py-3 font-mono text-lg font-bold tracking-wide text-black">
-                {txnId}
+                {orderId}
               </code>
             </div>
           )}

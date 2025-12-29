@@ -19,7 +19,7 @@ interface PageProps {
 
 async function getProductBySlug(slug: string) {
   const res = await fetch(`https://api.lux-store.eu/products/slug/${slug}`, {
-    cache: 'no-store', // Always fetch fresh data
+    cache: 'no-store', 
   });
   
   if (!res.ok) {

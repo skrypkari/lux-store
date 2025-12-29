@@ -3,149 +3,136 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, ExternalLink, Clock, Bitcoin } from "lucide-react";
+import { Copy, Check, Clock, Bitcoin } from "lucide-react";
 import Image from "next/image";
 
-const CRYPTO_NAMES: { [key: string]: string } = {
-  ETH: "ETH",
-  ETH_BASE: "ETH (Base)",
-  BTC: "BTC",
-  LTC: "LTC",
-  DASH: "DASH",
-  TZEC: "ZEC",
-  DOGE: "DOGE",
-  BCH: "BCH",
-  XMR: "XMR",
-  USDT: "USDT (ERC-20)",
-  USDC: "USDC (ERC-20)",
-  USDC_BASE: "USDC (Base)",
-  SHIB: "SHIB",
-  APE: "APE",
-  BTT_TRX: "BTT (TRC-20)",
-  USDT_TRX: "USDT (TRC-20)",
-  TRX: "TRX",
-  BNB: "BNB",
-  BUSD: "BUSD (BEP-20)",
-  USDT_BSC: "USDT (BEP-20)",
-  USDС_BSC: "USDC (BEP-20)",
-  LB: "LB (BEP-20)",
-  ETC: "ETC",
-  TON: "TON",
-  USDT_TON: "USDT (TON)",
-  SOL: "SOL",
-  USDT_SOL: "USDT (SPL)",
-  USDC_SOL: "USDC (SPL)",
-};
-
-const NETWORK_NAMES: { [key: string]: string } = {
-  ETH: "Ethereum",
-  ETH_BASE: "Base Network",
-  BTC: "Bitcoin",
-  LTC: "Litecoin",
-  DASH: "Dash",
-  TZEC: "Zcash",
-  DOGE: "Dogecoin",
-  BCH: "Bitcoin Cash",
-  XMR: "Monero",
-  USDT: "Ethereum (ERC-20)",
-  USDC: "Ethereum (ERC-20)",
-  USDC_BASE: "Base Network",
-  SHIB: "Ethereum (ERC-20)",
-  APE: "Ethereum (ERC-20)",
-  BTT_TRX: "Tron (TRC-20)",
-  USDT_TRX: "Tron (TRC-20)",
-  TRX: "Tron",
-  BNB: "BSC",
-  BUSD: "BSC (BEP-20)",
-  USDT_BSC: "BSC (BEP-20)",
-  USDС_BSC: "BSC (BEP-20)",
-  LB: "BSC (BEP-20)",
-  ETC: "Ethereum Classic",
-  TON: "TON Network",
-  USDT_TON: "TON Network",
-  SOL: "Solana",
-  USDT_SOL: "Solana (SPL)",
-  USDC_SOL: "Solana (SPL)",
-};
+interface PaymentData {
+  track_id: string;
+  orderId: string;
+  address: string;
+  amount: number;
+  currency: string;
+  network: string;
+  status: string;
+  expired_at: number;
+  qr_code: string;
+  txs?: Array<{
+    address?: string;
+    amount?: number;
+    currency?: string;
+    network?: string;
+  }>;
+}
 
 function CryptoPaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [paymentData, setPaymentData] = useState<any>(null);
+  const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
   const [copied, setCopied] = useState<{ [key: string]: boolean }>({});
   const [timeLeft, setTimeLeft] = useState(0);
   const [status, setStatus] = useState<string>("pending");
 
-  const getCryptoName = (code: string) => {
-    return CRYPTO_NAMES[code] || code;
-  };
-
-  const getNetworkName = (code: string) => {
-    return NETWORK_NAMES[code] || code;
-  };
-
   useEffect(() => {
-    if (
-      paymentData &&
-      (paymentData.status === "completed" || paymentData.status === "paid")
-    ) {
+    if (paymentData && (paymentData.status === "paid" || paymentData.status === "manual_accept")) {
       const timeout = setTimeout(() => {
-        if (paymentData.orderId && paymentData.accessToken) {
-          router.push(
-            `/orders/${paymentData.orderId}?token=${paymentData.accessToken}`
-          );
+        if (paymentData.orderId) {
+          router.push(`/checkout/crypto-success?orderId=${paymentData.orderId}`);
         } else {
-          router.push("/checkout/success");
+          router.push("/checkout/crypto-success");
         }
-      }, 2000); // 2 секунды задержка для UX
+      }, 2000); 
       return () => clearTimeout(timeout);
     }
   }, [paymentData, router]);
 
-  const fetchPaymentData = () => {
-    const txnId = searchParams.get("txn_id");
-    if (!txnId) {
+  useEffect(() => {
+    const orderId = searchParams.get("orderId");
+    const trackId = searchParams.get("trackId");
+    const address = searchParams.get("address");
+    const amount = searchParams.get("amount");
+    const currency = searchParams.get("currency");
+    const network = searchParams.get("network");
+    const expiredAt = searchParams.get("expiredAt");
+    
+    if (!orderId || !trackId || !address) {
       router.push("/");
       return;
     }
-    fetch(`https://api.lux-store.eu/plisio/invoice/${txnId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch payment data");
-        return res.json();
-      })
-      .then((data) => {
-        setPaymentData(data);
-        setStatus(data.status);
 
-        const expiryTime = data.expire_utc * 1000;
-        const now = Date.now();
-        const diff = Math.floor((expiryTime - now) / 1000);
-        setTimeLeft(diff > 0 ? diff : 0);
+    setPaymentData({
+      track_id: trackId,
+      orderId: orderId,
+      address: address,
+      amount: parseFloat(amount || '0'),
+      currency: currency || '',
+      network: network || '',
+      status: 'waiting',
+      expired_at: parseInt(expiredAt || '0'),
+      qr_code: `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(address)}&size=256x256`,
+    });
+    setStatus('waiting');
+    
+    const expiryTime = parseInt(expiredAt || '0') * 1000;
+    const now = Date.now();
+    const diff = Math.floor((expiryTime - now) / 1000);
+    setTimeLeft(diff > 0 ? diff : 0);
+
+    fetch(`https://api.lux-store.eu/oxapay/payment/${trackId}`)
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.success && result.data) {
+          setPaymentData(prev => prev ? ({
+            ...prev,
+            ...result.data,
+            address: address, 
+            qr_code: prev.qr_code, 
+          }) : null);
+          setStatus(result.data.status);
+        }
       })
       .catch((error) => {
-        console.error("Failed to fetch payment data:", error);
-        router.push("/checkout/crypto-failed");
+        console.error("Failed to fetch OxaPay payment:", error);
       });
-  };
-
-  useEffect(() => {
-    fetchPaymentData();
   }, [searchParams, router]);
 
   useEffect(() => {
     if (!paymentData) return;
 
     if (
-      ["completed", "paid", "expired", "cancelled", "error"].includes(
-        paymentData.status
+      ["paid", "manual_accept", "refunded", "expired"].includes(
+        paymentData.status?.toLowerCase() || ""
       )
     )
       return;
+
     const interval = setInterval(() => {
-      fetchPaymentData();
-    }, 10000); // 10 секунд
+      const trackId = searchParams.get("trackId");
+      if (!trackId) return;
+
+      fetch(`https://api.lux-store.eu/oxapay/payment/${trackId}`)
+        .then((res) => res.json())
+        .then((result) => {
+          if (result.success && result.data) {
+            setPaymentData(prev => prev ? ({
+              ...prev,
+              ...result.data,
+              orderId: prev.orderId,
+              address: prev.address,
+              amount: prev.amount,
+              currency: prev.currency,
+              network: prev.network,
+              qr_code: prev.qr_code,
+            }) : null);
+            setStatus(result.data.status);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch OxaPay payment:", error);
+        });
+    }, 10000);
+    
     return () => clearInterval(interval);
-  }, [paymentData]);
+  }, [paymentData, searchParams]);
 
   useEffect(() => {
     if (timeLeft <= 0) return;
@@ -212,7 +199,7 @@ function CryptoPaymentContent() {
             </div>
             <div>
               <p className="font-satoshi text-sm font-bold text-blue-900">
-                Network: {getNetworkName(paymentData.currency)}
+                Network: {paymentData.network}
               </p>
               <p className="font-general-sans text-xs text-blue-700">
                 Make sure to send from the correct network
@@ -271,15 +258,13 @@ function CryptoPaymentContent() {
                 Wallet Address
               </p>
               <div className="mb-3 break-all rounded-lg bg-black/5 p-3 font-mono text-sm font-bold">
-                {paymentData.wallet_hash}
+                {paymentData.address}
               </div>
               <Button
                 size="sm"
                 variant="outline"
                 className="w-full gap-2"
-                onClick={() =>
-                  copyToClipboard(paymentData.wallet_hash, "address")
-                }
+                onClick={() => copyToClipboard(paymentData.address, "address")}
               >
                 {copied.address ? (
                   <>
@@ -300,16 +285,14 @@ function CryptoPaymentContent() {
                 Amount to Send
               </p>
               <p className="mb-1 font-mono text-3xl font-bold text-black">
-                {paymentData.invoice_total_sum}{" "}
-                {getCryptoName(paymentData.currency)}
+                {paymentData.amount}{" "}
+                {paymentData.currency?.toUpperCase()}
               </p>
               <Button
                 size="sm"
                 variant="outline"
                 className="w-full gap-2 mt-3"
-                onClick={() =>
-                  copyToClipboard(paymentData.invoice_total_sum, "amount")
-                }
+                onClick={() => copyToClipboard(paymentData.amount.toString(), "amount")}
               >
                 {copied.amount ? (
                   <>
@@ -323,22 +306,6 @@ function CryptoPaymentContent() {
                   </>
                 )}
               </Button>
-              <div className="mt-4 space-y-1 border-t border-black/10 pt-4 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-black/60">Invoice Amount:</span>
-                  <span className="font-semibold">
-                    {paymentData.invoice_sum}{" "}
-                    {getCryptoName(paymentData.currency)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-black/60">Service Fee:</span>
-                  <span className="font-semibold">
-                    {paymentData.invoice_commission}{" "}
-                    {getCryptoName(paymentData.currency)}
-                  </span>
-                </div>
-              </div>
             </div>
 
             <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
@@ -346,7 +313,7 @@ function CryptoPaymentContent() {
                 Payment Status
               </p>
 
-              {status === "completed" || status === "paid" ? (
+              {status === "paid" || status === "manual_accept" ? (
                 <div className="flex items-center gap-2">
                   <div className="rounded-full bg-green-500 p-1">
                     <Check className="h-5 w-5 text-white" />
@@ -355,7 +322,7 @@ function CryptoPaymentContent() {
                     Payment Confirmed
                   </p>
                 </div>
-              ) : status === "pending" || status === "pending internal" ? (
+              ) : status === "paying" ? (
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -364,7 +331,51 @@ function CryptoPaymentContent() {
                     </p>
                   </div>
                   <p className="text-sm text-black/60">
-                    Waiting for confirmations...
+                    Processing payment...
+                  </p>
+                </div>
+              ) : status === "underpaid" ? (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="rounded-full bg-orange-500 p-1">
+                      <Clock className="h-5 w-5 text-white" />
+                    </div>
+                    <p className="text-xl font-bold text-orange-600">
+                      Underpaid
+                    </p>
+                  </div>
+                  <p className="text-sm text-black/60">
+                    Partial payment received. Please send the remaining amount.
+                  </p>
+                </div>
+              ) : status === "refunding" ? (
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+                    <p className="text-xl font-bold text-purple-600">
+                      Refunding
+                    </p>
+                  </div>
+                  <p className="text-sm text-black/60">
+                    Refund in progress...
+                  </p>
+                </div>
+              ) : status === "refunded" ? (
+                <div className="flex items-center gap-2">
+                  <div className="rounded-full bg-purple-500 p-1">
+                    <Check className="h-5 w-5 text-white" />
+                  </div>
+                  <p className="text-2xl font-bold text-purple-600">
+                    Refunded
+                  </p>
+                </div>
+              ) : status === "expired" ? (
+                <div className="flex items-center gap-2">
+                  <div className="rounded-full bg-red-500 p-1">
+                    <Clock className="h-5 w-5 text-white" />
+                  </div>
+                  <p className="text-2xl font-bold text-red-600">
+                    Payment Expired
                   </p>
                 </div>
               ) : (
@@ -394,8 +405,8 @@ function CryptoPaymentContent() {
               <p>
                 Send{" "}
                 <strong>
-                  exactly {paymentData.invoice_total_sum}{" "}
-                  {getCryptoName(paymentData.currency)}
+                  exactly {paymentData.amount}{" "}
+                  {paymentData.currency?.toUpperCase()}
                 </strong>{" "}
                 to the address above
               </p>

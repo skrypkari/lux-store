@@ -44,6 +44,25 @@ export default function ProductActions({ inStock, product, disabled }: ProductAc
 
     const quantityToAdd = Math.min(quantity, remainingSpace);
     addToCart({ ...product, inStock }, quantityToAdd);
+
+    if (typeof window !== 'undefined') {
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      (window as any).dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          currency: 'EUR',
+          value: Number(product.price * quantityToAdd),
+          items: [{
+            item_id: String(product.id),
+            item_name: product.name,
+            item_brand: product.brand || undefined,
+            item_category: undefined,
+            price: Number(product.price),
+            quantity: Number(quantityToAdd)
+          }]
+        }
+      });
+    }
   };
 
   const handleBuyNow = () => {

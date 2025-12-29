@@ -4,8 +4,20 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Bitcoin, ArrowLeft, Loader2 } from "lucide-react";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Bitcoin, ArrowLeft, Loader2, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { 
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 
 export interface ApiResponse {
@@ -34,17 +46,55 @@ export interface Network {
   static_fixed_fee: number;
 }
 
+const cryptoEmojis: Record<string, string> = {
+  BTC: "🟠",
+  ETH: "🟣",
+  USDT: "🟢",
+  USDC: "🔵",
+  BNB: "🟡",
+  DOGE: "🟤",
+  POL: "🟠",
+  LTC: "⚪",
+  SOL: "🟣",
+  TRX: "🔴",
+  SHIB: "🟡",
+  TON: "🔵",
+  XMR: "⚫",
+  DAI: "🟢",
+  BCH: "🟠",
+  NOT: "🔵",
+  DOGS: "🟣",
+  XRP: "🔵",
+};
+
+interface CryptoOption {
+  value: string; 
+  cryptoSymbol: string; 
+  cryptoName: string; 
+  networkKey: string; 
+  networkName: string; 
+  network: Network;
+  displayLabel: string; 
+}
+
+const formatFee = (fee: number): string => {
+  if (fee === 0) return "0";
+  if (fee < 0.00001) return fee.toFixed(8).replace(/\.?0+$/, "");
+  if (fee < 0.01) return fee.toFixed(6).replace(/\.?0+$/, "");
+  if (fee < 1) return fee.toFixed(4).replace(/\.?0+$/, "");
+  return fee.toFixed(2).replace(/\.?0+$/, "");
+};
 
 function CryptoSelectionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(true);
-  const [selectedSymbol, setSelectedSymbol] = useState<string>("");
   const [availableCryptos, setAvailableCryptos] = useState<Currency[]>([]);
-  const selectedCurrency = availableCryptos.find(c => c.symbol === selectedSymbol);
-  const [selectedNetworkKey, setSelectedNetworkKey] = useState<string>("");
-  const selectedNetwork = selectedCurrency?.networks?.[selectedNetworkKey];
+  const [cryptoOptions, setCryptoOptions] = useState<CryptoOption[]>([]);
+  const [selectedOption, setSelectedOption] = useState<CryptoOption | null>(null);
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
 
 
   useEffect(() => {
@@ -69,6 +119,22 @@ function CryptoSelectionContent() {
           (currency) => currency.status === true
         );
         setAvailableCryptos(cryptos);
+
+        const options: CryptoOption[] = [];
+        cryptos.forEach((crypto) => {
+          Object.entries(crypto.networks).forEach(([networkKey, network]) => {
+            options.push({
+              value: `${crypto.symbol}-${networkKey}`,
+              cryptoSymbol: crypto.symbol,
+              cryptoName: crypto.name,
+              networkKey: networkKey,
+              networkName: network.name,
+              network: network,
+              displayLabel: `${crypto.symbol} (${network.name})`,
+            });
+          });
+        });
+        setCryptoOptions(options);
       } catch (error) {
         console.error("Error fetching cryptocurrencies:", error);
       } finally {
@@ -79,10 +145,65 @@ function CryptoSelectionContent() {
     fetchAvailableCryptos();
   }, []);
 
-  const onCurrencyChange = (value: string) => {
-    setSelectedSymbol(value);
-    setSelectedNetworkKey("");
-  }
+  const handleSelectOption = (option: CryptoOption) => {
+    setSelectedOption(option);
+    setOpen(false);
+  };
+
+  const handleContinue = async () => {
+    if (!selectedOption) {
+      toast({
+        title: "Please select a payment method",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://api.lux-store.eu/oxapay/create-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId: orderId,
+          cryptocurrency: selectedOption.cryptoSymbol,
+          network: selectedOption.networkKey,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        toast({
+          title: "Payment creation failed",
+          description: result.message || "Please try again",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Build URL with all payment data
+      const params = new URLSearchParams({
+        orderId: orderId,
+        trackId: result.data.track_id,
+        address: result.data.address,
+        amount: result.data.amount.toString(),
+        currency: result.data.currency,
+        network: result.data.network,
+        expiredAt: result.data.expired_at.toString(),
+      });
+
+      router.push(`/checkout/crypto-payment?${params.toString()}`);
+    } catch (error) {
+      console.error('Payment creation error:', error);
+      toast({
+        title: "Payment creation failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-12">
@@ -120,121 +241,100 @@ function CryptoSelectionContent() {
               <Loader2 className="h-6 w-6 animate-spin text-black/50" />
             </div>
           ) : (
-            <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.25)]">
-              <div className="flex flex-col gap-6">
-
-                <div className="flex items-start justify-between gap-6">
-                  <div>
-                    <h2 className="font-satoshi text-xl font-semibold tracking-tight">Payment currency</h2>
-                    <p className="mt-1 font-general-sans text-sm text-black/50">
-                      Select coin and network to generate an invoice
-                    </p>
-                  </div>
-
-                  {/* маленький бейдж справа */}
-                  <div className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs text-black/60">
-                    Secure checkout
-                  </div>
+            <div className="space-y-6">
+              <div className="flex items-start justify-between gap-6">
+                <div>
+                  <h2 className="font-satoshi text-xl font-semibold tracking-tight">Choose Payment Method</h2>
+                  <p className="mt-1 font-general-sans text-sm text-black/50">
+                    Select cryptocurrency and network
+                  </p>
                 </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-
-                  <div className="space-y-2">
-                    <label className="font-general-sans text-xs font-medium uppercase tracking-wide text-black/50">
-                      Cryptocurrency
-                    </label>
-
-                    <Select value={selectedSymbol} onValueChange={onCurrencyChange}>
-                      <SelectTrigger
-                        className="
-              !h-12 w-full rounded-xl border-black/10 bg-white px-4
-              shadow-sm transition
-              hover:border-black/20 hover:shadow-md
-              focus:ring-0 focus-visible:ring-0
-            "
-                      >
-                        <SelectValue placeholder="Select cryptocurrency" />
-                      </SelectTrigger>
-
-                      <SelectContent className="rounded-xl border-black/10 bg-white shadow-2xl">
-                        <SelectGroup>
-                          {availableCryptos.map((crypto) => (
-                            <SelectItem
-                              key={crypto.symbol}
-                              value={crypto.symbol}
-                              className="rounded-lg"
-                            >
-                              <div className="flex items-center justify-between gap-6">
-                                <div className="flex items-center gap-3">
-                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black/[0.06] text-xs font-semibold">
-                                    {crypto.symbol.slice(0, 2)}
-                                  </div>
-                                  <div className="leading-tight text-left">
-                                    <div className="font-medium">{crypto.name}</div>
-                                    <div className="text-xs text-black/50">{crypto.symbol}</div>
-                                  </div>
-                                </div>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-
-                    {selectedCurrency && (
-                      <div className="text-xs text-black/45">
-                        Available networks: {Object.keys(selectedCurrency.networks).length}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="font-general-sans text-xs font-medium uppercase tracking-wide text-black/50">
-                      Network
-                    </label>
-
-                    <Select
-                      value={selectedNetworkKey}
-                      onValueChange={setSelectedNetworkKey}
-                      disabled={!selectedCurrency}
-                    >
-                      <SelectTrigger
-                        className="
-              !h-12 w-full rounded-xl border-black/10 bg-white px-4
-              shadow-sm transition
-              hover:border-black/20 hover:shadow-md
-              disabled:cursor-not-allowed disabled:opacity-50
-              focus:ring-0 focus-visible:ring-0
-            "
-                      >
-                        <SelectValue placeholder={selectedCurrency ? "Select network" : "Select cryptocurrency first"} />
-                      </SelectTrigger>
-
-                      <SelectContent className="rounded-xl border-black/10 bg-white shadow-2xl">
-                        <SelectGroup>
-                          {selectedCurrency &&
-                            Object.entries(selectedCurrency.networks).map(([key, net]) => (
-                              <SelectItem key={key} value={key} className="rounded-lg">
-                                <div className="flex w-full items-center justify-between gap-6 text-left">
-                                  <div className="leading-tight text-left">
-                                    <div className="font-medium text-left">{net.name}</div>
-                                    <div className="text-xs text-black/50 text-left">{net.network}</div>
-                                  </div>
-
-                                  <div className="text-right text-xs text-black/55 text-left">
-                                    <div className="text-left">Fee: {net.withdraw_fee}</div>
-                                    <div className="text-left">Conf: {net.required_confirmations}</div>
-                                  </div>
-                                </div>
-                              </SelectItem>
-                            ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
+                <div className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs text-black/60">
+                  Secure checkout
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <label className="font-general-sans text-xs font-medium uppercase tracking-wide text-black/50">
+                  Payment Currency
+                </label>
+
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-full justify-between h-14 rounded-xl border-black/10 bg-white px-4 shadow-sm hover:border-black/20 hover:bg-white hover:shadow-md"
+                    >
+                      {selectedOption ? (
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-black/5 to-black/10 text-lg">
+                            {cryptoEmojis[selectedOption.cryptoSymbol] || "💎"}
+                          </div>
+                          <div className="text-left">
+                            <div className="font-satoshi font-semibold text-sm">
+                              {selectedOption.displayLabel}
+                            </div>
+                            <div className="font-general-sans text-xs text-black/50">
+                              Fee: {formatFee(selectedOption.network.withdraw_fee)}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="font-general-sans text-black/40">Select cryptocurrency...</span>
+                      )}
+                      <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                    <Command>
+                      <CommandInput 
+                        placeholder="Search cryptocurrency..." 
+                        className="font-general-sans"
+                      />
+                      <CommandEmpty className="py-6 text-center text-sm font-general-sans text-black/50">
+                        No cryptocurrency found.
+                      </CommandEmpty>
+                      <CommandGroup className="max-h-[300px] overflow-auto">
+                        {cryptoOptions.map((option) => (
+                          <CommandItem
+                            key={option.value}
+                            value={`${option.cryptoSymbol} ${option.cryptoName} ${option.networkName} ${option.network.network}`}
+                            onSelect={() => handleSelectOption(option)}
+                            className="cursor-pointer"
+                          >
+                            <div className="flex items-center gap-3 w-full">
+                              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-black/5 to-black/10 text-base shrink-0">
+                                {cryptoEmojis[option.cryptoSymbol] || "💎"}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-satoshi font-semibold text-sm leading-tight">
+                                  {option.displayLabel}
+                                </div>
+                                <div className="font-general-sans text-xs text-black/50 leading-tight mt-0.5">
+                                  {option.network.network}
+                                </div>
+                              </div>
+                              <div className="text-xs text-black/50 font-general-sans">
+                                Fee: {formatFee(option.network.withdraw_fee)}
+                              </div>
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <Button
+                onClick={handleContinue}
+                disabled={!selectedOption}
+                className="w-full h-12 rounded-xl bg-black text-white hover:bg-black/90 font-satoshi font-semibold"
+              >
+                Continue to Payment
+              </Button>
             </div>
           )}
         </div>

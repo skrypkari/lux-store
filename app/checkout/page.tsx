@@ -654,7 +654,7 @@ export default function CheckoutPage() {
             throw new Error("Invalid payment URL received from Stripe");
           }
 
-          window.location.href = paymentData.payment_url;
+          window.location.href = `/checkout/redirecting?url=${encodeURIComponent(paymentData.payment_url)}`;
           return;
         } else {
           router.push(`/checkout/payment?id=${orderId}`);
@@ -682,7 +682,7 @@ export default function CheckoutPage() {
           throw new Error("Invalid payment URL received from AmPay");
         }
 
-        window.location.href = paymentData.redirect_url;
+        window.location.href = `/checkout/redirecting?url=${encodeURIComponent(paymentData.redirect_url)}`;
       } else if (paymentMethod === "open_banking") {
         const paymentResponse = await fetch(
           `https://api.lux-store.eu/orders/${orderId}/cointopay-payment`,
@@ -692,7 +692,7 @@ export default function CheckoutPage() {
         );
         const paymentData = await paymentResponse.json();
         const paymentUrl = paymentData.paymentUrl + "&alternative=false";
-        window.location.href = paymentUrl;
+        window.location.href = `/checkout/redirecting?url=${encodeURIComponent(paymentUrl)}`;
       } else if (paymentMethod === "sepa") {
         router.push(`/checkout/sepa?order_id=${orderId}`);
       } else if (paymentMethod === "ach_wire") {

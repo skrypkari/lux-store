@@ -549,6 +549,25 @@ function CategoryPageContent({ params, searchParams }: PageProps) {
       inStock: product.inStock || false
     });
 
+    if (typeof window !== 'undefined') {
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      (window as any).dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          currency: 'EUR',
+          value: Number(product.price || 0),
+          items: [{
+            item_id: String(product.id),
+            item_name: product.name,
+            item_brand: product.brand || undefined,
+            item_category: undefined,
+            price: Number(product.price || 0),
+            quantity: 1
+          }]
+        }
+      });
+    }
+
     setTimeout(() => {
       setAddingToCart(prev => ({ ...prev, [product.id]: false }));
     }, 1000);

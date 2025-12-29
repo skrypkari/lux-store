@@ -31,6 +31,7 @@ export default function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [totalResults, setTotalResults] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [categories, setCategories] = useState<Array<{ name: string; slug: string }>>([]);
@@ -92,6 +93,7 @@ export default function SearchBar() {
   useEffect(() => {
     if (query.length === 0) {
       setResults([]);
+      setTotalResults(0);
       setIsSearching(false);
       return;
     }
@@ -109,6 +111,7 @@ export default function SearchBar() {
         .then(res => res.json())
         .then(data => {
           setResults(data.products || []);
+          setTotalResults(data.total || 0);
           setIsSearching(false);
         })
         .catch(err => {
@@ -128,6 +131,7 @@ export default function SearchBar() {
     setIsOpen(false);
     setQuery("");
     setResults([]);
+    setTotalResults(0);
   };
 
   const trendingSearches = ["Hermès", "Chanel", "Rolex", "Cartier", "Hermès Birkin", "Hermès Kelly"];
@@ -237,7 +241,7 @@ export default function SearchBar() {
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-sm text-muted-foreground">
-                      Found <span className="font-semibold text-foreground">{results.length}</span> results
+                      Found <span className="font-semibold text-foreground">{totalResults.toLocaleString()}</span> results
                     </p>
                     <Link
                       href={`/search?q=${encodeURIComponent(query)}`}
