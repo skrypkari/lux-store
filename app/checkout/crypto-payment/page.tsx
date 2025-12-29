@@ -87,8 +87,8 @@ function CryptoPaymentContent() {
           setPaymentData(prev => prev ? ({
             ...prev,
             ...result.data,
-            orderId: prev.orderId,
-            token: prev.token,
+            orderId: result.data.orderId || prev.orderId,
+            token: result.data.token || prev.token,
             address: address, 
             amount: parseFloat(amount || '0'),
             currency: currency || '',
@@ -123,8 +123,8 @@ function CryptoPaymentContent() {
             setPaymentData(prev => prev ? ({
               ...prev,
               ...result.data,
-              orderId: prev.orderId,
-              token: prev.token,
+              orderId: result.data.orderId || prev.orderId,
+              token: result.data.token || prev.token,
               address: prev.address,
               amount: prev.amount,
               currency: prev.currency,
