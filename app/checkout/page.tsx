@@ -325,7 +325,7 @@ export default function CheckoutPage() {
     fetch("https://api.lux-store.eu/ach/details")
       .then((res) => res.json())
       .then((data) => {
-        setAchAccountAvailable(!!data.accountNumber);
+        setAchAccountAvailable(!!data.bank.accountNumber);
       })
       .catch(() => {
         setAchAccountAvailable(false);
