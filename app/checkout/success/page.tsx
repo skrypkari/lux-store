@@ -3,6 +3,7 @@
 declare global {
   interface Window {
     dataLayer?: any[];
+    __purchaseFired?: boolean;
   }
 }
 
@@ -43,6 +44,38 @@ function SuccessPageContent() {
       router.push("/");
     }
   }, [searchParams, router, clearCart]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && orderData && orderId && !window.__purchaseFired) {
+      window.__purchaseFired = true;
+      
+      try {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'purchase',
+          ecommerce: {
+            transaction_id: orderId,
+            value: orderData.total || 0,
+            currency: 'EUR',
+            shipping: orderData.shipping || 0,
+            tax: 0,
+            coupon: orderData.promo_code || undefined,
+            items: (orderData.items || []).map((item: any) => ({
+              item_id: item.sku || String(item.product_id),
+              item_name: item.product_name,
+              item_brand: item.brand || undefined,
+              item_category: undefined,
+              price: Number(item.price),
+              quantity: Number(item.quantity)
+            }))
+          }
+        });
+        console.log("Purchase event sent to GTM");
+      } catch (error) {
+        console.error("Failed to send purchase event:", error);
+      }
+    }
+  }, [orderData, orderId]);
 
   if (!orderId || !accessToken) {
     return null;
@@ -85,35 +118,6 @@ function SuccessPageContent() {
             className="gap-2 bg-black px-10 py-6 text-base font-bold shadow-xl hover:bg-black/90"
             onClick={(e) => {
               e.preventDefault();
-              
-              // Send purchase event to GTM
-              if (typeof window !== "undefined" && orderData) {
-                try {
-                  window.dataLayer = window.dataLayer || [];
-                  window.dataLayer.push({
-                    event: 'purchase',
-                    ecommerce: {
-                      transaction_id: orderId,
-                      value: orderData.total || 0,
-                      currency: 'EUR',
-                      shipping: orderData.shipping || 0,
-                      tax: 0,
-                      coupon: orderData.promo_code || undefined,
-                      items: (orderData.items || []).map((item: any) => ({
-                        item_id: item.sku || String(item.product_id),
-                        item_name: item.product_name,
-                        item_brand: item.brand || undefined,
-                        item_category: undefined,
-                        price: Number(item.price),
-                        quantity: Number(item.quantity)
-                      }))
-                    }
-                  });
-                } catch (error) {
-                  console.error("Failed to send purchase event:", error);
-                }
-              }
-              
               window.location.href = `/orders/${orderId}?token=${accessToken}`;
             }}
           >

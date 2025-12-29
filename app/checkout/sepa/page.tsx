@@ -19,6 +19,7 @@ interface SepaBankDetails {
   accountName: string;
   bankName: string;
   bankAddress: string;
+  reference?: string;
 }
 
 interface OrderInfo {
@@ -303,16 +304,16 @@ function SepaPaymentContent() {
                 <p className="text-sm font-semibold text-amber-900 mb-1">
                   Important: Payment Reference
                 </p>
-                <p className="font-mono font-bold text-lg mb-2">{orderId}</p>
+                <p className="font-mono font-bold text-lg mb-2">{bankDetails.reference || orderId}</p>
                 <p className="text-sm text-amber-800">
-                  Please use this order ID as your payment reference. Do NOT
+                  Please use this as your payment reference. Do NOT
                   change or modify it.
                 </p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => orderId && copyToClipboard(orderId, "reference")}
+                onClick={() => copyToClipboard(bankDetails.reference || orderId || "", "reference")}
               >
                 {copied.reference ? (
                   <Check className="h-4 w-4" />

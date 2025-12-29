@@ -56,8 +56,7 @@ function CryptoPaymentContent() {
     const amount = searchParams.get("amount");
     const currency = searchParams.get("currency");
     const network = searchParams.get("network");
-    const expiredAt = searchParams.get("expiredAt");
-    
+    const expiredAt = searchParams.get("expiredAt");    
     if (!orderId || !trackId || !address) {
       router.push("/");
       return;
