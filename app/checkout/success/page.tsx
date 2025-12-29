@@ -1,5 +1,11 @@
 "use client";
 
+declare global {
+  interface Window {
+    dataLayer?: any[];
+  }
+}
+
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -12,6 +18,7 @@ function SuccessPageContent() {
   const searchParams = useSearchParams();
   const [orderId, setOrderId] = useState("");
   const [accessToken, setAccessToken] = useState("");
+  const [orderData, setOrderData] = useState<any>(null);
   const { clearCart } = useCart();
 
   useEffect(() => {
@@ -21,6 +28,15 @@ function SuccessPageContent() {
     if (id && token) {
       setOrderId(id);
       setAccessToken(token);
+
+      fetch(`https://api.lux-store.eu/orders/${id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setOrderData(data);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch order details:", error);
+        });
 
       clearCart();
     } else {
@@ -34,7 +50,7 @@ function SuccessPageContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-[#FEFEFE] to-[#FAFAFA] py-20">
-      <div className="container mx-auto max-w-3xl px-4">
+      <div className="container mx-auto max-w-2xl px-4">
         <div className="text-center">
           <div className="mb-8 flex justify-center">
             <div className="relative">
@@ -45,190 +61,65 @@ function SuccessPageContent() {
             </div>
           </div>
 
-          <h1 className="mb-4 font-satoshi text-5xl font-bold text-black">
-            Payment Successful!
+          <h1 className="mb-8 font-satoshi text-5xl font-bold text-black">
+            Payment Success
           </h1>
-          <p className="mb-2 font-general-sans text-xl text-black/70">
-            Thank you for your luxury purchase
-          </p>
-          <p className="mb-8 font-general-sans text-black/60">
-            Your order has been confirmed and is being processed
-          </p>
 
-          <div className="mb-10 rounded-2xl border border-black/10 bg-white p-8 shadow-xl">
-            <div className="mb-4 flex items-center justify-center gap-2">
-              <Package className="h-6 w-6 text-black/60" />
-              <p className="font-satoshi text-sm font-bold uppercase tracking-wide text-black/70">
-                Order Confirmation
-              </p>
-            </div>
-            <p className="mb-2 font-general-sans text-sm text-black/60">
-              Your Order ID
+          <div className="mb-10 rounded-2xl border border-black/10 bg-white p-10 shadow-xl">
+            <p className="font-general-sans text-lg leading-relaxed text-black/80">
+              Thank you for your purchase with <span className="font-semibold">LUX STORE</span>.
             </p>
-            <div className="mb-4 flex items-center justify-center gap-3">
-              <code className="rounded-xl bg-black/5 px-6 py-3 font-mono text-2xl font-bold tracking-wide text-black">
-                {orderId}
-              </code>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  navigator.clipboard.writeText(orderId);
-                }}
-                className="h-12 w-12"
-              >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                  />
-                </svg>
-              </Button>
-            </div>
-            <Button
-              variant="link"
-              className="gap-2 font-semibold"
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.href = `/orders/${orderId}?token=${accessToken}`;
-              }}
-            >
-              View Order Details
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="mb-10 flex items-center justify-center gap-4">
-            <div className="h-px w-20 bg-gradient-to-r from-transparent to-black/20" />
-            <div className="h-2 w-2 rounded-full bg-black/20" />
-            <div className="h-px w-20 bg-gradient-to-l from-transparent to-black/20" />
-          </div>
-
-          <div className="mb-10 text-left">
-            <h2 className="mb-6 text-center font-satoshi text-2xl font-bold">
-              What Happens Next?
-            </h2>
-            <div className="space-y-4">
-              <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/10">
-                  <CheckCircle2 className="h-6 w-6 text-black/60" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">
-                    Payment Confirmed
-                  </h3>
-                  <p className="font-general-sans text-sm text-black/70">
-                    Your payment has been successfully processed and your order
-                    is confirmed.
-                  </p>
-                  <p className="mt-2 font-general-sans text-xs text-black/50">
-                    ✓ Current Status
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/10">
-                  <Mail className="h-6 w-6 text-black/60" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">
-                    Email Confirmation
-                  </h3>
-                  <p className="font-general-sans text-sm text-black/70">
-                    We'll send you an email confirmation with your order details
-                    and receipt within the next few minutes.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/10">
-                  <Package className="h-6 w-6 text-black/60" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">
-                    Order Processing
-                  </h3>
-                  <p className="font-general-sans text-sm text-black/70">
-                    Your order is being prepared for shipment. This typically
-                    takes 1-2 business days.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-lg">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-black/10">
-                  <Truck className="h-6 w-6 text-black/60" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="mb-1 font-satoshi text-lg font-bold">
-                    Tracking Information
-                  </h3>
-                  <p className="font-general-sans text-sm text-black/70">
-                    Once your order ships, we'll email you the tracking number
-                    so you can follow your package every step of the way.
-                  </p>
-                  <p className="mt-2 font-general-sans text-xs text-black/50">
-                    Expected delivery: 20-35 days
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center gap-6">
-            <Link href="/store/all">
-              <Button
-                size="lg"
-                className="gap-2 bg-black px-10 py-6 text-base font-bold shadow-xl hover:bg-black/90"
-              >
-                Continue Shopping
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-
-            <Link href="/">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 px-10 py-6 text-base font-semibold"
-              >
-                Return to Home
-              </Button>
-            </Link>
-          </div>
-
-          <div className="mt-10 rounded-2xl border border-black/10 bg-gradient-to-br from-[#FAFAFA] via-white to-[#F5F5F5] p-6">
-            <p className="mb-3 font-satoshi text-sm font-bold">
-              Need Assistance?
+            <p className="mt-6 font-general-sans text-lg leading-relaxed text-black/80">
+              Your payment has been successfully received, and your order is now being carefully prepared with the utmost attention. Our team is overseeing every detail to ensure a seamless and refined delivery experience.
             </p>
-            <p className="mb-4 font-general-sans text-sm text-black/60">
-              Our customer support team is here to help with any questions about
-              your order.
+            <p className="mt-6 font-general-sans text-lg leading-relaxed text-black/80">
+              You will receive a confirmation email shortly with all relevant order details. Should you require any assistance at any stage, our Concierge Service remains at your full disposal.
             </p>
-            <Link href="/contact">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 border-black/20 font-semibold"
-              >
-                Contact Support
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+            <p className="mt-6 font-general-sans text-lg leading-relaxed text-black/80">
+              We sincerely appreciate your trust and look forward to delivering an exceptional experience.
+            </p>
           </div>
 
-          <p className="mt-8 font-general-sans text-xs text-black/40">
-            A confirmation email has been sent to your registered email address
-          </p>
+          <Button
+            size="lg"
+            className="gap-2 bg-black px-10 py-6 text-base font-bold shadow-xl hover:bg-black/90"
+            onClick={(e) => {
+              e.preventDefault();
+              
+              // Send purchase event to GTM
+              if (typeof window !== "undefined" && orderData) {
+                try {
+                  window.dataLayer = window.dataLayer || [];
+                  window.dataLayer.push({
+                    event: 'purchase',
+                    ecommerce: {
+                      transaction_id: orderId,
+                      value: orderData.total || 0,
+                      currency: 'EUR',
+                      shipping: orderData.shipping || 0,
+                      tax: 0,
+                      coupon: orderData.promo_code || undefined,
+                      items: (orderData.items || []).map((item: any) => ({
+                        item_id: item.sku || String(item.product_id),
+                        item_name: item.product_name,
+                        item_brand: item.brand || undefined,
+                        item_category: undefined,
+                        price: Number(item.price),
+                        quantity: Number(item.quantity)
+                      }))
+                    }
+                  });
+                } catch (error) {
+                  console.error("Failed to send purchase event:", error);
+                }
+              }
+              
+              window.location.href = `/orders/${orderId}?token=${accessToken}`;
+            }}
+          >
+            View Your Order
+            <ArrowRight className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </div>

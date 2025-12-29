@@ -9,6 +9,7 @@ import Image from "next/image";
 interface PaymentData {
   track_id: string;
   orderId: string;
+  token?: string;
   address: string;
   amount: number;
   currency: string;
@@ -35,8 +36,10 @@ function CryptoPaymentContent() {
   useEffect(() => {
     if (paymentData && (paymentData.status === "paid" || paymentData.status === "manual_accept")) {
       const timeout = setTimeout(() => {
-        if (paymentData.orderId) {
-          router.push(`/checkout/crypto-success?orderId=${paymentData.orderId}`);
+        if (paymentData.orderId && paymentData.token) {
+          router.push(`/checkout/success?orderId=${paymentData.orderId}&token=${paymentData.token}`);
+        } else if (paymentData.orderId) {
+          router.push(`/checkout/success?orderId=${paymentData.orderId}`);
         } else {
           router.push("/checkout/crypto-success");
         }
@@ -47,6 +50,7 @@ function CryptoPaymentContent() {
 
   useEffect(() => {
     const orderId = searchParams.get("orderId");
+    const token = searchParams.get("token");
     const trackId = searchParams.get("trackId");
     const address = searchParams.get("address");
     const amount = searchParams.get("amount");
@@ -62,6 +66,7 @@ function CryptoPaymentContent() {
     setPaymentData({
       track_id: trackId,
       orderId: orderId,
+      token: token || undefined,
       address: address,
       amount: parseFloat(amount || '0'),
       currency: currency || '',
@@ -117,6 +122,7 @@ function CryptoPaymentContent() {
               ...prev,
               ...result.data,
               orderId: prev.orderId,
+              token: prev.token,
               address: prev.address,
               amount: prev.amount,
               currency: prev.currency,

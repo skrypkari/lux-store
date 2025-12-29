@@ -89,7 +89,7 @@ function PendingPaymentContent() {
           setStatus("paid");
 
           setTimeout(() => {
-            window.location.href = `/orders/processing?order_number=${data.order_number}&token=${data.access_token}`;
+            window.location.href = `/checkout/success?orderId=${data.order_number}&token=${data.access_token}`;
           }, 2000);
         } else if (data.payment_status === "pending") {
           setStatus("pending");

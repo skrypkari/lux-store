@@ -3,6 +3,7 @@
 declare global {
   interface Window {
     gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
   }
 }
 
@@ -436,6 +437,27 @@ export default function CheckoutPage() {
 
     try {
       setIsProcessing(true);
+
+      // Send begin_checkout event to GTM
+      if (typeof window !== "undefined") {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'begin_checkout',
+          ecommerce: {
+            currency: 'EUR',
+            value: total,
+            items: cartItems.map((p) => ({
+              item_id: String(p.id),
+              item_name: p.name,
+              item_brand: p.brand || undefined,
+              item_category: undefined,
+              price: Number(p.price),
+              quantity: Number(p.quantity)
+            }))
+          }
+        });
+      }
+
       const shippingData = JSON.parse(
         localStorage.getItem("checkoutShipping") || "{}"
       );
