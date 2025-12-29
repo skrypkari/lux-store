@@ -1044,6 +1044,8 @@ export default function CheckoutPage() {
               </div>
             )}
 
+            
+
             {currentStep === 2 && (
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-xl sm:p-8">
                 <div className="mb-6 flex items-center gap-3">

@@ -46,25 +46,25 @@ export interface Network {
   static_fixed_fee: number;
 }
 
-const cryptoEmojis: Record<string, string> = {
-  BTC: "🟠",
-  ETH: "🟣",
-  USDT: "🟢",
-  USDC: "🔵",
-  BNB: "🟡",
-  DOGE: "🟤",
-  POL: "🟠",
-  LTC: "⚪",
-  SOL: "🟣",
-  TRX: "🔴",
-  SHIB: "🟡",
-  TON: "🔵",
-  XMR: "⚫",
-  DAI: "🟢",
-  BCH: "🟠",
-  NOT: "🔵",
-  DOGS: "🟣",
-  XRP: "🔵",
+const cryptoLogos: Record<string, string> = {
+  BTC: "/bitcoin.svg",
+  ETH: "/ethereum.svg",
+  USDT: "/tether.svg",
+  USDC: "/usd-coin.svg",
+  BNB: "/bnb.svg",
+  DOGE: "/dogecoin.svg",
+  POL: "/polygon.svg",
+  LTC: "/litecoin.svg",
+  SOL: "/solana.svg",
+  TRX: "/tron.svg",
+  SHIB: "/shiba-inu.svg",
+  TON: "/ton.svg",
+  XMR: "/monero.svg",
+  DAI: "/dai.svg",
+  BCH: "/bitcoin-cash.svg",
+  NOT: "/notcoin.svg",
+  DOGS: "/dogs.svg",
+  XRP: "/ripple.svg",
 };
 
 interface CryptoOption {
@@ -114,6 +114,8 @@ function CryptoSelectionContent() {
         if (!response.ok) {
           throw new Error("Failed to fetch cryptocurrencies");
         }
+
+
         const result: ApiResponse = await response.json();
         const cryptos = Object.values(result.data).filter(
           (currency) => currency.status === true
@@ -269,8 +271,12 @@ function CryptoSelectionContent() {
                     >
                       {selectedOption ? (
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-black/5 to-black/10 text-lg">
-                            {cryptoEmojis[selectedOption.cryptoSymbol] || "💎"}
+                          <div className="flex h-8 w-8 items-center justify-center">
+                            <img 
+                              src={cryptoLogos[selectedOption.cryptoSymbol] || "/bitcoin.svg"} 
+                              alt={selectedOption.cryptoSymbol}
+                              className="h-full w-full object-contain rounded-md"
+                            />
                           </div>
                           <div className="text-left">
                             <div className="font-satoshi font-semibold text-sm">
@@ -305,8 +311,12 @@ function CryptoSelectionContent() {
                             className="cursor-pointer"
                           >
                             <div className="flex items-center gap-3 w-full">
-                              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-black/5 to-black/10 text-base shrink-0">
-                                {cryptoEmojis[option.cryptoSymbol] || "💎"}
+                              <div className="flex h-8 w-8 items-center justify-center shrink-0">
+                                <img 
+                                  src={cryptoLogos[option.cryptoSymbol] || "/bitcoin.svg"} 
+                                  alt={option.cryptoSymbol}
+                                  className="h-full w-full object-contain rounded-md"
+                                />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="font-satoshi font-semibold text-sm leading-tight">
