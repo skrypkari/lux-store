@@ -88,6 +88,8 @@ function CryptoPaymentContent() {
           setPaymentData(prev => prev ? ({
             ...prev,
             ...result.data,
+            orderId: prev.orderId,
+            token: prev.token,
             address: address, 
             qr_code: prev.qr_code, 
           }) : null);

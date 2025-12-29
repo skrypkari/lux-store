@@ -44,8 +44,13 @@ function SuccessPageContent() {
         });
 
       clearCart();
-    } else if (!hasFetched) {
-      router.push("/");
+    } else {
+      const timeout = setTimeout(() => {
+        if (!searchParams.get("orderId") || !searchParams.get("token")) {
+          router.push("/");
+        }
+      }, 1000);
+      return () => clearTimeout(timeout);
     }
   }, [searchParams]);
 
