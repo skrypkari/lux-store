@@ -7,6 +7,8 @@ export const ORDER_STATUSES = {
   ON_ITS_WAY: 'On Its Way to You',
   DELIVERED: 'Delivered',
   PAYMENT_FAILED: 'Payment Failed',
+  REFUND_INITIATED: 'Refund Initiated',
+  REFUND_COMPLETED: 'Refund Completed',
   CLOSED: 'Order Closed',
 } as const;
 
@@ -27,6 +29,10 @@ export const ORDER_STATUS_DESCRIPTIONS = {
     'Your order has been successfully delivered. We hope you enjoy your new piece, and our concierge team remains at your service should you need any assistance.',
   [ORDER_STATUSES.PAYMENT_FAILED]:
     'Unfortunately, your payment could not be completed. You may try again at your convenience, and our concierge team will gladly assist you should you need guidance.',
+  [ORDER_STATUSES.REFUND_INITIATED]:
+    'The refund process has been successfully initiated. Please note that processing a refund may take up to 14 business days and in some cases up to 30 days. The refund will be issued via the original payment method. We appreciate your patience while the transaction is being completed.',
+  [ORDER_STATUSES.REFUND_COMPLETED]:
+    'The refund has been successfully completed. We sincerely thank you for choosing LUX STORE and regret that this purchase did not meet your expectations. Your funds have been returned via the original payment method. Should you wish to explore our collection again in the future, our Concierge Service will be delighted to assist you.',
   [ORDER_STATUSES.CLOSED]:
     'Your order has been closed. If this was done in error or if you wish to place a new request, our concierge team is always here to assist you.',
 } as const;
