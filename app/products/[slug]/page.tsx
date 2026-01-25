@@ -177,10 +177,12 @@ export default async function ProductPage({ params }: PageProps) {
     details: productAttributes,
     description: fullDescription,
     features: [
-      "100% Authentic Guaranteed",
-      "Comes with original dust bag",
-      "Authentication certificate",
-      "Secure packaging and shipping",
+      "Full original brand set",
+      "Original brand packaging",
+      "Official international brand warranty",
+      "Store-issued invoice & waybill",
+      "Secure transit packaging",
+      "Fully insured delivery",
     ],
     specifications: specifications,
   };
@@ -476,7 +478,7 @@ export default async function ProductPage({ params }: PageProps) {
             
             <div className="border rounded-lg p-6 bg-card">
               <h3 className="font-semibold mb-4">What's Included</h3>
-              <ul className="space-y-2">
+              <ul className="grid lg:grid-cols-2 gap-3">
                 {product.features.map((feature, index) => (
                   <li key={index} className="flex items-start gap-2 text-sm">
                     <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
